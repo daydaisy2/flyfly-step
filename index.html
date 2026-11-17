@@ -145,6 +145,20 @@
   .back{align-self:flex-start;display:flex;align-items:center;gap:5px;padding:6px 12px 6px 8px;border-radius:999px;
     background:rgba(255,255,255,.6);font-size:11.5px;font-weight:900;color:#5D5A46;letter-spacing:-.02em}
   .dhead{gap:8px}
+  .ov-lab{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:900;color:#8F8A73;
+    letter-spacing:-.02em;margin-bottom:3px}
+  .mapbtn{display:flex;align-items:center;gap:8px;width:100%;height:46px;border-radius:14px;background:var(--cream);
+    border:1.5px solid #E7DDBE;padding:0 13px;font-size:12.5px;font-weight:900;color:var(--navy);
+    text-decoration:none;letter-spacing:-.02em;line-height:1.2}
+  .mapbtn .mg{font-size:16px;line-height:1;flex:0 0 auto}
+  .mapbtn .mt{flex:1 1 auto;min-width:0;text-align:left}
+  .mapbtn .mx{margin-left:auto;flex:0 0 auto;font-size:10px;font-weight:800;color:#A29C84}
+  .mapbtn:active{background:#FFF8DF}
+  .maprow{display:flex;gap:6px}
+  .maprow .mapbtn{flex:1 1 0;min-width:0}
+  .mapbtn.sm{height:36px;border-radius:11px;background:#fff;font-size:11px;border-color:var(--cream-line)}
+  .mapbtn.sm .mg{font-size:13px}
+  .mapbtn.sm .mt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dh-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
   .dh-name{margin:0;font-size:20px;font-weight:900;letter-spacing:-.04em;color:var(--navy);line-height:1.22}
   .dh-meta{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:-.02em}
@@ -314,6 +328,101 @@
   .shake{animation:shake .34s}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
+  /* ============ 임장 도장 ============ */
+  .stamps{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .stamp{display:inline-flex;align-items:center;gap:5px;border:2px solid #BF3B2E;border-radius:9px;
+    padding:2px 7px 2px 5px;color:#BF3B2E;background:rgba(191,59,46,.05);transform:rotate(-4deg)}
+  .stamp .si{border:1px solid rgba(191,59,46,.45);border-radius:6px;padding:2px 6px;display:flex;align-items:baseline;gap:4px}
+  .stamp b{font-size:11.5px;font-weight:900;letter-spacing:-.03em;line-height:1.15}
+  .stamp i{font-style:normal;font-size:9px;font-weight:900;opacity:.82;letter-spacing:-.01em}
+  .stamp .paw{font-size:12px;line-height:1}
+  .stamp-btn{height:29px;border-radius:10px;background:#fff;border:1.5px dashed #D9CF9E;color:#8F8A73;
+    font-size:10.5px;font-weight:900;padding:0 10px;letter-spacing:-.02em;display:inline-flex;align-items:center;gap:4px}
+  .stamp-btn.on{border-style:solid;border-color:#BF3B2E;color:#BF3B2E;background:#FDF1EF}
+  .cx-visit{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .cx-visit .cnt{font-size:10px;font-weight:900;color:#8F8A73;letter-spacing:-.03em}
+  .cx-visit .cnt b{color:var(--navy)}
+
+  /* ============ 매물 · 자금 세팅 ============ */
+  .lsts{display:flex;flex-direction:column;gap:6px}
+  .lst{background:#fff;border-radius:14px;padding:9px 10px;display:flex;flex-direction:column;gap:6px;
+    border:1px solid var(--cream-line)}
+  .lst-h{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+  .lst-n{display:block;font-size:12.5px;font-weight:900;color:var(--navy);letter-spacing:-.03em;line-height:1.3}
+  .lst-loc{display:block;font-size:9.5px;font-weight:800;color:#A29C84;letter-spacing:-.02em;margin-top:1px}
+  .lstspec{display:grid;grid-template-columns:1fr 1fr;gap:2px 8px}
+  .lstspec .sp .k{font-size:8.5px}
+  .lstspec .sp .v{font-size:10.5px}
+  .seed{background:var(--cream);border-radius:11px;padding:7px 9px;display:flex;flex-direction:column;gap:3px}
+  .seed-h{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:1px}
+  .seed-h .t{font-size:9.5px;font-weight:900;color:#8F8A73;letter-spacing:-.02em}
+  .seed-h .pill{font-size:9px;padding:2px 6px}
+  .srow{display:flex;align-items:baseline;gap:5px}
+  .srow .k{flex:0 0 auto;width:32px;font-size:9.5px;font-weight:900;color:#8F8A73;letter-spacing:-.03em}
+  .srow .v{flex:1 1 auto;font-size:11.5px;font-weight:900;color:var(--ink);letter-spacing:-.03em}
+  .srow .x{flex:0 0 auto;font-size:9px;font-weight:800;color:#A29C84;letter-spacing:-.02em}
+  .srow.loan .v{color:#2A2694}
+  .srow.cap .v{color:var(--green)}
+  .srow.red .v{color:var(--red)}
+  .srow.fee .k{width:52px}
+  .srow hr{display:none}
+  .sdiv{height:1px;background:#E8DFC4;margin:1px 0}
+  .total{display:flex;align-items:center;justify-content:space-between;gap:8px;
+    background:linear-gradient(150deg,#2B2799,#1E1B7A);color:#fff;border-radius:12px;padding:8px 11px;
+    box-shadow:0 7px 14px rgba(30,27,122,.18)}
+  .total .tk{font-size:9.5px;font-weight:900;color:#CFCBF3;letter-spacing:-.02em;line-height:1.3}
+  .total .tk span{display:block;font-size:8px;font-weight:800;color:#A9A4E6;letter-spacing:-.01em;margin-top:1px}
+  .total .tv{font-size:15.5px;font-weight:900;letter-spacing:-.04em;color:#FFE680}
+  .warnline{font-size:9.5px;font-weight:800;color:#B3261E;background:#FBEAE8;border-radius:9px;padding:6px 8px;
+    letter-spacing:-.02em;line-height:1.4}
+  .lst-empty{font-size:10.5px;font-weight:800;color:#B4AE97;background:#fff;border:1px dashed var(--cream-line);
+    border-radius:11px;padding:8px 10px;letter-spacing:-.02em}
+
+  /* ============ 지도 이미지 ============ */
+  .mapimg{display:block;width:100%;border-radius:13px;overflow:hidden;background:var(--cream);
+    border:0;padding:0;line-height:0;position:relative}
+  .mapimg img{width:100%;height:auto;display:block}
+  .mapimg .mapcap{display:block;line-height:1.25;font-size:9.5px;font-weight:900;color:#fff;letter-spacing:-.02em;
+    background:rgba(30,27,122,.74);padding:5px 8px;text-align:left}
+  .mapimg .ph{display:grid;place-items:center;height:92px;font-size:10.5px;font-weight:800;color:#A29C84;line-height:1.5}
+  .imgrow{display:flex;gap:6px}
+  .imgrow .addrow{flex:1 1 auto}
+  .imgrow .drop{flex:0 0 auto;height:38px;padding:0 12px;border-radius:12px;background:#FBEAE8;color:var(--red);
+    font-size:11px;font-weight:900;display:grid;place-items:center;letter-spacing:-.02em}
+  .bigmap-wrap{position:fixed;inset:0;z-index:95;background:rgba(12,10,4,.95);display:flex;align-items:flex-start;
+    justify-content:center;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pinch-zoom}
+  .bigmap-wrap img{display:block;width:100%;height:auto;flex:0 0 auto;transition:width .18s ease}
+  .bigmap-wrap.zoom img{width:240%}
+  .bigmap-wrap.zoom{align-items:flex-start}
+  .bigmap-x{position:fixed;top:calc(env(safe-area-inset-top) + 12px);right:14px;width:36px;height:36px;border-radius:12px;
+    background:rgba(255,255,255,.94);color:#2A2694;font-size:14px;display:grid;place-items:center;
+    box-shadow:0 6px 16px rgba(0,0,0,.35)}
+  .bigmap-z{position:fixed;right:14px;bottom:calc(env(safe-area-inset-bottom) + 14px);height:34px;padding:0 13px;
+    border-radius:999px;background:rgba(255,255,255,.94);color:#2A2694;font-size:11px;font-weight:900;
+    letter-spacing:-.02em;display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+  .bigmap-cap{position:fixed;left:14px;bottom:calc(env(safe-area-inset-bottom) + 19px);
+    font-size:10px;font-weight:800;color:#EFEBFF;background:rgba(255,255,255,.16);padding:5px 10px;border-radius:999px;
+    letter-spacing:-.02em;white-space:nowrap}
+
+  /* ============ 시트 안 계산기 ============ */
+  .fld-head{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:10.5px;font-weight:900;color:var(--navy);
+    letter-spacing:-.03em}
+  .fld-head::after{content:"";flex:1 1 auto;height:1px;background:var(--cream-line)}
+  .fld .hint{font-size:9.5px;font-weight:800;color:#A29C84;letter-spacing:-.02em;line-height:1.35}
+  .fld .hint b{color:var(--navy)}
+  .pchips{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .pch{height:33px;border-radius:11px;background:var(--cream);font-size:10.5px;font-weight:900;color:#6E6851;
+    letter-spacing:-.03em;display:grid;place-items:center;border:1.5px solid transparent}
+  .pch.on{background:#fff;border-color:var(--navy);color:var(--navy);box-shadow:0 3px 10px rgba(30,27,122,.14)}
+  .livebox{background:var(--cream);border-radius:14px;padding:9px 11px;display:flex;flex-direction:column;gap:4px}
+  .livebox .lr{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+  .livebox .lr .k{font-size:10px;font-weight:900;color:#8F8A73;letter-spacing:-.02em}
+  .livebox .lr .v{font-size:12px;font-weight:900;color:var(--ink);letter-spacing:-.03em}
+  .livebox .lr.big{margin-top:2px;padding-top:6px;border-top:1px dashed #E3D9BC}
+  .livebox .lr.big .k{color:var(--navy);font-size:10.5px}
+  .livebox .lr.big .v{color:var(--navy);font-size:15px}
+  .livebox .note{font-size:9.5px;font-weight:800;color:#A29C84;letter-spacing:-.02em;line-height:1.4}
+
   #toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));z-index:120;
     transform:translateX(-50%) translateY(10px);background:#1E1B7A;color:#fff;font-size:12px;font-weight:800;
     padding:10px 15px;border-radius:999px;max-width:86vw;text-align:center;letter-spacing:-.02em;
@@ -433,6 +542,255 @@ function safeUrl(u){
   u = String(u || '').trim();
   return /^https?:\/\//i.test(u) ? u : '';
 }
+
+/* ---------- 금액 ---------- */
+function num(v){
+  var n = Number(String(v == null ? '' : v).replace(/[^\d.-]/g, ''));
+  return isFinite(n) ? Math.round(n) : 0;
+}
+/* '12억 5,000' · '12억5000' · '125000' · '12.5억' · '예시 · 12억 5,000만' 을 모두 만원 단위 숫자로 */
+function parseMoney(v){
+  var s = String(v == null ? '' : v).replace(/[\s,]/g, '').replace(/원/g, '');
+  if(!s) return 0;
+  var m = /(\d+(?:\.\d+)?)억(\d+(?:\.\d+)?)?/.exec(s);
+  if(m){
+    var eok = parseFloat(m[1]) || 0;
+    var rest = m[2] ? parseFloat(m[2]) : 0;
+    return Math.round(eok * 10000 + rest);
+  }
+  m = /(\d+(?:\.\d+)?)만/.exec(s);
+  if(m) return Math.round(parseFloat(m[1]));
+  m = /(\d[\d.]*)/.exec(s);
+  return m ? Math.round(parseFloat(m[1].replace(/\.$/, '')) || 0) : 0;
+}
+function cleanText(v){
+  return String(v == null ? '' : v).replace(/^\s*예시\s*·\s*/, '').trim();
+}
+function fmtMoney(v){
+  v = Math.round(Number(v) || 0);
+  if(!v) return '—';
+  var neg = v < 0;
+  if(neg) v = -v;
+  var eok = Math.floor(v / 10000), man = v % 10000, out = '';
+  if(eok) out += eok.toLocaleString('ko-KR') + '억';
+  if(man) out += (out ? ' ' : '') + man.toLocaleString('ko-KR') + '만';
+  return (neg ? '-' : '') + (out || '0');
+}
+function fmtWon(v){
+  return fmtMoney(v) + (v ? '원' : '');
+}
+function manToEokText(v){
+  return v ? fmtMoney(v) : '';
+}
+
+/* ---------- 자금 세팅 계산 ---------- */
+var PRESETS = [
+  { k:'ltv70', t:'생초 LTV 70%', r:0.70 },
+  { k:'ltv40', t:'LTV 40%', r:0.40 },
+  { k:'gap', t:'전세 끼고(갭)', r:0 },
+  { k:'manual', t:'직접입력', r:null }
+];
+function presetOf(k){
+  for(var i=0;i<PRESETS.length;i++) if(PRESETS[i].k === (k || 'manual')) return PRESETS[i];
+  return PRESETS[3];
+}
+/* 취득세 간이 계산 (1주택 6억↓1.1% / 6~9억 누진 / 9억↑3.5%, 다주택 8%·12%) */
+function acqTax(priceMan, houses){
+  var p = priceMan * 10000;
+  if(!p) return 0;
+  var h = String(houses || '1');
+  var rate, edu, agri;
+  if(h === '3'){ rate = 0.12; edu = 0.004; agri = 0.002; }
+  else if(h === '2'){ rate = 0.08; edu = 0.004; agri = 0.002; }
+  else {
+    if(p <= 600000000){ rate = 0.01; edu = 0.001; agri = 0; }
+    else if(p <= 900000000){ rate = ((p / 100000000) * 2 / 3 - 3) / 100; edu = 0.003; agri = 0.002; }
+    else { rate = 0.03; edu = 0.003; agri = 0.002; }
+  }
+  return Math.round(priceMan * (rate + edu + agri));
+}
+function acqRateText(priceMan, houses){
+  var p = priceMan * 10000, h = String(houses || '1'), r;
+  if(h === '3') r = 12.6; else if(h === '2') r = 8.6;
+  else if(p <= 600000000) r = 1.1;
+  else if(p <= 900000000) r = Math.round((((p / 100000000) * 2 / 3 - 3) + 0.5) * 100) / 100;
+  else r = 3.5;
+  return r;
+}
+function seedOf(L){
+  L = L || {};
+  var price = num(L.maemae), jeon = num(L.jeonse);
+  var pre = presetOf(L.preset);
+  var loan, note = '';
+  if(pre.r != null) loan = price * pre.r;
+  else loan = num(L.loan);
+  var cap = num(L.loanCap);
+  if(cap > 0 && loan > cap){ loan = cap; note = '한도'; }
+  var room = price > 0 ? Math.max(0, price - jeon) : 0;
+  if(price > 0 && loan > room){ loan = room; note = note ? '한도·갭' : '갭'; }
+  loan = Math.max(0, Math.round(loan));
+  var capital = price - jeon - loan;
+
+  var rate = Number(L.rate) > 0 ? Number(L.rate) : 5;
+  var term = Number(L.term) > 0 ? Number(L.term) : 30;
+  var mInt = Math.round(loan * (rate / 100) / 12);
+  var mr = rate / 1200, mn = Math.round(term * 12);
+  var mPay = loan ? Math.round(loan * mr / (1 - Math.pow(1 + mr, -mn))) : 0;
+
+  var feeRate = (L.feeRate === undefined || L.feeRate === null || L.feeRate === '') ? 0.55 : Number(L.feeRate);
+  var fee = (L.fee === undefined || L.fee === null || L.fee === '') ? Math.round(price * feeRate / 100) : Math.round(Number(L.fee));
+
+  var houses = L.houses || '1';
+  var taxAuto = acqTax(price, houses);
+  var tax = (L.tax === undefined || L.tax === null || L.tax === '') ? taxAuto : Math.round(Number(L.tax));
+
+  return {
+    price: price, jeon: jeon, loan: loan, capital: capital,
+    rate: rate, term: term, mInt: mInt, mPay: mPay, note: note,
+    feeRate: feeRate, fee: fee, tax: tax, taxAuto: taxAuto, houses: houses,
+    total: capital + fee + tax, preset: pre
+  };
+}
+
+/* ---------- 지도 이미지 ---------- */
+var imgCache = {};   /* regionId → { ts, data } */
+/* Firebase 규칙상 쓸 수 있는 곳은 rooms/* 뿐이라, 지도 이미지는 방 옆 노드에 따로 둔다
+   (방 본문은 15초마다 통째로 받으므로 이미지는 본문에서 빼는 게 훨씬 가볍다) */
+function imgNodeUrl(id){ return DB + '/rooms/' + ROOM + '-img/' + encodeURIComponent(id) + '.json'; }
+function ensureMapImg(id, ts){
+  var c = imgCache[id];
+  if(c && c.ts === ts) return;
+  if(c && c.loading) return;
+  imgCache[id] = { ts: ts, data: (c && c.data) || '', loading: true };
+  fetch(imgNodeUrl(id), { cache:'no-store' }).then(function(r){
+    return r.ok ? r.json() : null;
+  }).then(function(o){
+    imgCache[id] = { ts: ts, data: (o && o.data) || '' };
+    if(/^#r=/.test(location.hash || '')) render();
+  }).catch(function(){
+    imgCache[id] = { ts: ts, data: '', err: true };
+    if(/^#r=/.test(location.hash || '')) render();
+  });
+}
+function compressImage(file, done, fail){
+  var tries = [[1400, 0.82], [1100, 0.72], [900, 0.62]];
+  var url = URL.createObjectURL(file);
+  var img = new Image();
+  img.onload = function(){
+    var w = img.naturalWidth || 1200, h = img.naturalHeight || 900;
+    var i = 0;
+    var step = function(){
+      var maxW = tries[i][0], q = tries[i][1];
+      var scale = Math.min(1, maxW / w);
+      var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+      var cv = document.createElement('canvas');
+      cv.width = cw; cv.height = ch;
+      var ctx = cv.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cw, ch);
+      ctx.drawImage(img, 0, 0, cw, ch);
+      var data = cv.toDataURL('image/jpeg', q);
+      i++;
+      if(data.length > 800000 && i < tries.length) return step();
+      URL.revokeObjectURL(url);
+      done(data, cw, ch);
+    };
+    step();
+  };
+  img.onerror = function(){
+    URL.revokeObjectURL(url);
+    if(fail) fail(new Error('image'));
+  };
+  img.src = url;
+}
+function putMapImg(id, data, w, h){
+  lastWrite = Date.now();
+  return fetch(imgNodeUrl(id), { method:'PUT', cache:'no-store',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ data: data, w: w, h: h, ts: Date.now() })
+  }).then(function(r){
+    if(!r.ok) throw new Error('http ' + r.status);
+    return true;
+  });
+}
+function delMapImg(id){
+  lastWrite = Date.now();
+  return fetch(imgNodeUrl(id), { method:'DELETE', cache:'no-store' }).then(function(r){
+    if(!r.ok) throw new Error('http ' + r.status);
+    return true;
+  });
+}
+function pickMapImage(id){
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.style.display = 'none';
+  document.body.appendChild(inp);
+  inp.addEventListener('change', function(){
+    var f = inp.files && inp.files[0];
+    inp.remove();
+    if(!f) return;
+    toast('지도를 줄이는 중…');
+    compressImage(f, function(data, w, h){
+      var r = deep(S.regions[id]);
+      if(!r.route) r.route = {};
+      var ts = Date.now();
+      putMapImg(id, data, w, h).then(function(){
+        imgCache[id] = { ts: ts, data: data };
+        r.route.mapImg = ts;
+        return saveRegion(id, r, '지도를 첨부했어요 🗺️');
+      }).catch(function(){
+        toast('지도를 저장하지 못했어요 — 연결을 확인해 주세요', 'err');
+      });
+    }, function(){
+      toast('이 사진은 열 수 없어요', 'err');
+    });
+  });
+  inp.click();
+}
+function dropMapImage(id){
+  confirmBox('지도 사진을 지울까요?', '첨부한 지도 이미지만 사라져요.', '지우기', function(){
+    var r = deep(S.regions[id]);
+    delMapImg(id).catch(function(){}).then(function(){
+      imgCache[id] = { ts: 0, data: '' };
+      if(r.route) r.route.mapImg = '';
+      saveRegion(id, r, '지도 사진을 지웠어요');
+    });
+  });
+}
+function openBigMap(id){
+  var c = imgCache[id];
+  var r = S.regions[id];
+  var ts = (r && r.route) ? (Number(r.route.mapImg) || 0) : 0;
+  if(!c || !c.data){
+    if(ts){ imgCache[id] = null; ensureMapImg(id, ts); toast('지도를 다시 불러오는 중…'); }
+    else toast('첨부한 지도가 없어요');
+    return;
+  }
+  var wrap = document.createElement('div');
+  wrap.className = 'bigmap-wrap';
+  wrap.innerHTML = '<img alt="임장 지도 확대">'
+    + '<span class="bigmap-cap">지도를 탭하면 확대/축소</span>'
+    + '<button class="bigmap-z" data-z aria-label="확대">＋ 확대</button>'
+    + '<button class="bigmap-x" aria-label="닫기">✕</button>';
+  wrap.querySelector('img').src = c.data;
+  var zBtn = wrap.querySelector('[data-z]');
+  var toggleZoom = function(){
+    var on = wrap.classList.toggle('zoom');
+    zBtn.textContent = on ? '－ 축소' : '＋ 확대';
+    wrap.querySelector('img').style.cursor = 'zoom-out';
+    setTimeout(function(){
+      wrap.scrollLeft = Math.max(0, (wrap.scrollWidth - wrap.clientWidth) / 2);
+      if(on) wrap.scrollTop = Math.max(0, (wrap.scrollHeight - wrap.clientHeight) / 2);
+    }, 200);
+  };
+  zBtn.addEventListener('click', function(e){ e.stopPropagation(); toggleZoom(); });
+  wrap.querySelector('img').addEventListener('click', function(e){ e.stopPropagation(); toggleZoom(); });
+  wrap.addEventListener('click', function(e){
+    if(e.target.classList.contains('bigmap-x') || e.target === wrap) wrap.remove();
+  });
+  layer.appendChild(wrap);
+}
+
 function today(){
   var d = new Date();
   var p = function(n){ return (n<10?'0':'') + n; };
@@ -472,7 +830,7 @@ function blankRegion(){
     name:'', date: today(), status:'plan', stars:0, tagline:'',
     summary:{ complex:'', price:'', gap:'' },
     yt:{ title:'', url:'', watched:'', points:[] },
-    route:{ line:'', map:'', steps:[], notes:'' },
+    route:{ line:'', map:'', mapImg:'', steps:[], notes:'' },
     place:{ transport:'', school:'', market:'', redev:'', impression:'' },
     complexes:[],
     talk:{ owner:[], resident:[], verdict:{ line:'', good:[], bad:[], rank:'', next:'' } }
@@ -527,7 +885,7 @@ function startSync(){
     if(document.visibilityState === 'visible') refresh(false);
   }, 15000);
 }
-function saveRegion(id, body){
+function saveRegion(id, body, msg){
   lastWrite = Date.now();
   var payload = deep(body);
   delete payload.id;
@@ -536,7 +894,7 @@ function saveRegion(id, body){
     payload.id = id;
     S.regions[id] = payload;
     dotEl.className = 'dot live';
-    toast('저장했어요 ✓');
+    toast(msg || '저장했어요 ✓');
     closeAll();
     render();
     return true;
@@ -658,7 +1016,14 @@ function regionCard(r){
   if(r.summary && r.summary.complex) html += '<div class="rc-key">' + esc(r.summary.complex) + '</div>';
   if(r.summary && r.summary.price) html += '<div class="rc-price">' + esc(r.summary.price) + '</div>';
   if(r.tagline) html += '<p class="rc-tag">“' + esc(r.tagline) + '”</p>';
-  html += '<div class="rc-foot"><span>단지 ' + ((r.complexes || []).length) + '개</span><span>·</span><span>'
+  html += '<div class="rc-foot"><span>단지 ' + ((r.complexes || []).length) + '개</span>'
+    + (function(){
+        var list2 = r.complexes || [];
+        if(!list2.length) return '';
+        var v = list2.filter(function(c){ return c && c.visit; }).length;
+        return '<span>·</span><span>👣 ' + v + '/' + list2.length + '단지</span>';
+      })()
+    + '<span>·</span><span>'
     + esc((r.talk && r.talk.verdict && r.talk.verdict.rank) || '순위 미정') + '</span><span class="arrow">›</span></div>';
   html += '</button>';
   return html;
@@ -684,14 +1049,26 @@ function renderDetail(id){
 
   /* 헤더 */
   html += '<section class="card dhead">';
-  html += '<div class="dh-top"><h2 class="dh-name">' + esc(r.name || '이름 없는 지역')
-    + (r.sample ? ' <span class="pill">예시</span>' : '') + '</h2>' + status + '</div>';
+  html += '<div class="dh-top"><div style="min-width:0"><div class="ov-lab">📌 기본 개요</div><h2 class="dh-name">'
+    + esc(r.name || '이름 없는 지역')
+    + (r.sample ? ' <span class="pill">예시</span>' : '') + '</h2></div>' + status + '</div>';
   html += '<div class="dh-meta"><span>' + esc(fmtDate(r.date) || '날짜 미정') + '</span>' + starsHTML(r.stars) + '</div>';
   if(r.tagline) html += '<p class="dh-tag">“' + esc(r.tagline) + '”</p>';
   html += '<div class="dh-sum">';
   if(r.summary && r.summary.complex) html += '<div class="rowline"><span class="k">핵심 단지</span><span class="v"><b>' + esc(r.summary.complex) + '</b></span></div>';
   if(r.summary && r.summary.price) html += '<div class="rowline"><span class="k">매매·전세</span><span class="v">' + esc(r.summary.price) + '</span></div>';
   if(r.summary && r.summary.gap) html += '<div class="rowline green"><span class="k">갭</span><span class="v"><b>' + esc(r.summary.gap) + '</b></span></div>';
+  var goalBits = [];
+  if(r.summary && r.summary.budget) goalBits.push('예산 ' + r.summary.budget);
+  if(r.summary && r.summary.area) goalBits.push(r.summary.area);
+  if(goalBits.length) html += '<div class="rowline"><span class="k">목표</span><span class="v"><b>' + esc(goalBits.join(' · ')) + '</b></span></div>';
+  if(r.route && r.route.line) html += '<div class="rowline stack"><span class="k">임장 루트</span><span class="v">' + esc(r.route.line) + '</span></div>';
+  var cxAll = r.complexes || [];
+  if(cxAll.length){
+    var cxVisit = cxAll.filter(function(c){ return c && c.visit; }).length;
+    html += '<div class="rowline"><span class="k">임장 도장</span><span class="v"><b>👣 방문 ' + cxVisit + ' / ' + cxAll.length + '단지</b>'
+      + (cxVisit ? '' : ' <span class="muted">아직 도장 없음</span>') + '</span></div>';
+  }
   html += '</div>';
   if(unlocked){
     html += '<div class="dh-act"><button class="mini-btn" data-act="edit-region" data-id="' + esc(id) + '">기본 정보 수정</button>'
@@ -733,11 +1110,35 @@ function secRoute(r, id){
   var o = r.route || {};
   var html = '<section class="card"><div class="card-h"><h2>🗺️ 임장 루트 &amp; 지도</h2>' + pen('edit-route', id) + '</div>';
   if(o.line) html += '<p class="quote">' + esc(o.line) + '</p>';
-  var url = safeUrl(o.map);
-  if(url){
-    html += '<a class="go" href="' + esc(url) + '" target="_blank" rel="noopener"><span class="gi">🗺️</span>'
-      + '<span>지도에서 루트 보기</span><span class="gx">열기 ↗</span></a>';
+
+  /* 지도 이미지 — 첨부했으면 바로 보이고, 탭하면 크게 */
+  var ts = Number(o.mapImg) || 0;
+  if(ts){
+    var c = imgCache[id];
+    if(!c || (c.ts !== ts && !c.loading)) ensureMapImg(id, ts);
+    html += '<button class="mapimg" data-act="open-map" data-id="' + esc(id) + '" aria-label="지도 크게 보기">';
+    if(c && c.data){
+      html += '<img src="' + c.data + '" alt="임장 지도">';
+    } else {
+      html += '<span class="ph">' + (c && c.err ? '지도를 불러오지 못했어요 — 탭해서 다시 시도' : '지도를 불러오는 중…') + '</span>';
+    }
+    html += '<span class="mapcap">🗺️ 지도 탭해서 크게 보기</span></button>';
   }
+
+  var url = safeUrl(o.map);
+  var nvHref = url || ('https://map.naver.com/p/search/' + encodeURIComponent(r.name || ''));
+  if(nvHref && nvHref !== 'https://map.naver.com/p/search/'){
+    html += '<a class="mapbtn" href="' + esc(nvHref) + '" target="_blank" rel="noopener"><span class="mg">🗺️</span>'
+      + '<span class="mt">네이버지도 열기</span><span class="mx">' + (url ? '저장한 링크' : '지역명으로 검색') + ' ↗</span></a>';
+  }
+
+  if(unlocked){
+    html += '<div class="imgrow"><button class="addrow" data-act="pick-map" data-id="' + esc(id) + '">📷 '
+      + (ts ? '지도 사진 교체' : '지도 사진 첨부') + '</button>'
+      + (ts ? '<button class="drop" data-act="drop-map" data-id="' + esc(id) + '">삭제</button>' : '') + '</div>';
+    html += '<p class="cap-l">폰 갤러리에서 고르면 자동으로 줄여서 저장해요 (가로 1400px JPEG)</p>';
+  }
+
   var steps = (o.steps || []).filter(function(s){ return s && (s.place || s.memo); });
   if(steps.length){
     html += '<ol class="steps2">' + steps.map(function(s, i){
@@ -747,7 +1148,7 @@ function secRoute(r, id){
     }).join('') + '</ol>';
   }
   if(o.notes) html += '<p class="memo">' + esc(o.notes) + '</p>';
-  if(!o.line && !url && !steps.length && !o.notes) html += '<p class="empty-line">아직 루트를 정리하지 않았어요.</p>';
+  if(!o.line && !url && !ts && !steps.length && !o.notes) html += '<p class="empty-line">아직 루트를 정리하지 않았어요.</p>';
   return html + '</section>';
 }
 
@@ -770,10 +1171,17 @@ function secPlace(r, id){
   return html + '</section>';
 }
 
+function stampHTML(visit){
+  return '<span class="stamp"><span class="paw">👣</span><span class="si"><b>임장 완료</b><i>'
+    + esc(fmtDate(visit)) + '</i></span></span>';
+}
+
 function secCx(r, id){
   var list = r.complexes || [];
+  var visited = list.filter(function(c){ return c && c.visit; }).length;
   var html = '<section class="card"><div class="card-h"><h2>🏢 단지별 카드</h2>'
-    + (list.length ? '<span class="pill">' + list.length + '개</span>' : '') + '</div>';
+    + (list.length ? '<span class="pill' + (visited ? ' navy' : '') + '">👣 방문 ' + visited + ' / ' + list.length + '단지</span>' : '')
+    + '</div>';
   if(!list.length) html += '<p class="empty-line">아직 단지를 추가하지 않았어요.</p>';
   list.forEach(function(c, i){
     html += '<div class="cx">';
@@ -797,11 +1205,101 @@ function secCx(r, id){
         return '<div class="pr ' + x[2] + '"><span class="k">' + x[0] + '</span><span class="v">' + esc(x[1]) + '</span></div>';
       }).join('') + '</div>';
     }
+
+    /* 👣 임장 도장 */
+    html += '<div class="cx-visit">';
+    if(c.visit) html += stampHTML(c.visit);
+    if(unlocked){
+      html += '<button class="stamp-btn' + (c.visit ? ' on' : '') + '" data-act="stamp" data-id="' + esc(id) + '" data-i="' + i + '"'
+        + ' aria-pressed="' + (c.visit ? 'true' : 'false') + '">'
+        + (c.visit ? '도장 지우기' : '👣 임장 도장') + '</button>';
+    } else if(!c.visit){
+      html += '<span class="cnt">아직 도장 없음</span>';
+    }
+    html += '</div>';
+
     if(c.memo) html += '<p class="memo">' + esc(c.memo) + '</p>';
+
+    /* 네이버 지도 · 부동산 바로 열기 */
+    if(c.name || c.naver || c.land){
+      var nm = c.name || '';
+      var mapHref = safeUrl(c.naver) || ('https://map.naver.com/p/search/' + encodeURIComponent(nm));
+      var landHref = safeUrl(c.land) || ('https://m.land.naver.com/search/result/' + encodeURIComponent(nm));
+      html += '<div class="maprow">'
+        + '<a class="mapbtn sm" href="' + esc(mapHref) + '" target="_blank" rel="noopener"><span class="mg">🗺️</span><span class="mt">네이버지도</span></a>'
+        + '<a class="mapbtn sm" href="' + esc(landHref) + '" target="_blank" rel="noopener"><span class="mg">🏢</span><span class="mt">네이버부동산</span></a>'
+        + '</div>';
+    }
+
+    /* 매물별 자금 세팅 */
+    var ls = c.listings || [];
+    if(ls.length){
+      html += '<div class="lsts">' + ls.map(function(L, k){ return listingHTML(L, id, i, k); }).join('') + '</div>';
+    }
+    if(unlocked){
+      html += '<button class="addrow" data-act="add-lst" data-id="' + esc(id) + '" data-i="' + i + '">＋ 매물 · 자금 세팅 추가</button>';
+    } else if(!ls.length){
+      html += '<p class="lst-empty">아직 매물 세팅이 없어요.</p>';
+    }
     html += '</div>';
   });
   if(unlocked) html += '<button class="addrow" data-act="add-cx" data-id="' + esc(id) + '">＋ 단지 추가</button>';
   return html + '</section>';
+}
+
+function listingHTML(L, id, ci, li){
+  var s = seedOf(L);
+  var name = L.name || '매물';
+  var spec = [
+    ['동·층향', L.dong], ['입주가능', L.moveIn],
+    ['세대수(연식)', L.households],
+    ['공시가격', L.gongsi ? fmtMoney(L.gongsi) : ''],
+    ['시세', L.sise ? fmtMoney(L.sise) : ''], ['전고점', L.peak ? fmtMoney(L.peak) : ''],
+    ['전세 호가', L.jeonseAsk ? fmtMoney(L.jeonseAsk) : ''], ['매매 호가', L.asking ? fmtMoney(L.asking) : '']
+  ].filter(function(x){ return x[1]; });
+
+  var html = '<div class="lst">';
+  html += '<div class="lst-h"><span><b class="lst-n">' + esc(name) + '</b>'
+    + (L.where ? '<span class="lst-loc">' + esc(L.where) + '</span>' : '') + '</span>';
+  if(unlocked){
+    html += '<span class="cx-act"><button class="pen" data-act="edit-lst" data-id="' + esc(id) + '" data-i="' + ci + '" data-k="' + li + '" aria-label="매물 수정">✏️</button></span>';
+  }
+  html += '</div>';
+  if(spec.length){
+    html += '<div class="lstspec">' + spec.map(function(x){
+      return '<div class="sp"><span class="k">' + x[0] + '</span><span class="v">' + esc(x[1]) + '</span></div>';
+    }).join('') + '</div>';
+  }
+
+  /* 자금 세팅 */
+  html += '<div class="seed"><div class="seed-h"><span class="t">자금 세팅</span>'
+    + '<span class="pill navy">' + esc(s.preset.t) + '</span></div>';
+  html += '<div class="srow"><span class="k">매매</span><span class="v">' + fmtMoney(s.price) + '</span></div>';
+  html += '<div class="srow"><span class="k">전세</span><span class="v">' + fmtMoney(s.jeon) + '</span></div>';
+  html += '<div class="srow loan"><span class="k">대출</span><span class="v">' + fmtMoney(s.loan) + '</span>'
+    + (s.loan ? '<span class="x">월 ' + s.mPay + '만 · 이자 ' + s.mInt + '만</span>' : '') + '</div>';
+  html += '<div class="sdiv"></div>';
+  html += '<div class="srow cap"><span class="k">자본</span><span class="v">' + fmtMoney(s.capital) + '</span>'
+    + '<span class="x">초기투자금</span></div>';
+  if(s.note) html += '<div class="srow"><span class="k"></span><span class="x">'
+    + (s.note === '한도' ? '대출 한도 적용' : s.note === '갭' ? '전세 갑까지만 대출' : '한도·갑 적용') + '</span></div>';
+  html += '</div>';
+
+  /* 부대비용 */
+  html += '<div class="seed"><div class="seed-h"><span class="t">부대비용</span>'
+    + '<span class="pill">' + s.feeRate + '% · ' + acqRateText(s.price, s.houses) + '%</span></div>';
+  html += '<div class="srow fee"><span class="k">중개보수</span><span class="v">' + fmtMoney(s.fee) + '</span></div>';
+  html += '<div class="srow fee"><span class="k">취득세</span><span class="v">' + fmtMoney(s.tax) + '</span></div>';
+  html += '</div>';
+
+  if(s.capital < 0){
+    html += '<p class="warnline">전세 + 대출이 매매가보다 커요. 대출금을 줄여 주세요.</p>';
+  }
+
+  html += '<div class="total"><span class="tk">예상 총투자금<span>자본 + 중개 + 취득세</span></span>'
+    + '<b class="tv">' + (s.total < 0 ? '-' : '') + fmtMoney(Math.abs(s.total)) + '</b></div>';
+  html += '</div>';
+  return html;
 }
 
 function secTalk(r, id){
@@ -899,6 +1397,11 @@ var F = {
       getVal:function(d){ return getP(d, path) || opts[0][0]; },
       setVal:function(d, v){ setP(d, path, v); } };
   },
+  head: function(label){
+    return { label:label, type:'head',
+      getVal:function(){ return ''; },
+      setVal:function(){} };
+  },
   stars: function(label, path){
     return { label:label, type:'stars',
       getVal:function(d){ return parseInt(getP(d, path), 10) || 0; },
@@ -973,6 +1476,8 @@ function openSheet(cfg){
         if(r.el.querySelector('input,textarea,select')) r.el.querySelector('input,textarea,select').focus();
         return;
       }
+      if(r.field.type === 'head') continue;
+      if(r.field.key) out[r.field.key] = v;
       r.field.setVal(draft, v);
     }
     cfg.onSave(draft, out);
@@ -992,6 +1497,11 @@ function openSheet(cfg){
 function buildField(f, draft){
   var box = document.createElement('div');
   box.className = 'fld';
+  if(f.type === 'head'){
+    box.className = 'fld-head';
+    box.textContent = f.label;
+    return { el:box, field:f, read:function(){ return ''; } };
+  }
   var lab = document.createElement('span');
   lab.className = 'fld-l';
   lab.textContent = f.label;
@@ -1130,7 +1640,9 @@ function openRegionForm(id){
     F.txt('한 줄 총평', 'tagline', '예) 역·학군·상권이 한 번에, 대로변 소음은 확인 필요'),
     F.txt('핵심 단지', 'summary.complex', '예) 미사강변골든센트로 59㎡'),
     F.txt('매매·전세', 'summary.price', '예) 매매 12억 · 전세 6억 8,500만'),
-    F.txt('갭', 'summary.gap', '예) 갭 5억 1,500만')
+    F.txt('갭', 'summary.gap', '예) 갭 5억 1,500만'),
+    Object.assign(F.txt('목표 예산', 'summary.budget', '예) 5억 이내 · 생초 LTV 70%'), { half:true }),
+    Object.assign(F.txt('목표 평형', 'summary.area', '예) 전용 59㎡'), { half:true })
   ];
   openSheet({
     title: isNew ? '새 지역 임장노트' : '기본 정보 수정',
@@ -1184,7 +1696,7 @@ function openRouteForm(id){
     base: r,
     fields: [
       F.txt('오늘의 루트 한 줄', 'route.line', '예) 미사역 3번 출구 → 골든센트로 → 센트럴자이'),
-      F.txt('지도 링크', 'route.map', '네이버지도·부자지도 링크'),
+      F.txt('네이버지도 링크', 'route.map', 'https://map.naver.com/... (비우면 지역명으로 검색)'),
       F.list('이동 순서', 'route.steps',
         [{ key:'place', label:'장소', ph:'예) 미사강변골든센트로' },
          { key:'how', label:'수단·소요 시간', ph:'예) 도보 8분' },
@@ -1235,6 +1747,8 @@ function openCxForm(id, idx){
       Object.assign(F.txt('최근 실거래', path + '.deal', '11억 8,000만'), { half:true }),
       Object.assign(F.txt('현재 호가', path + '.asking', '12억'), { half:true }),
       Object.assign(F.txt('전세가', path + '.jeonse', '6억 8,500만'), { half:true }),
+      F.txt('네이버지도 URL', path + '.naver', '비우면 단지명으로 지도 검색'),
+      F.txt('네이버부동산 URL', path + '.land', '비우면 단지명으로 부동산 검색'),
       F.area('현장 메모', path + '.memo', '예) 동간거리 넓고 조경 양호, 대로변 동은 소음', 3)
     ],
     delLabel: '단지 삭제',
@@ -1249,6 +1763,260 @@ function openCxForm(id, idx){
       saveRegion(id, d);
     }
   });
+}
+
+/* ================== 매물 · 자금 세팅 시트 ================== */
+function blankListing(c){
+  c = c || {};
+  var ask = parseMoney(c.asking), jeon = parseMoney(c.jeonse);
+  return {
+    name: '', where: '', dong: '', moveIn: '',
+    households: cleanText(c.households),
+    gongsi: 0, sise: 0, peak: parseMoney(c.peak),
+    jeonseAsk: jeon, asking: ask,
+    maemae: ask, jeonse: jeon,
+    preset: 'ltv70', loan: 0, loanCap: 0, rate: 5, term: 30,
+    feeRate: 0.55, fee: '', houses: '1', tax: '',
+    memo: ''
+  };
+}
+
+function openListingSheet(regionId, ci, li){
+  var r0 = deep(S.regions[regionId]);
+  var cx = (r0.complexes || [])[ci];
+  if(!cx) return;
+  cx.listings = cx.listings || [];
+  var isNew = (li === null || li === undefined);
+  var L = isNew ? blankListing(cx) : deep(cx.listings[li] || {});
+  var preset = L.preset || 'ltv70';
+
+  var wrap = document.createElement('div');
+  wrap.className = 'sheet-wrap';
+  wrap.innerHTML = '<div class="sheet"><div class="sheet-h"><div><h3>'
+    + (isNew ? '🧮 매물 · 자금 세팅 추가' : '🧮 매물 · 자금 세팅 수정') + '</h3>'
+    + '<p>' + esc(cx.name || '단지') + ' · 매매가·전세·대출을 넣으면 자본과 총투자금이 바로 나와요</p></div>'
+    + '<button class="sheet-x" data-x aria-label="닫기">✕</button></div>'
+    + '<div class="sheet-b"></div><div class="sheet-f"></div></div>';
+  var body = wrap.querySelector('.sheet-b');
+  var foot = wrap.querySelector('.sheet-f');
+  var I = {};
+  var liveBox = document.createElement('div');
+  var presetWrap = null;
+
+  function head(t){
+    var d = document.createElement('div'); d.className = 'fld-head'; d.textContent = t; body.appendChild(d);
+  }
+  function fld(label, key, opts){
+    opts = opts || {};
+    var box = document.createElement('div'); box.className = 'fld';
+    var lab = document.createElement('span'); lab.className = 'fld-l'; lab.textContent = label;
+    var inp = document.createElement('input');
+    inp.type = 'text';
+    inp.setAttribute('data-f2', key);
+    if(opts.money) inp.inputMode = 'numeric';
+    inp.value = opts.money
+      ? (Number(L[key]) ? Number(L[key]).toLocaleString('ko-KR') : '')
+      : (L[key] || '');
+    if(opts.ph) inp.placeholder = opts.ph;
+    box.appendChild(lab); box.appendChild(inp);
+    if(opts.money){
+      var h = document.createElement('span'); h.className = 'hint';
+      box.appendChild(h); inp._hint = h;
+      setHint(inp);
+    }
+    I[key] = inp;
+    inp.addEventListener('input', function(){
+      if(opts.money) setHint(inp);
+      if(opts.after) opts.after();
+      recalc();
+    });
+    return box;
+  }
+  function area(label, key, ph){
+    var box = document.createElement('div'); box.className = 'fld';
+    var lab = document.createElement('span'); lab.className = 'fld-l'; lab.textContent = label;
+    var ta = document.createElement('textarea'); ta.rows = 2; ta.value = L[key] || ''; if(ph) ta.placeholder = ph;
+    ta.setAttribute('data-f2', key);
+    box.appendChild(lab); box.appendChild(ta);
+    I[key] = ta;
+    ta.addEventListener('input', recalc);
+    return box;
+  }
+  function two(a, b){
+    var d = document.createElement('div'); d.className = 'frow';
+    d.appendChild(a); d.appendChild(b); body.appendChild(d);
+  }
+  function one(el){ body.appendChild(el); }
+  function setHint(inp){
+    if(!inp._hint) return;
+    var v = parseMoney(inp.value);
+    inp._hint.innerHTML = v ? '→ <b>' + fmtMoney(v) + '원</b>' : '';
+  }
+  function collect(){
+    var o = {};
+    ['name','where','dong','moveIn','households','memo'].forEach(function(k){
+      o[k] = I[k] ? String(I[k].value || '').trim() : '';
+    });
+    ['gongsi','sise','peak','jeonseAsk','asking','maemae','jeonse','loan','loanCap','fee','tax']
+      .forEach(function(k){ o[k] = I[k] ? parseMoney(I[k].value) : 0; });
+    o.preset = preset;
+    o.rate = I.rate ? (parseFloat(String(I.rate.value).replace(/[^\d.]/g, '')) || 0) : 0;
+    o.term = I.term ? (parseInt(String(I.term.value).replace(/[^\d]/g, ''), 10) || 0) : 0;
+    o.feeRate = I.feeRate ? (parseFloat(String(I.feeRate.value).replace(/[^\d.]/g, '')) || 0) : 0;
+    o.houses = I.houses ? I.houses.value : '1';
+    return o;
+  }
+  function recalc(){
+    var s = seedOf(collect());
+    var html = '<div class="livebox">'
+      + '<div class="lr"><span class="k">자본 (초기투자금)</span><span class="v">' + fmtMoney(s.capital) + '</span></div>'
+      + '<div class="lr"><span class="k">중개보수</span><span class="v">' + fmtMoney(s.fee) + '</span></div>'
+      + '<div class="lr"><span class="k">취득세</span><span class="v">' + fmtMoney(s.tax) + '</span></div>'
+      + '<div class="lr big"><span class="k">예상 총투자금</span><span class="v">' + fmtMoney(s.total) + '</span></div>'
+      + '<div class="note">대출 ' + fmtMoney(s.loan) + ' · 월 원리금 ' + s.mPay + '만 (이자 ' + s.mInt + '만 · '
+      + s.rate + '%·' + s.term + '년)' + (s.note ? ' · ' + s.note + ' 상한 적용' : '') + '</div>'
+      + (s.capital < 0 ? '<div class="note" style="color:#B3261E">전세 + 대출이 매매가보다 커요</div>' : '')
+      + '</div>';
+    liveBox.innerHTML = html;
+  }
+  function paintPresets(){
+    if(!presetWrap) return;
+    Array.prototype.forEach.call(presetWrap.children, function(b){
+      b.classList.toggle('on', b.getAttribute('data-preset') === preset);
+    });
+  }
+  function applyPreset(){
+    var s = seedOf(collect());
+    I.loan.value = s.loan ? Number(s.loan).toLocaleString('ko-KR') : '';
+    setHint(I.loan);
+  }
+
+  /* --- 매물 정보 --- */
+  head('매 물 정 보');
+  one(fld('아파트명 (평수)', 'name', { ph:'예) 꿈의숲아이파크(59)' }));
+  two(fld('동 · 층향', 'dong', { ph:'예) 713동 9층' }), fld('입주가능', 'moveIn', { ph:'예) 2028년 1월' }));
+  two(fld('세대수 (연식)', 'households', { ph:'예) 1,711(2022)' }), fld('시 · 구 · 동', 'where', { ph:'예) 성북구 장위동' }));
+  two(fld('공시가격 (만원)', 'gongsi', { money:1, ph:'예) 68,600' }), fld('시세 (만원)', 'sise', { money:1, ph:'예) 117,500' }));
+  two(fld('전고점 (만원)', 'peak', { money:1, ph:'예) 125,000' }), fld('매매 호가 (만원)', 'asking', { money:1, ph:'예) 125,000' }));
+  one(fld('전세 호가 (만원)', 'jeonseAsk', { money:1, ph:'예) 75,000' }));
+
+  /* --- 자금 세팅 --- */
+  head('자 금 세 팅');
+  two(fld('매매가 (만원)', 'maemae', { money:1, after:function(){ if(preset !== 'manual') applyPreset(); } }),
+      fld('전세 (만원)', 'jeonse', { money:1, after:function(){ if(preset !== 'manual') applyPreset(); } }));
+
+  var pbox = document.createElement('div'); pbox.className = 'fld';
+  var plab = document.createElement('span'); plab.className = 'fld-l'; plab.textContent = '자금 세팅 전략';
+  presetWrap = document.createElement('div'); presetWrap.className = 'pchips';
+  PRESETS.forEach(function(p){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'pch' + (preset === p.k ? ' on' : '');
+    b.textContent = p.t; b.setAttribute('data-preset', p.k);
+    b.addEventListener('click', function(){
+      preset = p.k;
+      paintPresets();
+      applyPreset();
+      recalc();
+    });
+    presetWrap.appendChild(b);
+  });
+  pbox.appendChild(plab); pbox.appendChild(presetWrap);
+  one(pbox);
+
+  one(fld('대출금 (만원)', 'loan', { money:1, ph:'프리셋을 고르면 자동 계산', after:function(){
+    if(preset !== 'manual'){ preset = 'manual'; paintPresets(); }
+    setHint(I.loan);
+  } }));
+  one(fld('대출 한도 (만원)', 'loanCap', { money:1, ph:'은행 DSR 한도 · 비우면 없음',
+    after:function(){ if(preset !== 'manual') applyPreset(); } }));
+  two(fld('금리 (%)', 'rate', { ph:'5.0' }), fld('기간 (년)', 'term', { ph:'30' }));
+
+  body.appendChild(liveBox);
+
+  /* --- 부대비용 --- */
+  head('부 대 비 용');
+  two(fld('중개 요율 (%)', 'feeRate', { ph:'0.55', after:function(){
+      var price = parseMoney(I.maemae.value);
+      var rate = parseFloat(String(I.feeRate.value).replace(/[^\d.]/g, '')) || 0;
+      I.fee.value = price ? Math.round(price * rate / 100).toLocaleString('ko-KR') : '';
+      setHint(I.fee);
+    } }),
+    fld('중개보수 (만원)', 'fee', { money:1, ph:'자동 계산' }));
+
+  var hbox = document.createElement('div'); hbox.className = 'fld';
+  var hlab = document.createElement('span'); hlab.className = 'fld-l'; hlab.textContent = '주택 수';
+  var hsel = document.createElement('select');
+  [['1','1주택'], ['2','2주택'], ['3','3주택 이상']].forEach(function(o){
+    var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; hsel.appendChild(op);
+  });
+  hsel.value = L.houses || '1';
+  hbox.appendChild(hlab); hbox.appendChild(hsel);
+  I.houses = hsel;
+  hsel.addEventListener('change', function(){
+    I.tax.value = acqTax(parseMoney(I.maemae.value), hsel.value).toLocaleString('ko-KR');
+    setHint(I.tax);
+    recalc();
+  });
+  two(hbox, fld('취득세 (만원)', 'tax', { money:1, ph:'자동 계산' }));
+  var note = document.createElement('p');
+  note.className = 'hint';
+  note.textContent = '취득세는 주택 수·금액 간이 계산이에요. 부동산계산기 금액이 있으면 직접 고쳐 주세요.';
+  body.appendChild(note);
+
+  head('메 모');
+  one(area('현장 메모', 'memo', '예) 남향, 로얄층, 급매 여부'));
+
+  /* 초기값 채우기 */
+  if(!L.fee){
+    var p0 = parseMoney(I.maemae.value);
+    var r0v = parseFloat(String(I.feeRate.value).replace(/[^\d.]/g, '')) || 0.55;
+    I.fee.value = p0 ? Math.round(p0 * r0v / 100).toLocaleString('ko-KR') : '';
+    setHint(I.fee);
+  }
+  if(!L.tax){
+    I.tax.value = acqTax(parseMoney(I.maemae.value), hsel.value).toLocaleString('ko-KR');
+    setHint(I.tax);
+  }
+  recalc();
+
+  /* --- 버튼 --- */
+  if(!isNew){
+    var del = document.createElement('button');
+    del.className = 'btn btn-danger'; del.textContent = '매물 삭제';
+    del.addEventListener('click', function(){
+      closeAll();
+      confirmBox('이 매물을 삭제할까요?', esc(L.name || '매물'), '삭제', function(){
+        var r = deep(S.regions[regionId]);
+        (r.complexes[ci].listings || []).splice(li, 1);
+        saveRegion(regionId, r, '매물을 지웠어요');
+      });
+    });
+    foot.appendChild(del);
+  }
+  var cancel = document.createElement('button');
+  cancel.className = 'btn btn-ghost'; cancel.textContent = '취소';
+  cancel.addEventListener('click', closeAll);
+  foot.appendChild(cancel);
+
+  var save = document.createElement('button');
+  save.className = 'btn btn-navy'; save.textContent = isNew ? '매물 추가' : '저장';
+  save.addEventListener('click', function(){
+    var o = collect();
+    if(!o.name){ toast('아파트명을 넣어 주세요', 'err'); I.name.focus(); return; }
+    if(!o.maemae){ toast('매매가를 넣어 주세요', 'err'); I.maemae.focus(); return; }
+    if(o.preset !== 'manual') o.loan = seedOf(o).loan;
+    var r = deep(S.regions[regionId]);
+    r.complexes[ci].listings = r.complexes[ci].listings || [];
+    if(isNew) r.complexes[ci].listings.push(o);
+    else r.complexes[ci].listings[li] = o;
+    saveRegion(regionId, r, isNew ? '매물을 추가했어요 ✓' : '저장했어요 ✓');
+  });
+  foot.appendChild(save);
+
+  wrap.addEventListener('click', function(e){ if(e.target === wrap) closeAll(); });
+  wrap.querySelector('[data-x]').addEventListener('click', closeAll);
+  layer.appendChild(wrap);
+  sheetOpen = true;
 }
 
 function openTalkForm(id){
@@ -1366,6 +2134,27 @@ viewEl.addEventListener('click', function(e){
 
   if(act === 'open'){ location.hash = '#r=' + encodeURIComponent(id); return; }
   if(act === 'back'){ location.hash = ''; return; }
+  if(act === 'open-map'){ openBigMap(id); return; }
+  if(act === 'pick-map'){
+    if(!unlocked){ toast('기록 모드에서 첨부할 수 있어요'); return; }
+    pickMapImage(id); return;
+  }
+  if(act === 'drop-map'){
+    if(!unlocked){ toast('기록 모드에서 지울 수 있어요'); return; }
+    dropMapImage(id); return;
+  }
+  if(act === 'stamp'){
+    if(!unlocked){ toast('기록 모드에서 도장을 찍을 수 있어요'); return; }
+    var ciS = parseInt(i, 10);
+    var dS = deep(S.regions[id]);
+    if(!dS.complexes || !dS.complexes[ciS]) return;
+    var cS = dS.complexes[ciS];
+    if(cS.visit){ delete cS.visit; saveRegion(id, dS, '도장을 지웠어요'); }
+    else { cS.visit = today(); saveRegion(id, dS, '👣 임장 도장을 찍었어요'); }
+    return;
+  }
+  if(act === 'add-lst'){ openListingSheet(id, parseInt(i, 10), null); return; }
+  if(act === 'edit-lst'){ openListingSheet(id, parseInt(i, 10), parseInt(t.getAttribute('data-k'), 10)); return; }
   if(act === 'filter'){ filter = t.getAttribute('data-f'); render(); viewEl.scrollTop = 0; return; }
   if(act === 'add-region'){ openRegionForm(null); return; }
   if(act === 'edit-region'){ openRegionForm(id); return; }
