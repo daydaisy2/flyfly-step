@@ -254,6 +254,7 @@
   .btn-navy:active{transform:scale(.99)}
   .btn-ghost{background:var(--cream);color:#6E6851;flex:0 0 auto;padding:0 16px}
   .btn-danger{background:#FBEAE8;color:var(--red);flex:0 0 auto;padding:0 16px}
+  .btn-red{background:var(--red);color:#fff;box-shadow:0 10px 20px rgba(140,43,36,.22)}
   .frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .frow .fld{min-width:0}
   .fld{display:flex;flex-direction:column;gap:5px}
@@ -1100,7 +1101,7 @@ function confirmBox(title, body, okText, onOk){
   wrap.className = 'modal-wrap';
   wrap.innerHTML = '<div class="modal"><h3>' + esc(title) + '</h3><p>' + body + '</p>'
     + '<div class="mrow"><button class="btn btn-ghost" data-no>취소</button>'
-    + '<button class="btn btn-navy" data-yes>' + esc(okText) + '</button></div></div>';
+    + '<button class="btn btn-red" data-yes>' + esc(okText) + '</button></div></div>';
   wrap.querySelector('[data-no]').addEventListener('click', closeAll);
   wrap.querySelector('[data-yes]').addEventListener('click', function(){ closeAll(); onOk(); });
   wrap.addEventListener('click', function(e){ if(e.target === wrap) closeAll(); });
