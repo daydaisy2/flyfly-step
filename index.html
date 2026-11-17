@@ -783,12 +783,17 @@ function openBigMap(id){
       if(on) wrap.scrollTop = Math.max(0, (wrap.scrollHeight - wrap.clientHeight) / 2);
     }, 200);
   };
+  var closeBig = function(){
+    if(wrap.parentNode) wrap.remove();
+    settleOverlayHistory();
+  };
   zBtn.addEventListener('click', function(e){ e.stopPropagation(); toggleZoom(); });
   wrap.querySelector('img').addEventListener('click', function(e){ e.stopPropagation(); toggleZoom(); });
   wrap.addEventListener('click', function(e){
-    if(e.target.classList.contains('bigmap-x') || e.target === wrap) wrap.remove();
+    if(e.target.classList.contains('bigmap-x') || e.target === wrap) closeBig();
   });
   layer.appendChild(wrap);
+  pushOverlayHistory();
 }
 
 function today(){
@@ -911,7 +916,7 @@ function deleteRegion(id){
     delete S.regions[id];
     toast('삭제했어요');
     closeAll();
-    if(/^#r=/.test(location.hash)) location.hash = '';
+    if(/^#r=/.test(location.hash)){ if(!navHash('')) render(); }
     else render();
   }).catch(function(){
     toast('삭제하지 못했어요 — 연결을 확인해 주세요', 'err');
@@ -1415,10 +1420,57 @@ var F = {
 };
 
 function closeAll(){
-  Array.prototype.forEach.call(document.querySelectorAll('.sheet-wrap,.modal-wrap,.pin-wrap'), function(n){ n.remove(); });
+  Array.prototype.forEach.call(document.querySelectorAll(OVERLAY_SEL), function(n){ n.remove(); });
   sheetOpen = false;
+  settleOverlayHistory();
   if(refresh) refresh(false);
 }
+
+/* ================== 안드로이드 뒤로가기 — 열린 팝업만 닫기 ==================
+   시트·확인 모달·지도 확대 뷰어·잠금 해제 팝업을 열 때 히스토리를 하나 쌓고,
+   뒤로가기(popstate)에서는 앱을 나가지 않고 열린 팝업만 닫는다. */
+var OVERLAY_SEL = '.sheet-wrap,.modal-wrap,.pin-wrap,.bigmap-wrap';
+var overlayHistPushed = false;   /* 팝업을 위해 쌓아 둔 히스토리 엔트리가 남아 있는지 */
+var overlayHistUrl = '';         /* 쌓을 때의 주소 — 그 사이 해시 이동을 했는지 비교용 */
+var overlaySelfBack = false;     /* 정리를 위해 우리가 부른 history.back() 표시 */
+function anyOverlayOpen(){ return !!document.querySelector(OVERLAY_SEL); }
+function pushOverlayHistory(){
+  if(overlayHistPushed) return;
+  try{
+    history.pushState({ appModal: true }, '');
+    overlayHistPushed = true;
+    overlayHistUrl = location.href;
+  }catch(e){}
+}
+function settleOverlayHistory(){
+  if(!overlayHistPushed) return;
+  setTimeout(function(){
+    if(!overlayHistPushed) return;   /* 이미 정리됐거나 뒤로가기로 소비됨 */
+    if(anyOverlayOpen()) return;     /* 다음 팝업이 이어받았다 */
+    overlayHistPushed = false;
+    if(location.href !== overlayHistUrl) return;   /* 그 사이 해시가 바뀌었으면 그대로 둔다 */
+    if(history.state && history.state.appModal){
+      overlaySelfBack = true;
+      try{ history.back(); }catch(e){ overlaySelfBack = false; }
+    }
+  }, 0);
+}
+/* 팝업을 닫은 직후 해시를 바꿀 때는 쌓아 둔 엔트리를 새 주소로 갈아 끼운다(중간 엔트리 방지) */
+function navHash(h){
+  var target = location.pathname + location.search + (h || '');
+  if(overlayHistPushed){
+    overlayHistPushed = false;
+    try{ history.replaceState(null, '', target); return true; }catch(e){}
+  }
+  location.hash = h || '';
+  return false;
+}
+window.addEventListener('popstate', function(){
+  if(overlaySelfBack){ overlaySelfBack = false; return; }   /* 정리용 back() — 무시 */
+  if(!anyOverlayOpen()) return;
+  overlayHistPushed = false;   /* 엔트리는 방금 소비됐다 */
+  closeAll();                  /* flag가 false라 settleOverlayHistory는 히스토리를 건드리지 않는다 */
+});
 
 function openSheet(cfg){
   var draft = deep(cfg.base || {});
@@ -1488,6 +1540,7 @@ function openSheet(cfg){
   wrap.querySelector('[data-x]').addEventListener('click', closeAll);
   layer.appendChild(wrap);
   sheetOpen = true;
+  pushOverlayHistory();
   setTimeout(function(){
     var first = body.querySelector('input[type=text]');
     if(first && !cfg.noFocus) first.focus();
@@ -1626,6 +1679,7 @@ function confirmBox(title, body, okText, onOk){
   wrap.addEventListener('click', function(e){ if(e.target === wrap) closeAll(); });
   layer.appendChild(wrap);
   sheetOpen = true;
+  pushOverlayHistory();
 }
 
 /* ================== 지역 폼 ================== */
@@ -1660,7 +1714,7 @@ function openRegionForm(id){
       if(isNew){
         var nid = newId();
         saveRegion(nid, d).then(function(ok){
-          if(ok){ location.hash = '#r=' + encodeURIComponent(nid); render(); }
+          if(ok){ navHash('#r=' + encodeURIComponent(nid)); render(); }
         });
       } else {
         saveRegion(id, d).then(function(ok){ if(ok) render(); });
@@ -2017,6 +2071,7 @@ function openListingSheet(regionId, ci, li){
   wrap.querySelector('[data-x]').addEventListener('click', closeAll);
   layer.appendChild(wrap);
   sheetOpen = true;
+  pushOverlayHistory();
 }
 
 function openTalkForm(id){
@@ -2122,6 +2177,7 @@ function openPin(){
   });
   layer.appendChild(wrap);
   sheetOpen = true;
+  pushOverlayHistory();
 }
 
 /* ================== 이벤트 ================== */
