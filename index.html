@@ -449,6 +449,9 @@
     opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;box-shadow:0 10px 24px rgba(30,27,122,.3)}
   #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
   #toast.err{background:#8C2B24}
+  /* 메모 시트처럼 아래를 가리는 팝업이 열려 있으면 알림은 위로 */
+  #toast.lift{bottom:auto;top:calc(16px + env(safe-area-inset-top));transform:translateX(-50%) translateY(-8px)}
+  #toast.lift.on{transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -822,12 +825,12 @@ function today(){
   var p = function(n){ return (n<10?'0':'') + n; };
   return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
 }
-var toastT = null;
+var toastT = null, toastLift = false;
 function toast(msg, kind){
   toastEl.textContent = msg;
-  toastEl.className = 'on' + (kind === 'err' ? ' err' : '');
+  toastEl.className = (toastLift ? 'lift ' : '') + 'on' + (kind === 'err' ? ' err' : '');
   clearTimeout(toastT);
-  toastT = setTimeout(function(){ toastEl.className = ''; }, 2100);
+  toastT = setTimeout(function(){ toastEl.className = toastLift ? 'lift' : ''; }, 2100);
 }
 
 /* ================== 데이터 ================== */
@@ -1443,6 +1446,8 @@ var F = {
 function closeAll(){
   Array.prototype.forEach.call(document.querySelectorAll(OVERLAY_SEL), function(n){ n.remove(); });
   sheetOpen = false;
+  toastLift = false;
+  if(toastEl) toastEl.classList.remove('lift');
   settleOverlayHistory();
   if(refresh) refresh(false);
 }
@@ -1584,6 +1589,7 @@ function openMemoSheet(){
     + '</div>';
   layer.appendChild(wrap);
   sheetOpen = true;
+  toastLift = true;   /* 알림이 입력란과 메모 목록을 가리지 않게 위로 */
   resetMemoClear();
   pushOverlayHistory();
   wrap.addEventListener('click', function(e){ if(e.target === wrap) closeAll(); });
