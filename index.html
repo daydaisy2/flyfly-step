@@ -523,6 +523,7 @@ function saveRegion(id, body){
   lastWrite = Date.now();
   var payload = deep(body);
   delete payload.id;
+  delete payload.sample;   /* 한 번이라도 손대면 더 이상 '예시'가 아니다 */
   return api('regions/' + encodeURIComponent(id), 'PUT', payload).then(function(){
     payload.id = id;
     S.regions[id] = payload;
@@ -1136,7 +1137,6 @@ function openRegionForm(id){
     },
     delLabel: '지역 삭제',
     onSave: function(d){
-      if(d.sample) delete d.sample;
       if(isNew){
         var nid = newId();
         saveRegion(nid, d).then(function(ok){
