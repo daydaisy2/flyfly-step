@@ -350,6 +350,7 @@ var ROOM = 'imchall-public-v1';
 var LS = 'imchall.unlock.v1';
 var PW_HASH = '0341266d632db4ef5aeac567ed6d00f44506e1c4f73f9e7a44f8cbc21888c597';
 var SALT = 'imchall::v1::';
+var CACHE_KEY = 'imchall.cache.v1';
 
 var roomUrl = function(){ return DB + '/rooms/' + ROOM + '.json'; };
 var nodeUrl = function(p){ return DB + '/rooms/' + ROOM + '/' + p + '.json'; };
@@ -494,9 +495,16 @@ function refresh(force){
     return r.json();
   }).then(function(data){
     normalize(data);
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify(data)); }catch(e){}
     dotEl.className = 'dot live';
     render();
   }).catch(function(){ dotEl.className = 'dot warn'; });
+}
+function loadCache(){
+  try{
+    var raw = localStorage.getItem(CACHE_KEY);
+    if(raw) normalize(JSON.parse(raw));
+  }catch(e){}
 }
 function queueRefresh(){
   clearTimeout(refreshTimer);
@@ -1417,6 +1425,7 @@ document.addEventListener('visibilitychange', function(){
 
 /* ================== 시작 ================== */
 try{ unlocked = localStorage.getItem(LS) === '1'; }catch(e){}
+loadCache();
 render();
 refresh(true);
 startSync();
