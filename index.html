@@ -57,6 +57,26 @@
   .lock-btn{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;
     background:rgba(255,255,255,.55);font-size:14px;color:var(--navy);line-height:1}
   .lock-btn.on{background:#fff;box-shadow:0 4px 12px rgba(112,86,0,.16)}
+  .memo-btn{position:relative;width:34px;height:34px;border-radius:12px;display:grid;place-items:center;
+    background:rgba(255,255,255,.55);font-size:15px;color:var(--navy);line-height:1;
+    transition:background .18s,color .18s,box-shadow .18s}
+  .memo-btn.has{background:var(--navy);color:#fff;box-shadow:0 4px 12px rgba(30,27,122,.24)}
+  .memo-cnt{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;
+    background:#E8603C;color:#fff;font-size:9.5px;font-weight:900;line-height:17px;text-align:center;
+    border:1.5px solid var(--yellow)}
+  .memo-cnt[hidden]{display:none}
+  .memo-add{width:100%;height:44px;border-radius:14px;border:0;cursor:pointer;background:var(--cream);
+    color:var(--navy);font-family:inherit;font-size:13px;font-weight:900;letter-spacing:-.02em}
+  .memo-add:active{transform:scale(.99)}
+  .memo-list{display:flex;flex-direction:column;gap:7px}
+  .memo-row{display:flex;align-items:flex-start;gap:8px;background:var(--cream);border-radius:14px;padding:10px 11px}
+  .memo-row .mx{flex:1 1 auto;min-width:0;font-size:12px;font-weight:800;color:#3A382E;line-height:1.45;
+    letter-spacing:-.02em;white-space:pre-line;word-break:break-word}
+  .memo-del{flex:0 0 auto;width:26px;height:26px;border:0;border-radius:9px;background:#FBEAE8;color:var(--red);
+    font-size:11px;font-weight:900;display:grid;place-items:center;cursor:pointer}
+  .memo-empty{margin:8px 0;text-align:center;font-size:11.5px;font-weight:800;color:#A29C84;line-height:1.6}
+  .memo-wrap .sheet-f .btn-navy{flex:1 1 auto}
+  .btn-ghost.confirm{background:var(--red);color:#fff}
   #view{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
     padding:2px 16px 20px;display:flex;flex-direction:column;gap:11px;scrollbar-width:none}
   #view>*{flex:0 0 auto}
@@ -437,6 +457,7 @@
     <h1 class="brand"><span class="fl">👣</span>리훨 임챌</h1>
     <div class="top-right">
       <span id="dot" class="dot" title="동기화 상태" aria-label="동기화 상태"></span>
+      <button id="memoBtn" class="memo-btn" type="button" aria-label="수정 요청 메모">📝<span class="memo-cnt" id="memoCnt" hidden>0</span></button>
       <button id="lockBtn" class="lock-btn" aria-label="기록 모드">🔒</button>
     </div>
   </header>
@@ -1471,6 +1492,140 @@ window.addEventListener('popstate', function(){
   overlayHistPushed = false;   /* 엔트리는 방금 소비됐다 */
   closeAll();                  /* flag가 false라 settleOverlayHistory는 히스토리를 건드리지 않는다 */
 });
+
+/* ================== 📝 수정 요청 메모 (이 기기에만 저장) ==================
+   고치고 싶은 곳을 그때그때 적어 두고, [전체 복사]로 피클 채팅에 붙여넣을 수 있게 한다.
+   시트는 다른 팝업과 같은 .sheet-wrap 이라 안드로이드 뒤로가기로도 닫힌다. */
+var MEMO_KEY = 'imchall.memos.v1';
+var MEMOS = loadMemos();
+var memoTimer = null;
+function loadMemos(){
+  try{
+    var a = JSON.parse(localStorage.getItem(MEMO_KEY) || '[]');
+    return Object.prototype.toString.call(a) === '[object Array]'
+      ? a.filter(function(m){ return m && m.text; }) : [];
+  }catch(e){ return []; }
+}
+function saveMemos(){
+  try{ localStorage.setItem(MEMO_KEY, JSON.stringify(MEMOS)); }catch(e){}
+  paintMemoBadge();
+}
+function paintMemoBadge(){
+  var b = document.getElementById('memoBtn'), c = document.getElementById('memoCnt');
+  if(!b || !c) return;
+  var n = MEMOS.length;
+  b.classList.toggle('has', n > 0);
+  c.textContent = n > 9 ? '9+' : String(n);
+  c.hidden = n === 0;
+  b.setAttribute('aria-label', n ? '수정 요청 메모 ' + n + '개' : '수정 요청 메모');
+}
+function memoRowsHtml(){
+  if(!MEMOS.length) return '<p class="memo-empty">아직 적어 둔 요청이 없어요<br>고치고 싶은 곳을 그때그때 적어 두세요</p>';
+  return MEMOS.map(function(m){
+    return '<div class="memo-row"><span class="mx">' + esc(m.text) + '</span>'
+      + '<button class="memo-del" type="button" data-mdel="' + esc(m.id) + '" aria-label="삭제">✕</button></div>';
+  }).join('');
+}
+function paintMemoList(){
+  var l = document.getElementById('memoList');
+  if(l) l.innerHTML = memoRowsHtml();
+}
+function resetMemoClear(){
+  var b = document.getElementById('memoClear');
+  if(!b) return;
+  b.classList.remove('confirm');
+  b.textContent = '🗑 비우기';
+  if(memoTimer){ clearTimeout(memoTimer); memoTimer = null; }
+}
+function addMemo(){
+  var inp = document.getElementById('memoInput');
+  if(!inp) return;
+  var v = inp.value.trim();
+  if(!v){ toast('요청 내용을 적어 주세요', 'err'); inp.focus(); return; }
+  MEMOS.push({ id: 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), text: v, at: Date.now() });
+  saveMemos();
+  inp.value = '';
+  paintMemoList();
+  toast('메모를 추가했어요');
+  inp.focus();
+}
+function copyText(t){
+  if(navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t);
+  return new Promise(function(resolve, reject){
+    var ta = document.createElement('textarea');
+    ta.value = t; ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, t.length);
+    var ok = false;
+    try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
+    ta.remove();
+    if(ok) resolve(); else reject(new Error('copy failed'));
+  });
+}
+function openMemoSheet(){
+  if(document.querySelector('.memo-wrap')) return;
+  var wrap = document.createElement('div');
+  wrap.className = 'sheet-wrap memo-wrap';
+  wrap.innerHTML = '<div class="sheet">'
+    + '<div class="sheet-h"><div><h3>📝 두두에게 보낼 수정 요청</h3>'
+    + '<p>메모는 이 기기에만 저장되고, 앱을 닫아도 그대로 남아요</p></div>'
+    + '<button class="sheet-x" data-x aria-label="닫기">✕</button></div>'
+    + '<div class="sheet-b">'
+    +   '<div class="fld"><span class="fld-l">요청 내용</span>'
+    +   '<textarea id="memoInput" maxlength="300" placeholder="예: 점검 항목 글자가 조금 작아요"></textarea></div>'
+    +   '<button class="memo-add" id="memoAdd" type="button">＋ 메모 추가</button>'
+    +   '<div class="memo-list" id="memoList">' + memoRowsHtml() + '</div>'
+    + '</div>'
+    + '<div class="sheet-f">'
+    +   '<button class="btn btn-navy" id="memoCopy">📋 전체 복사</button>'
+    +   '<button class="btn btn-ghost" id="memoClear">🗑 비우기</button>'
+    + '</div>'
+    + '</div>';
+  layer.appendChild(wrap);
+  sheetOpen = true;
+  resetMemoClear();
+  pushOverlayHistory();
+  wrap.addEventListener('click', function(e){ if(e.target === wrap) closeAll(); });
+  wrap.querySelector('[data-x]').addEventListener('click', closeAll);
+  document.getElementById('memoAdd').addEventListener('click', addMemo);
+  document.getElementById('memoInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && (e.metaKey || e.ctrlKey)){ e.preventDefault(); addMemo(); }
+  });
+  document.getElementById('memoList').addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-mdel]') : null;
+    if(!b) return;
+    MEMOS = MEMOS.filter(function(m){ return m.id !== b.getAttribute('data-mdel'); });
+    saveMemos();
+    paintMemoList();
+  });
+  document.getElementById('memoCopy').addEventListener('click', function(){
+    if(!MEMOS.length){ toast('복사할 메모가 없어요', 'err'); return; }
+    var text = '리훨 임챌 수정 요청:\n' + MEMOS.map(function(m){ return '- ' + m.text; }).join('\n');
+    try{
+      copyText(text).then(function(){ toast('복사했어요! 피클 채팅에 붙여넣기 해 주세요'); },
+        function(){ toast('복사하지 못했어요 — 메모를 길게 눌러 복사해 주세요', 'err'); });
+    }catch(err){ toast('복사하지 못했어요 — 메모를 길게 눌러 복사해 주세요', 'err'); }
+  });
+  document.getElementById('memoClear').addEventListener('click', function(e){
+    if(!MEMOS.length){ toast('비울 메모가 없어요', 'err'); return; }
+    var btn = e.currentTarget;
+    if(!btn.classList.contains('confirm')){
+      btn.classList.add('confirm');
+      btn.textContent = '정말 비울까요?';
+      if(memoTimer) clearTimeout(memoTimer);
+      memoTimer = setTimeout(resetMemoClear, 4000);
+      return;
+    }
+    MEMOS = [];
+    saveMemos();
+    paintMemoList();
+    resetMemoClear();
+    toast('메모를 모두 지웠어요');
+  });
+}
+document.getElementById('memoBtn').addEventListener('click', openMemoSheet);
+paintMemoBadge();
 
 function openSheet(cfg){
   var draft = deep(cfg.base || {});

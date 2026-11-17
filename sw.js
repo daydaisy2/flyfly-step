@@ -1,6 +1,6 @@
 /* 리훨 임챌 서비스워커 — 마지막 화면은 오프라인에서도 열리게.
    Firebase(다른 출처) 통신은 절대 캐시하지 않는다. */
-const CACHE = 'imchall-v3';
+const CACHE = 'imchall-v4';
 const ASSETS = [
   './',
   './index.html',
