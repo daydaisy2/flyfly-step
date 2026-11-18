@@ -430,19 +430,8 @@ function fmtMoney(v){
   if(man) out += (out ? ' ' : '') + man.toLocaleString('ko-KR') + '만';
   return out || '0';
 }
-/* 취득세 간이 계산 (1주택 6억↓1.1% / 6~9억 누진 / 9억↑3.3%, 다주택 8.4%·12.4%)
-   농어촌특별세 0.2%는 전용 85㎡ 초과일 때만 더한다(85㎡ 이하 비과세). 정확한 값은 부동산계산기 결과를 직접 입력 */
-function acqTax(priceMan, houses, area){
-  var p = priceMan * 10000;
-  if(!p) return 0;
-  var h = String(houses || '1'), rate, edu, agri = Number(area) > 85 ? 0.002 : 0;
-  if(h === '3'){ rate = 0.12; edu = 0.004; }
-  else if(h === '2'){ rate = 0.08; edu = 0.004; }
-  else if(p <= 600000000){ rate = 0.01; edu = 0.001; agri = 0; }
-  else if(p <= 900000000){ rate = ((p / 100000000) * 2 / 3 - 3) / 100; edu = 0.003; }
-  else { rate = 0.03; edu = 0.003; }
-  return Math.round(priceMan * (rate + edu + agri));
-}
+/* 부대비용(중개료 + 취득세 등)은 따로 계산하지 않고 매매가 × 0.5% 로 묶는다 */
+var EXTRA_RATE = 0.005;
 function fmtNum(n){
   n = Math.round(Number(n) || 0);
   return n ? n.toLocaleString('ko-KR') : '—';
@@ -450,19 +439,14 @@ function fmtNum(n){
 /* 자금 세팅: 같은 매물을 두 가지로 본다
      매매 / 전세 / 자본(= 매매 − 전세)      (전세 끼고 살 때)
      매매 / 대출 / 자본(= 매매 − 대출)      (대출 받을 때 — 대출은 규제 때문에 자동 계산하지 않고 직접 입력)
-   총투자금 = 자본 + 중개보수 + 취득세 (중개보수·취득세는 직접 넣으면 그 값). 안 적은 쪽은 계산하지 않는다 */
+   부대비용 = 매매 × 0.5% (중개료·취득세를 묶음), 총투자금 = 자본 + 부대비용. 안 적은 쪽은 계산하지 않는다 */
 function seedOf(L){
   L = L || {};
   var price = parseMoney(L.maemae), jeon = parseMoney(L.jeonse), loan = parseMoney(L.loan);
-  var feeRate = (L.feeRate === undefined || L.feeRate === null || L.feeRate === '') ? 0.55 : Number(L.feeRate);
-  var hasFee = !(L.fee === undefined || L.fee === null || L.fee === '');
-  var fee = hasFee ? Math.round(Number(L.fee)) : Math.round(price * feeRate / 100);
-  var houses = L.houses || '1', taxAuto = acqTax(price, houses, L.area);
-  var hasTax = !(L.tax === undefined || L.tax === null || L.tax === '');
-  var tax = hasTax ? Math.round(Number(L.tax)) : taxAuto;
+  var extra = Math.round(price * EXTRA_RATE);
   var ownJ = (price && jeon) ? price - jeon : null, ownL = (price && loan) ? price - loan : null;
-  return { price:price, jeon:jeon, loan:loan, ownJ:ownJ, ownL:ownL, feeRate:feeRate, fee:fee, hasFee:hasFee, tax:tax, hasTax:hasTax, houses:houses,
-    totalJ: ownJ === null ? null : ownJ + fee + tax, totalL: ownL === null ? null : ownL + fee + tax };
+  return { price:price, jeon:jeon, loan:loan, ownJ:ownJ, ownL:ownL, extra:extra,
+    totalJ: ownJ === null ? null : ownJ + extra, totalL: ownL === null ? null : ownL + extra };
 }
 /* 조사 기준: 전용 84㎡ 국평 입주매물, 1~3층 · 세안고 제외 (탑층은 총층수를 받지 않아 직접 거른다) — 바꾸려면 아래 숫자만 고치면 된다 */
 var RULE = { area: 84, floorMax: 3 };
@@ -830,8 +814,7 @@ function listingPanel(vid, pid, lsts){
     ['','매매','', function(L, x){ return fmtNum(x.price); }, 'pe2 num blue'],
     ['','대출','', function(L, x){ return fmtNum(x.loan); }, 'pe2 num'],
     ['','자본','대출 기준', function(L, x){ return ownCell(x.ownL); }, 'pe2 num blue strong'],
-    ['부대','중개','', function(L, x){ return fmtNum(x.fee) + '<small>' + (x.hasFee ? '직접 입력' : x.feeRate + '% 기준') + '</small>'; }, 'pe num'],
-    ['','취득','', function(L, x){ return fmtNum(x.tax) + '<small>' + (x.hasTax ? '직접 입력' : (x.houses === '1' ? '1주택' : x.houses + '주택') + ' 간이계산') + '</small>'; }, 'pe num'],
+    ['부대','부대비용','매매 × 0.5%', function(L, x){ return fmtNum(x.extra); }, 'pe num'],
     ['합계','총투자금','전세 기준', function(L, x){ return x.totalJ === null ? '—' : fmtNum(x.totalJ); }, 'total num strong'],
     ['','총투자금','대출 기준', function(L, x){ return x.totalL === null ? '—' : fmtNum(x.totalL); }, 'total num strong'],
     ['판정','조사 기준',RULE.area + '㎡ · ' + (RULE.floorMax + 1) + '층↑ · 세안고 제외', function(L, x, j){
@@ -856,7 +839,7 @@ function listingPanel(vid, pid, lsts){
     t += '</tr>';
   });
   t += '</tbody></table></div>';
-  t += '<p class="note">단위: 만원 · 세팅은 매매 / 전세 / 자본, 매매 / 대출 / 자본 두 가지를 나란히 봐요 (대출은 직접 입력) · 안 적은 쪽은 — 로 나와요</p>';
+  t += '<p class="note">단위: 만원 · 세팅은 매매 / 전세 / 자본, 매매 / 대출 / 자본 두 가지를 나란히 봐요 (대출은 직접 입력) · 부대비용은 중개료·취득세를 묶어 매매 × 0.5% · 안 적은 쪽은 — 로 나와요</p>';
   if(unlocked) t += '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>';
   return t;
 }
@@ -1280,11 +1263,10 @@ function openListingForm(vid, pid, li){
   var blank = function(x){ return (x === undefined || x === null || x === '') ? '' : String(x); };
   var data = L ? {
       dong:L.dong, floor:blank(L.floor), area:blank(L.area), sealed:L.sealed || 'N', kb:money(L.kb),
-      maemae:money(L.maemae), jeonse:money(L.jeonse), loan:money(L.loan),
-      feeRate:blank(L.feeRate), fee:blank(L.fee), houses:L.houses || '1', tax:blank(L.tax)
+      maemae:money(L.maemae), jeonse:money(L.jeonse), loan:money(L.loan)
     } : {
       dong:'', floor:'', area:'', sealed:'N', kb:'',
-      maemae:'', jeonse:'', loan:'', feeRate:'', fee:'', houses:'1', tax:''
+      maemae:'', jeonse:'', loan:''
     };
   var save = function(body, msg){ return saveVideo(vid, body, msg); };
   openSheet({
@@ -1300,21 +1282,13 @@ function openListingForm(vid, pid, li){
       { k:'maemae', label:'매매 (만원)', placeholder:'예) 12억 5,000' },
       { k:'jeonse', label:'전세 (만원)', half:true, placeholder:'예) 5억 7,000', hint:'자본 = 매매 − 전세' },
       { k:'loan', label:'대출 (만원)', half:true, placeholder:'예) 8억 7,500', hint:'직접 입력 · 자본 = 매매 − 대출' },
-      { head:'부대' },
-      { k:'feeRate', label:'중개 요율 (%)', half:true, placeholder:'0.55' },
-      { k:'fee', label:'중개보수 직접 (만원)', half:true, placeholder:'비우면 자동' },
-      { k:'houses', label:'취득세 기준', type:'select', half:true, options:[['1','1주택'],['2','2주택'],['3','3주택+']] },
-      { k:'tax', label:'취득세 직접 (만원)', half:true, placeholder:'비우면 간이계산', hint:'부동산계산기 값을 넣으면 그 값을 써요' }
     ],
     onSave: function(x){
       var o = {};
-      ['dong','sealed','houses'].forEach(function(k){ o[k] = x[k]; });
+      ['dong','sealed'].forEach(function(k){ o[k] = x[k]; });
       o.floor = x.floor ? (parseInt(String(x.floor).replace(/[^\d]/g, ''), 10) || '') : '';
       o.area = x.area ? (parseFloat(String(x.area).replace(/[^\d.]/g, '')) || '') : '';
       ['kb','maemae','jeonse','loan'].forEach(function(k){ o[k] = x[k] ? parseMoney(x[k]) : ''; });
-      o.feeRate = x.feeRate ? (parseFloat(String(x.feeRate).replace(/[^\d.]/g, '')) || '') : '';
-      o.fee = x.fee ? parseMoney(x.fee) : '';
-      o.tax = x.tax ? parseMoney(x.tax) : '';
       var body = deep(v);
       var tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0];
       var ls = arr(tp.listings);
