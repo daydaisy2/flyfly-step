@@ -150,6 +150,34 @@
   .ph1 img.ok{opacity:1}
   .ph1.add{background:var(--white);border:2px dashed #D9CF9E;color:#8F8A73;font-size:12px;font-weight:900;text-align:center;line-height:1.3;
     display:grid;place-items:center}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:16px;border:1px solid #E7DDBE;margin:0 -4px}
+  .tbl{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+  .tbl th,.tbl td{border-right:1px solid #EFE6C8;border-bottom:1px solid #EFE6C8;padding:8px 10px;vertical-align:middle;background:#fff}
+  .tbl tr>:last-child{border-right:0}
+  .tbl tbody tr:last-child>*{border-bottom:0}
+  .tbl th.g{position:sticky;left:0;z-index:3;width:30px;min-width:30px;padding:0;text-align:center;color:#fff;font-weight:900;font-size:12px;letter-spacing:.1em}
+  .tbl th.g span{display:block;writing-mode:vertical-rl;margin:0 auto;padding:4px 0;white-space:nowrap}
+  .tbl .grp-a{background:#5B64B8}
+  .tbl .grp-b{background:var(--navy)}
+  .tbl .grp-c{background:#7A6A2E}
+  .tbl .grp-d{background:var(--green)}
+  .tbl thead th{background:var(--cream);font-weight:900;color:var(--navy);text-align:center;position:sticky;top:0;z-index:2}
+  .tbl thead th.g{z-index:4;background:var(--cream)}
+  .tbl thead th.c{min-width:132px;max-width:170px;font-size:14px;letter-spacing:-.03em}
+  .tbl thead th.c button{width:100%;text-align:center;font-weight:900;color:var(--navy);font-size:14px}
+  .tbl th.l{position:sticky;left:30px;z-index:3;min-width:96px;background:#EEF0FB;color:#2B2F66;font-weight:900;font-size:12.5px;text-align:left;letter-spacing:-.03em;box-shadow:2px 0 0 #E7DDBE}
+  .tbl th.l small,.tbl th.corner small{display:block;font-size:10.5px;font-weight:700;color:#7A7F9E;margin-top:1px}
+  .tbl thead th.corner{background:#EEF0FB;z-index:4;text-align:left;font-size:12.5px;color:#2B2F66}
+  .tbl td{text-align:center;font-weight:800;color:var(--ink);letter-spacing:-.03em;min-width:132px}
+  .tbl td.txt{font-size:13px;font-weight:700}
+  .tbl td.num{font-variant-numeric:tabular-nums;font-size:14px}
+  .tbl td small{display:block;font-size:10.5px;font-weight:700;color:#8F8A73;margin-top:2px;line-height:1.35}
+  .tbl td.hl{background:#FFF1C2}
+  .tbl td.pe{background:#FDEAE0}
+  .tbl td.blue{color:#2A2DD0}
+  .tbl td.strong{font-weight:900;font-size:15px}
+  .tbl td.total{background:var(--navy);color:#FFE680;font-size:16px}
+  .tbl td .neg{color:var(--red)}
   .setup{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .sc{background:var(--cream);border-radius:20px;padding:12px 13px;display:flex;flex-direction:column;gap:6px;min-width:0}
   .sc h3{margin:0 0 2px;font-size:13.5px;font-weight:900;color:var(--navy);letter-spacing:-.03em}
@@ -352,13 +380,45 @@ function acqTax(priceMan, houses){
   else { rate = 0.03; edu = 0.003; agri = 0.002; }
   return Math.round(priceMan * (rate + edu + agri));
 }
-/* LTV 기준 자금 세팅: 대출 = 매매가 × LTV, 내 돈 = 매매가 − 대출, 총투자금 = 내 돈 + 중개보수 + 취득세 */
-function setupOf(pt, ltv){
-  var price = parseMoney(pt.price);
-  var rate = Number(pt.rate) > 0 ? Number(pt.rate) : 5;
-  var loan = Math.round(price * ltv), own = price - loan;
-  var fee = Math.round(price * 0.0055), tax = acqTax(price, pt.houses || '1');
-  return { price:price, loan:loan, own:own, interest:Math.round(loan * rate / 100 / 12), fee:fee, tax:tax, total:own + fee + tax, rate:rate };
+function fmtNum(n){
+  n = Math.round(Number(n) || 0);
+  return n ? n.toLocaleString('ko-KR') : '—';
+}
+/* 자금 세팅 전략 */
+var PRESETS = [
+  { k:'ltv70', t:'생초(LTV70%)', r:0.70 },
+  { k:'ltv40', t:'LTV40%', r:0.40 },
+  { k:'gap', t:'전세 끼고(갭)', r:0 },
+  { k:'manual', t:'직접입력', r:null }
+];
+function presetOf(k){
+  for(var i=0;i<PRESETS.length;i++) if(PRESETS[i].k === k) return PRESETS[i];
+  return PRESETS[0];
+}
+/* 매물 한 칸의 자금 세팅
+   대출 = 매매가 × LTV (대출 한도 · 갭을 넘으면 그 선까지) / 자본 = 매매 − 전세 − 대출
+   총투자금 = 자본 + 중개보수 + 취득세 (중개보수·취득세는 직접 넣으면 그 값) */
+function seedOf(L){
+  L = L || {};
+  var price = parseMoney(L.maemae), jeon = parseMoney(L.jeonse), pre = presetOf(L.preset);
+  var loan = pre.r != null ? price * pre.r : parseMoney(L.loan), note = '';
+  var cap = parseMoney(L.loanCap);
+  if(cap > 0 && loan > cap){ loan = cap; note = '한도'; }
+  var room = price > 0 ? Math.max(0, price - jeon) : 0;
+  if(price > 0 && loan > room){ loan = room; note = note ? '한도·갭' : '갭'; }
+  loan = Math.max(0, Math.round(loan));
+  var capital = price - jeon - loan;
+  var rate = Number(L.rate) > 0 ? Number(L.rate) : 5, term = Number(L.term) > 0 ? Number(L.term) : 30;
+  var mr = rate / 1200, mn = Math.round(term * 12);
+  var mPay = loan ? Math.floor(loan * mr / (1 - Math.pow(1 + mr, -mn))) : 0;   /* 만원 단위 절사 */
+  var feeRate = (L.feeRate === undefined || L.feeRate === null || L.feeRate === '') ? 0.55 : Number(L.feeRate);
+  var hasFee = !(L.fee === undefined || L.fee === null || L.fee === '');
+  var fee = hasFee ? Math.round(Number(L.fee)) : Math.round(price * feeRate / 100);
+  var houses = L.houses || '1', taxAuto = acqTax(price, houses);
+  var hasTax = !(L.tax === undefined || L.tax === null || L.tax === '');
+  var tax = hasTax ? Math.round(Number(L.tax)) : taxAuto;
+  return { price:price, jeon:jeon, loan:loan, capital:capital, rate:rate, term:term, mPay:mPay, note:note, feeRate:feeRate, fee:fee, hasFee:hasFee,
+    tax:tax, hasTax:hasTax, houses:houses, total:capital + fee + tax, preset:pre };
 }
 
 /* ================== 사진 (Firebase 옆 노드, 방 본문과 분리) ==================
@@ -442,7 +502,7 @@ function normalize(data){
       var v = data.videos[id];
       if(v && typeof v === 'object'){
         v = deep(v); v.id = id;
-        v.points = arr(v.points).map(function(p){ p.photos = arr(p.photos); return p; });
+        v.points = arr(v.points).map(function(p){ p.photos = arr(p.photos); p.listings = arr(p.listings); return p; });
         out[id] = v;
       }
     });
@@ -649,6 +709,57 @@ function renderVideo(id){
   viewEl.innerHTML = h;
 }
 
+/* ---------- 매물 세팅 표 (정보 → 세팅 → 부대 → 합계, 매물 하나가 한 열) ---------- */
+function listingPanel(vid, pid, lsts){
+  if(!lsts.length){
+    return '<p class="none">' + (unlocked ? '아직 매물이 없어요. 아래 버튼으로 첫 매물을 넣어 보세요.' : '아직 매물이 없어요') + '</p>'
+      + (unlocked ? '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>' : '');
+  }
+  var seeds = lsts.map(seedOf);
+  var rows = [
+    ['정보','아파트명(평수)','', function(L){ return esc(L.name) || '—'; }, 'hl txt'],
+    ['','동·층향','', function(L){ return esc(L.dong) || '—'; }, 'hl txt'],
+    ['','입주가능','', function(L){ return esc(L.moveIn) || '—'; }, 'hl txt'],
+    ['','매매','', function(L, x){ return fmtNum(x.price); }, 'hl num'],
+    ['','시군구','', function(L){ return esc(L.where) || '—'; }, 'txt'],
+    ['','세대수(연식)','', function(L){ return esc(L.households) || '—'; }, 'txt'],
+    ['','공시','', function(L){ return fmtNum(parseMoney(L.gongsi)); }, 'num'],
+    ['','시세','', function(L){ return fmtNum(parseMoney(L.sise)); }, 'num'],
+    ['','전고','', function(L){ return fmtNum(parseMoney(L.peak)); }, 'num'],
+    ['','전세','네이버최저호가', function(L){ return fmtNum(parseMoney(L.jeonseAsk)); }, 'num'],
+    ['','호가','네이버최저호가', function(L){ return fmtNum(parseMoney(L.asking)); }, 'num'],
+    ['세팅','매매','', function(L, x){ return fmtNum(x.price); }, 'pe num blue'],
+    ['','전세','', function(L, x){ return fmtNum(x.jeon); }, 'pe num'],
+    ['','대출','', function(L, x){
+        return fmtNum(x.loan) + '<small>' + esc(x.preset.t) + (x.note ? ' · ' + x.note + ' 상한' : '') + (x.mPay ? '<br>월 ' + x.mPay.toLocaleString('ko-KR') + '만원' : '') + '</small>'; }, 'pe num'],
+    ['','자본','', function(L, x){ return x.capital < 0 ? '<span class="neg">' + fmtNum(x.capital) + '</span>' : fmtNum(x.capital); }, 'pe num blue strong'],
+    ['부대','중개','', function(L, x){ return fmtNum(x.fee) + '<small>' + (x.hasFee ? '직접 입력' : x.feeRate + '% 기준') + '</small>'; }, 'pe num'],
+    ['','취득','', function(L, x){ return fmtNum(x.tax) + '<small>' + (x.hasTax ? '직접 입력' : (x.houses === '1' ? '1주택' : x.houses + '주택') + ' 간이계산') + '</small>'; }, 'pe num'],
+    ['합계','총투자금','자본+중개+취득', function(L, x){ return fmtNum(x.total); }, 'total num strong']
+  ];
+  var span = {};
+  rows.forEach(function(r){ if(r[0]) span[r[0]] = 0; });
+  var cur = '';
+  rows.forEach(function(r){ if(r[0]) cur = r[0]; span[cur]++; });
+  var t = '<div class="tbl-wrap"><table class="tbl"><thead><tr><th class="g"></th><th class="l corner">구분<small>(단독명의)</small></th>';
+  lsts.forEach(function(L, i){
+    var nm = esc(L.label || L.name || ('매물 ' + (i + 1)));
+    t += '<th class="c">' + (unlocked ? '<button data-act="edit-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '" data-i="' + i + '" aria-label="매물 수정">' + nm + ' ✏️</button>' : nm) + '</th>';
+  });
+  t += '</tr></thead><tbody>';
+  rows.forEach(function(r){
+    t += '<tr>';
+    if(r[0]) t += '<th class="g grp-' + (r[0] === '정보' ? 'a' : r[0] === '세팅' ? 'b' : r[0] === '부대' ? 'c' : 'd') + '" rowspan="' + span[r[0]] + '"><span>' + r[0] + '</span></th>';
+    t += '<th class="l">' + r[1] + (r[2] ? '<small>' + r[2] + '</small>' : '') + '</th>';
+    lsts.forEach(function(L, i){ t += '<td class="' + r[4] + '">' + r[3](L, seeds[i]) + '</td>'; });
+    t += '</tr>';
+  });
+  t += '</tbody></table></div>';
+  t += '<p class="note">단위: 만원 · 월 금액은 원리금(금리·기간은 매물마다 수정) · 자본 = 매매 − 전세 − 대출</p>';
+  if(unlocked) t += '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>';
+  return t;
+}
+
 function renderPoint(vid, pid){
   var v = S.videos[vid], p = v && arr(v.points).filter(function(x){ return x.pid === pid; })[0];
   paintSeasons(lastSeason);
@@ -682,17 +793,8 @@ function renderPoint(vid, pid){
   if(!phs.length && !unlocked) gal = '<p class="none">아직 사진이 없어요</p>';
   h += accHTML('photo', '📷', '현장사진', phs.length ? phs.length + '장' : '', gal);
   if(isApt){
-    var price = parseMoney(p.price), setup;
-    if(price){
-      var a = setupOf(p, 0.7), b = setupOf(p, 0.4);
-      var one = function(t, cls, x){
-        return '<div class="sc ' + cls + '"><h3>' + t + '</h3><div class="r">대출<b>' + fmtMoney(x.loan) + '</b></div><div class="r">내 돈<b>' + fmtMoney(x.own) + '</b></div>'
-          + '<div class="r">월 이자<b>' + fmtMoney(x.interest) + '</b></div><div class="tot"><small>예상 총투자금</small><b>' + fmtMoney(x.total) + '</b></div></div>';
-      };
-      setup = '<div class="setup">' + one('LTV 70%', '', a) + one('LTV 40%', 'g', b) + '</div>'
-        + '<p class="note">매매 ' + fmtMoney(price) + ' · 중개보수 0.55%(' + fmtMoney(a.fee) + ') · 취득세 ' + ((p.houses || '1') === '1' ? '1주택' : p.houses + '주택') + ' 간이(' + fmtMoney(a.tax) + ') · 금리 ' + a.rate + '%</p>';
-    } else setup = '<p class="none">' + (unlocked ? '✏️ 지점 수정에서 매매가를 넣으면 계산돼요' : '아직 매매가가 없어요') + '</p>';
-    h += accHTML('setup', '🧮', '매물 세팅', price ? '매매 ' + fmtMoney(price) : '', setup);
+    var lsts = arr(p.listings);
+    h += accHTML('setup', '🧮', '매물 세팅', lsts.length ? '매물 ' + lsts.length + '개' : '', listingPanel(vid, pid, lsts));
   }
   h += accHTML('memo', '📝', '메모', p.memo ? '' : '비어 있어요', p.memo ? '<div class="memo">' + esc(p.memo) + '</div>' : '<p class="none">' + (unlocked ? '✏️ 지점 수정에서 적을 수 있어요' : '아직 메모가 없어요') + '</p>');
   h += '</div>';
@@ -807,10 +909,12 @@ function openSheet(cfg){
   wrap.innerHTML = '<div class="sheet" role="dialog" aria-modal="true"><div class="sheet-h"><div><h3>' + esc(cfg.title) + '</h3>' + (cfg.sub ? '<p>' + esc(cfg.sub) + '</p>' : '')
     + '</div><button class="sheet-x" data-x aria-label="닫기">✕</button></div><div class="sheet-b">' + body + '</div>'
     + '<div class="sheet-f">' + (cfg.onDelete ? '<button class="btn btn-danger" data-del>' + esc(cfg.delText || '삭제') + '</button>' : '')
+    + (cfg.extra ? '<button class="btn btn-ghost" data-extra>' + esc(cfg.extra.text) + '</button>' : '')
     + '<button class="btn btn-navy" data-save>' + esc(cfg.saveText || '저장') + '</button></div></div>';
   wrap.addEventListener('click', function(e){
     if(e.target === wrap || e.target.closest('[data-x]')){ closeAll(); return; }
     if(e.target.closest('[data-del]')){ cfg.onDelete(); return; }
+    if(e.target.closest('[data-extra]')){ cfg.extra.fn(); return; }
     if(e.target.closest('[data-save]')){
       var vals = {}, bad = null;
       cfg.fields.forEach(function(f){
@@ -872,8 +976,8 @@ function openPointForm(vid, pid){
   var pts = arr(v.points);
   var p = pid ? pts.filter(function(x){ return x.pid === pid; })[0] : null;
   var data = p ? { name:p.name, kind:p.kind === 'spot' ? 'spot' : 'apt', naver:p.naver, land:p.land, hh:p.hh, built:p.built, area:p.area, park:p.park, far:p.far,
-      price:p.price ? fmtMoney(parseMoney(p.price)) : '', rate:p.rate, houses:p.houses || '1', memo:p.memo }
-    : { name:'', kind:'apt', naver:'', land:'', hh:'', built:'', area:'', park:'', far:'', price:'', rate:'', houses:'1', memo:'' };
+      memo:p.memo }
+    : { name:'', kind:'apt', naver:'', land:'', hh:'', built:'', area:'', park:'', far:'', memo:'' };
   openSheet({
     title: p ? '지점 수정' : '지점 추가', sub: (p ? (pts.indexOf(p) + 1) : (pts.length + 1)) + '번 지점',
     data: data,
@@ -888,10 +992,6 @@ function openPointForm(vid, pid){
       { k:'area', label:'평형', half:true, placeholder:'예) 59·84㎡' },
       { k:'park', label:'주차', half:true, placeholder:'예) 1.1대' },
       { k:'far', label:'용적률', placeholder:'예) 230%' },
-      { head:'매물 세팅 (LTV 70% · 40%)' },
-      { k:'price', label:'매매가', placeholder:'예) 10억 5,000', hint:'만원 단위로 넣어도 돼요. 12억 5,000 · 125000 모두 인식해요.' },
-      { k:'rate', label:'금리 (%)', type:'num', half:true, placeholder:'5' },
-      { k:'houses', label:'취득세 기준', type:'select', options:[['1','1주택'],['2','2주택'],['3','3주택+']], half:true },
       { head:'메모' },
       { k:'memo', label:'메모', type:'textarea', placeholder:'이 지점에서 본 것, 느낀 점' }
     ],
@@ -899,10 +999,9 @@ function openPointForm(vid, pid){
       var body = deep(v), list = arr(body.points), np;
       if(p){ np = list.filter(function(q){ return q.pid === pid; })[0]; }
       else { np = { pid:newId('p'), photos:[] }; list.push(np); }
-      ['name','kind','hh','built','area','park','far','rate','houses','memo'].forEach(function(k){ np[k] = x[k]; });
+      ['name','kind','hh','built','area','park','far','memo'].forEach(function(k){ np[k] = x[k]; });
       np.naver = x.naver ? (safeUrl(x.naver) || safeUrl('https://' + x.naver)) : '';
       np.land = x.land ? (safeUrl(x.land) || safeUrl('https://' + x.land)) : '';
-      np.price = x.price ? parseMoney(x.price) : '';
       body.points = list;
       saveVideo(vid, body, p ? '저장했어요 ✓' : '지점을 추가했어요 📍');
     },
@@ -915,6 +1014,88 @@ function openPointForm(vid, pid){
       });
     } : null,
     delText: '지점 삭제'
+  });
+}
+
+/* ---------- 매물 폼 ---------- */
+function openListingForm(vid, pid, li){
+  var v = S.videos[vid]; if(!v) return;
+  var pt = arr(v.points).filter(function(x){ return x.pid === pid; })[0]; if(!pt) return;
+  var list = arr(pt.listings), L = li == null ? null : list[li];
+  var money = function(x){ var n = parseMoney(x); return n ? n.toLocaleString('ko-KR') : ''; };
+  var blank = function(x){ return (x === undefined || x === null || x === '') ? '' : String(x); };
+  var data = L ? {
+      label:L.label, name:L.name, dong:L.dong, moveIn:L.moveIn, households:L.households, where:L.where,
+      gongsi:money(L.gongsi), sise:money(L.sise), peak:money(L.peak), asking:money(L.asking), jeonseAsk:money(L.jeonseAsk),
+      maemae:money(L.maemae), jeonse:money(L.jeonse), preset:L.preset || 'ltv70', loanCap:money(L.loanCap), loan:money(L.loan),
+      rate:blank(L.rate), term:blank(L.term), feeRate:blank(L.feeRate), fee:blank(L.fee), houses:L.houses || '1', tax:blank(L.tax)
+    } : {
+      label:'', name:'', dong:'', moveIn:'', households:'', where:'', gongsi:'', sise:'', peak:'', asking:'', jeonseAsk:'',
+      maemae:'', jeonse:'', preset:'ltv70', loanCap:'', loan:'', rate:'', term:'', feeRate:'', fee:'', houses:'1', tax:''
+    };
+  var save = function(body, msg){ return saveVideo(vid, body, msg); };
+  openSheet({
+    title: L ? '매물 수정' : '매물 추가', sub: pt.name || '', data: data,
+    fields: [
+      { head:'매물 정보' },
+      { k:'label', label:'열 이름 (표 맨 위)', placeholder:'예) 장위', hint:'비워 두면 아파트명이 들어가요' },
+      { k:'name', label:'아파트명 (평수)', placeholder:'예) 꿈의숲아이파크(59)' },
+      { k:'dong', label:'동 · 층향', half:true, placeholder:'예) 713동 9층' },
+      { k:'moveIn', label:'입주가능', half:true, placeholder:'예) 2028년 1월' },
+      { k:'households', label:'세대수 (연식)', half:true, placeholder:'예) 1,711(2022)' },
+      { k:'where', label:'시 · 구 · 동', half:true, placeholder:'예) 성북구 장위동' },
+      { k:'gongsi', label:'공시 (만원)', half:true, placeholder:'예) 68,600' },
+      { k:'sise', label:'시세 (만원)', half:true, placeholder:'예) 117,500' },
+      { k:'peak', label:'전고점 (만원)', half:true, placeholder:'예) 125,000' },
+      { k:'asking', label:'매매 호가 (만원)', half:true, placeholder:'예) 125,000' },
+      { k:'jeonseAsk', label:'전세 호가 (만원)', placeholder:'예) 75,000' },
+      { head:'세팅' },
+      { k:'maemae', label:'매매 (만원)', half:true, placeholder:'예) 125,000', hint:'12억 5,000 · 125000 모두 돼요' },
+      { k:'jeonse', label:'전세 (만원)', half:true, placeholder:'예) 57,000' },
+      { k:'preset', label:'대출 전략', type:'select', options:PRESETS.map(function(x){ return [x.k, x.t]; }) },
+      { k:'loanCap', label:'대출 한도 (만원, 선택)', half:true, placeholder:'예) 25,250', hint:'넘으면 이 금액까지만' },
+      { k:'loan', label:'대출 (직접입력용)', half:true, placeholder:'예) 20,000', hint:'전략이 직접입력일 때만' },
+      { k:'rate', label:'금리 (%)', half:true, placeholder:'5' },
+      { k:'term', label:'기간 (년)', half:true, placeholder:'30' },
+      { head:'부대' },
+      { k:'feeRate', label:'중개 요율 (%)', half:true, placeholder:'0.55' },
+      { k:'fee', label:'중개보수 직접 (만원)', half:true, placeholder:'비우면 자동', hint:'' },
+      { k:'houses', label:'취득세 기준', type:'select', half:true, options:[['1','1주택'],['2','2주택'],['3','3주택+']] },
+      { k:'tax', label:'취득세 직접 (만원)', half:true, placeholder:'비우면 간이계산', hint:'' }
+    ],
+    onSave: function(x){
+      var o = {};
+      ['label','name','dong','moveIn','households','where','preset','houses'].forEach(function(k){ o[k] = x[k]; });
+      ['gongsi','sise','peak','asking','jeonseAsk','maemae','jeonse','loanCap','loan'].forEach(function(k){ o[k] = x[k] ? parseMoney(x[k]) : ''; });
+      o.rate = parseFloat(String(x.rate).replace(/[^\d.]/g, '')) || '';
+      o.term = parseInt(String(x.term).replace(/[^\d]/g, ''), 10) || '';
+      o.feeRate = x.feeRate ? (parseFloat(String(x.feeRate).replace(/[^\d.]/g, '')) || '') : '';
+      o.fee = x.fee ? parseMoney(x.fee) : '';
+      o.tax = x.tax ? parseMoney(x.tax) : '';
+      var body = deep(v);
+      var tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0];
+      var ls = arr(tp.listings);
+      if(L) ls[li] = o; else ls.push(o);
+      tp.listings = ls;
+      save(body, L ? '저장했어요 ✓' : '매물을 추가했어요 🏢');
+    },
+    onDelete: L ? function(){
+      confirmBox('이 매물을 삭제할까요?', esc(L.label || L.name || '이 매물'), '삭제', function(){
+        var body = deep(v), tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0];
+        tp.listings = arr(tp.listings).filter(function(_, k){ return k !== li; });
+        save(body, '매물을 삭제했어요');
+      });
+    } : null,
+    delText: '매물 삭제',
+    extra: L ? { text: (L.preset === 'ltv40' ? 'LTV70% 복제' : 'LTV40% 복제'), fn:function(){
+      var body = deep(v), tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0], ls = arr(tp.listings);
+      var c = deep(L), to = (L.preset === 'ltv40') ? 'ltv70' : 'ltv40';
+      c.preset = to; c.loan = ''; c.loanCap = to === 'ltv40' ? '' : c.loanCap;
+      var base = String(L.label || L.name || '').replace(/\s*·\s*LTV\d+%$/, '');
+      c.label = base ? base + ' · ' + (to === 'ltv40' ? 'LTV40%' : 'LTV70%') : '';
+      ls.splice(li + 1, 0, c); tp.listings = ls;
+      save(body, (to === 'ltv40' ? 'LTV40%' : 'LTV70%') + ' 기준으로 복제했어요');
+    } } : null
   });
 }
 
@@ -1048,6 +1229,8 @@ document.addEventListener('click', function(e){
     case 'edit-video': openVideoForm(id); break;
     case 'add-point': openPointForm(id, null); break;
     case 'edit-point': openPointForm(id, p); break;
+    case 'add-lst': openListingForm(id, p, null); break;
+    case 'edit-lst': openListingForm(id, p, parseInt(t.getAttribute('data-i'), 10)); break;
     case 'noyt': toast('유튜브 링크가 아직 없어요'); break;
     case 'visit': toggleVisit(id, null, parseInt(t.getAttribute('data-i'), 10)); break;
     case 'visit-here': toggleVisit(id, p, null); break;
