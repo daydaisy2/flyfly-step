@@ -39,6 +39,9 @@ self.addEventListener('fetch', (e) => {
   // 다른 출처(Firebase 등)는 서비스워커가 건드리지 않는다
   if (url.origin !== self.location.origin) return;
 
+  // robots.txt 는 서비스워커가 가로채지 않는다 — 검색 로봇이 늘 서버 응답을 받도록
+  if (url.pathname.endsWith('/robots.txt')) return;
+
   // 화면(HTML)은 네트워크 우선, 실패하면 캐시
   if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
     /* cache:'no-cache' — 브라우저가 들고 있는 10분짜리 사본을 쓰지 않고 매번 서버에 새 버전인지 물어본다
