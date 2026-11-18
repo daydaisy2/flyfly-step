@@ -296,15 +296,20 @@
   .shake{animation:shake .34s}
   @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
-  /* 사진 크게 보기 */
-  .big-wrap{position:fixed;inset:0;z-index:95;background:rgba(12,10,4,.95);display:flex;align-items:flex-start;justify-content:center;
-    overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pinch-zoom}
-  .big-wrap img{display:block;width:100%;height:auto;flex:0 0 auto;transition:width .18s ease}
-  .big-wrap.zoom img{width:240%}
-  .big-x,.big-z,.big-d{position:fixed;background:rgba(255,255,255,.95);color:var(--navy);display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.35)}
-  .big-x{top:calc(env(safe-area-inset-top) + 12px);right:14px;width:40px;height:40px;border-radius:50%;font-size:15px}
-  .big-z{right:14px;bottom:calc(env(safe-area-inset-bottom) + 14px);height:40px;padding:0 16px;border-radius:999px;font-size:12.5px;font-weight:900}
-  .big-d{left:14px;bottom:calc(env(safe-area-inset-bottom) + 14px);height:40px;padding:0 16px;border-radius:999px;font-size:12.5px;font-weight:900;color:var(--red)}
+  /* 사진·지도 크게 보기 (가로로 눕히기 · 두 손가락 확대 · 드래그 이동) */
+  .big-wrap{position:fixed;inset:0;z-index:95;background:#0C0A04;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+  .big-wrap:active{cursor:grabbing}
+  .big-wrap img{position:absolute;left:50%;top:50%;max-width:none;max-height:none;transform-origin:center center;will-change:transform;
+    -webkit-user-drag:none;user-select:none;pointer-events:none;background:#fff}
+  .big-x{position:fixed;top:calc(env(safe-area-inset-top) + 12px);right:14px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.95);color:var(--navy);
+    display:grid;place-items:center;font-size:15px;box-shadow:0 6px 16px rgba(0,0,0,.35);z-index:2}
+  .big-bar{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 14px);transform:translateX(-50%);display:flex;gap:7px;align-items:center;z-index:2;
+    padding:6px;border-radius:999px;background:rgba(255,255,255,.95);box-shadow:0 8px 20px rgba(0,0,0,.4)}
+  .big-bar button{min-width:44px;height:44px;padding:0 13px;border-radius:999px;background:var(--cream);color:var(--navy);font-size:13px;font-weight:900;display:grid;place-items:center;white-space:nowrap}
+  .big-bar button:active{background:#F1E8C4}
+  .big-bar button.d{color:var(--red);background:var(--red-soft)}
+  .big-hint{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 20px);transform:translateX(-50%);max-width:calc(100vw - 90px);padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.18);
+    color:#EFEBFF;font-size:12px;font-weight:700;text-align:center;pointer-events:none;transition:opacity .5s;z-index:1}
 
   #toast{position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom));z-index:120;transform:translateX(-50%) translateY(10px);
     background:var(--navy);color:#fff;font-size:13.5px;font-weight:800;padding:12px 18px;border-radius:999px;max-width:88vw;text-align:center;
@@ -926,7 +931,7 @@ function navHash(h){
   return false;
 }
 function closeAll(){
-  Array.prototype.forEach.call(document.querySelectorAll(OVERLAY_SEL), function(n){ n.remove(); });
+  Array.prototype.forEach.call(document.querySelectorAll(OVERLAY_SEL), function(n){ if(n._cleanup){ try{ n._cleanup(); }catch(e){} } n.remove(); });
   sheetOpen = false;
   settleOverlayHistory();
 }
@@ -937,31 +942,122 @@ window.addEventListener('popstate', function(){
   closeAll();
 });
 
-/* ---------- 사진 크게 보기 ---------- */
+/* ---------- 사진·지도 크게 보기 ----------
+   · 가로 사진(지도)을 세로 화면에서 열면 자동으로 눕혀서 크게 보여 준다(↻ 로 되돌리기)
+   · 가능한 폰에서는 화면 방향도 가로로 잠가 본다(안 되면 눕힌 그림으로 대신)
+   · 두 손가락으로 확대·축소, 한 손가락으로 이동, 두 번 탭하면 확대/원래대로, 마우스 휠도 지원 */
 function openBig(key, onDelete){
   var c = imgCache[key];
   if(!c || !c.data){ toast('사진을 불러오는 중이에요'); return; }
   var wrap = document.createElement('div');
   wrap.className = 'big-wrap';
-  wrap.innerHTML = '<img alt="사진 크게 보기"><button class="big-z" data-z>＋ 확대</button><button class="big-x" aria-label="닫기">✕</button>'
-    + (onDelete ? '<button class="big-d" data-d>🗑 지우기</button>' : '');
-  wrap.querySelector('img').src = c.data;
-  var zBtn = wrap.querySelector('[data-z]');
-  var toggle = function(){
-    var on = wrap.classList.toggle('zoom');
-    zBtn.textContent = on ? '－ 축소' : '＋ 확대';
-    setTimeout(function(){
-      wrap.scrollLeft = Math.max(0, (wrap.scrollWidth - wrap.clientWidth) / 2);
-      if(on) wrap.scrollTop = Math.max(0, (wrap.scrollHeight - wrap.clientHeight) / 2);
-    }, 200);
-  };
-  wrap.addEventListener('click', function(e){
-    if(e.target.closest('[data-z]') || e.target.tagName === 'IMG'){ toggle(); return; }
-    if(e.target.closest('[data-d]')){ closeAll(); onDelete(); return; }
-    if(e.target.closest('.big-x') || e.target === wrap) closeAll();
+  wrap.innerHTML = '<img alt="크게 보기" draggable="false">'
+    + '<button class="big-x" aria-label="닫기">✕</button>'
+    + '<div class="big-hint">두 손가락으로 확대 · 끌어서 이동 · 두 번 탭하면 확대</div>'
+    + '<div class="big-bar"><button data-b="out" aria-label="축소">－</button><button data-b="in" aria-label="확대">＋</button>'
+    + '<button data-b="rot">↻ 돌리기</button><button data-b="fit">맞춤</button>' + (onDelete ? '<button class="d" data-b="del">🗑</button>' : '') + '</div>';
+  var img = wrap.querySelector('img'), hint = wrap.querySelector('.big-hint');
+  var st = { z:1, tx:0, ty:0, rot:0, nw:0, nh:0, auto:true, locked:false };
+  var MAXZ = 8;
+
+  function size(){ return { W: wrap.clientWidth || window.innerWidth, H: wrap.clientHeight || window.innerHeight }; }
+  function eff(){ return st.rot ? { w: st.nh, h: st.nw } : { w: st.nw, h: st.nh }; }
+  function base(){ var d = size(), e = eff(); return Math.min(d.W / e.w, d.H / e.h); }
+  function apply(){
+    if(!st.nw) return;
+    var d = size(), e = eff(), k = base() * st.z;
+    var mx = Math.max(0, (e.w * k - d.W) / 2), my = Math.max(0, (e.h * k - d.H) / 2);
+    st.tx = Math.min(mx, Math.max(-mx, st.tx));
+    st.ty = Math.min(my, Math.max(-my, st.ty));
+    img.style.transform = 'translate(' + st.tx + 'px,' + st.ty + 'px) rotate(' + (st.rot ? 90 : 0) + 'deg) scale(' + k + ')';
+    wrap.setAttribute('data-z', st.z.toFixed(2)); wrap.setAttribute('data-rot', st.rot ? '90' : '0');
+  }
+  function autoRot(){
+    if(!st.auto || !st.nw) return;
+    var d = size(), want = (st.nw > st.nh && d.H > d.W) ? 90 : 0;   /* 가로 그림 + 세로 화면 → 눕히기 */
+    if((want === 90) !== !!st.rot){ st.rot = want ? 1 : 0; st.z = 1; st.tx = 0; st.ty = 0; }
+  }
+  function zoomAt(f, cx, cy){   /* (cx,cy): 화면 중심 기준 좌표 */
+    var nz = Math.min(MAXZ, Math.max(1, st.z * f)), r = nz / st.z;
+    st.tx = cx - (cx - st.tx) * r; st.ty = cy - (cy - st.ty) * r; st.z = nz;
+    if(nz === 1){ st.tx = 0; st.ty = 0; }
+    apply();
+  }
+  function rel(x, y){ var d = size(); return { x: x - d.W / 2, y: y - d.H / 2 }; }
+
+  img.onload = function(){ st.nw = img.naturalWidth; st.nh = img.naturalHeight;
+    img.style.width = st.nw + 'px'; img.style.height = st.nh + 'px'; img.style.marginLeft = (-st.nw / 2) + 'px'; img.style.marginTop = (-st.nh / 2) + 'px';
+    autoRot(); apply(); };
+  img.src = c.data;
+
+  /* 포인터(터치·마우스) 제스처 */
+  var ptrs = {}, pinch = null, tapT = 0, tapX = 0, tapY = 0, moved = 0, downT = 0;
+  function count(){ return Object.keys(ptrs).length; }
+  wrap.addEventListener('pointerdown', function(e){
+    if(e.target.closest('button')) return;
+    ptrs[e.pointerId] = { x:e.clientX, y:e.clientY };
+    try{ wrap.setPointerCapture(e.pointerId); }catch(x){}
+    moved = 0; downT = Date.now();
+    if(count() === 2){ var k = Object.keys(ptrs).map(function(i){ return ptrs[i]; }); pinch = { d: Math.hypot(k[0].x - k[1].x, k[0].y - k[1].y) || 1, mx: (k[0].x + k[1].x) / 2, my: (k[0].y + k[1].y) / 2 }; }
   });
+  wrap.addEventListener('pointermove', function(e){
+    var p = ptrs[e.pointerId]; if(!p) return;
+    var dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
+    if(count() === 1){ st.tx += dx; st.ty += dy; apply(); }
+    else if(count() === 2 && pinch){
+      var k = Object.keys(ptrs).map(function(i){ return ptrs[i]; });
+      var d = Math.hypot(k[0].x - k[1].x, k[0].y - k[1].y) || 1, mx = (k[0].x + k[1].x) / 2, my = (k[0].y + k[1].y) / 2;
+      var m = rel(mx, my);
+      st.tx += mx - pinch.mx; st.ty += my - pinch.my;     /* 두 손가락을 함께 옮기면 이동 */
+      zoomAt(d / pinch.d, m.x, m.y);
+      pinch.d = d; pinch.mx = mx; pinch.my = my;
+    }
+  });
+  function up(e){
+    var had = ptrs[e.pointerId]; delete ptrs[e.pointerId];
+    if(count() < 2) pinch = null;
+    if(had && count() === 0 && moved < 10 && Date.now() - downT < 350){      /* 탭 */
+      var now = Date.now();
+      if(now - tapT < 320 && Math.hypot(e.clientX - tapX, e.clientY - tapY) < 40){   /* 두 번 탭 */
+        tapT = 0;
+        if(st.z > 1.05){ st.z = 1; st.tx = 0; st.ty = 0; apply(); }
+        else { var m = rel(e.clientX, e.clientY); zoomAt(2.5, m.x, m.y); }
+      } else { tapT = now; tapX = e.clientX; tapY = e.clientY; }
+    }
+  }
+  wrap.addEventListener('pointerup', up);
+  wrap.addEventListener('pointercancel', up);
+  wrap.addEventListener('wheel', function(e){ e.preventDefault(); var m = rel(e.clientX, e.clientY); zoomAt(e.deltaY < 0 ? 1.2 : 1 / 1.2, m.x, m.y); }, { passive:false });
+
+  wrap.addEventListener('click', function(e){
+    var b = e.target.closest('[data-b]');
+    if(e.target.closest('.big-x')){ closeAll(); return; }
+    if(!b) return;
+    var t = b.getAttribute('data-b');
+    if(t === 'in') zoomAt(1.6, 0, 0);
+    else if(t === 'out') zoomAt(1 / 1.6, 0, 0);
+    else if(t === 'fit'){ st.z = 1; st.tx = 0; st.ty = 0; apply(); }
+    else if(t === 'rot'){ st.auto = false; st.rot = st.rot ? 0 : 1; st.z = 1; st.tx = 0; st.ty = 0; apply(); }
+    else if(t === 'del'){ closeAll(); onDelete(); }
+  });
+
+  function onResize(){ autoRot(); apply(); }
+  window.addEventListener('resize', onResize);
+  wrap._cleanup = function(){
+    window.removeEventListener('resize', onResize);
+    try{ if(st.locked && screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); }catch(e){}
+  };
   layer.appendChild(wrap);
   pushOverlayHistory();
+  setTimeout(function(){ hint.style.opacity = '0'; }, 3200);
+  /* 가능하면 폰 화면 자체를 가로로 (설치형 앱에서 되는 폰이 많음). 안 되면 눕힌 그림으로 충분히 큼 */
+  img.addEventListener('load', function(){
+    try{
+      if(img.naturalWidth > img.naturalHeight && screen.orientation && screen.orientation.lock){
+        screen.orientation.lock('landscape').then(function(){ st.locked = true; }).catch(function(){});
+      }
+    }catch(e){}
+  });
 }
 
 /* ---------- 확인창 ---------- */
