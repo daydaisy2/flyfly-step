@@ -885,7 +885,7 @@ function renderPoint(vid, pid){
     var sp = spec.length ? '<div class="spec">' + spec.map(function(x){ return '<div class="sp"><small>' + x[0] + '</small><b>' + esc(x[1]) + '</b></div>'; }).join('') + '</div>'
         + '<p class="note">금액 단위 만원 · 네이버부동산 기준' + (p.asof ? ' · 조회기준일 ' + esc(fmtDate(p.asof)) : '') + '</p>'
       : '<p class="none">아직 입력한 개요가 없어요</p>';
-    h += accHTML('spec', '🏢', '기본 개요', '변하지 않는 정보' + (p.asof ? ' · 조회 ' + esc(fmtDate(p.asof)) : ''), sp);
+    h += accHTML('spec', '🏢', '기본 개요', [p.built ? esc(p.built) : '', p.hh ? esc(p.hh) : '', p.asof ? '조회 ' + esc(fmtDate(p.asof)) : ''].filter(Boolean).join(' · ') || '연식 · 세대수 · 시세', sp);
   }
   var phs = arr(p.photos);
   var gal = '<div class="photos">' + phs.map(function(ph){
@@ -1208,7 +1208,7 @@ function openPointForm(vid, pid, insertAt){
       { k:'kind', label:'종류', type:'select', options:[['apt','아파트 단지 (기본 개요 + 아파트 매물 세팅)'],['redev','재개발 구역 (기본 개요 + 재개발 매물 세팅)'],['spot','그 밖의 지점 (역·학교 등)']] },
       { k:'naver', label:'네이버지도 링크', type:'url', placeholder:'https://naver.me/…' },
       { k:'land', label:'네이버부동산 링크', type:'url', placeholder:'https://new.land.naver.com/…' },
-      { head:'기본 개요 — 변하지 않는 정보 (네이버부동산 기준 · 단위 만원)' },
+      { head:'기본 개요 (네이버부동산 기준 · 단위 만원)' },
       { k:'sgg', label:'시군구', half:true, placeholder:'예) 경기도 하남시' },
       { k:'emd', label:'읍면동', half:true, placeholder:'예) 망월동' },
       { k:'built', label:'연식', half:true, placeholder:'예) 2015.12' },
