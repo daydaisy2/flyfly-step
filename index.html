@@ -259,7 +259,12 @@
   .gate-card .pin-fl{margin-bottom:2px}
   .gate-card h2{margin:12px 0 0;font-size:21px;font-weight:900;letter-spacing:-.045em;color:var(--navy);line-height:1.25}
   .gate-card p{margin:6px 0 0;font-size:13px;font-weight:600;color:var(--soft);line-height:1.55}
-  .gate-card input{width:100%;margin-top:18px;background:var(--cream);border:1.5px solid transparent;border-radius:16px;padding:14px 16px;font-size:17px;font-weight:700;
+  .gate-row{display:flex;gap:8px;align-items:stretch;margin-top:18px}
+  .gate-row input{flex:1 1 auto;min-width:0;width:auto}
+  .gate-eye{flex:0 0 auto;padding:0 16px;border-radius:16px;background:var(--cream);color:var(--navy);font-size:13px;font-weight:900}
+  .gate-first{margin:14px 0 8px;padding:12px 14px;border-radius:16px;background:var(--brand-soft,#FFF6CC);color:#5D5A46;font-size:13px;font-weight:600;line-height:1.6;text-align:left}
+  .gate-first b{color:var(--navy);font-size:14px}
+  .gate-card input{width:100%;margin-top:0;background:var(--cream);border:1.5px solid transparent;border-radius:16px;padding:14px 16px;font-size:17px;font-weight:700;
     color:var(--ink);outline:none;text-align:center;letter-spacing:.04em}
   .gate-card input:focus{border-color:var(--navy);background:#fff}
   .gate-card .gate-msg{min-height:20px;margin-top:10px;font-size:13px;font-weight:700;color:var(--red)}
@@ -1441,7 +1446,8 @@ function openGate(){
   wrap.className = 'gate';
   wrap.innerHTML = '<div class="gate-card"><div class="pin-fl">👣</div><h2>리훨 부부데이지<br>임장챌린지</h2>'
     + '<p>입장 비밀번호를 입력해 주세요.<br>한 번 입장한 폰은 다음부터 바로 열려요.</p>'
-    + '<input id="gatePw" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="비밀번호" aria-label="입장 비밀번호">'
+    + '<div class="gate-row"><input id="gatePw" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="비밀번호 (6자 이상)" aria-label="입장 비밀번호">'
+    + '<button type="button" class="gate-eye" id="gateEye" aria-label="비밀번호 보기">보기</button></div>'
     + '<p class="gate-msg" id="gateMsg" role="alert"></p>'
     + '<button class="gate-go" id="gateGo">입장</button><div id="gateAsk"></div></div>';
   document.body.appendChild(wrap);
@@ -1468,9 +1474,9 @@ function openGate(){
         if(d){ enter(room); return; }
         pending = room;
         msg.textContent = '';
-        ask.innerHTML = '<p style="margin-top:12px;color:#5D5A46">이 비밀번호로 저장된 기록이 없어요.<br>처음이라면 새로 시작하고, 아니라면 다시 입력해 주세요.</p>'
-          + '<button class="gate-sub" id="gateNew" style="background:var(--yellow);color:var(--navy)">이 비밀번호로 새로 시작</button>'
-          + '<button class="gate-sub" id="gateAgain">다시 입력</button>';
+        ask.innerHTML = '<p class="gate-first"><b>처음 오셨네요 👋</b><br>이 비밀번호로 저장된 기록이 아직 없어요.<br>이 비밀번호로 시작할까요? 이미 쓰던 비밀번호가 있다면 아래에서 다시 입력해 주세요.</p>'
+          + '<button class="gate-go" id="gateNew" style="background:var(--yellow);color:var(--navy)">이 비밀번호로 시작하기</button>'
+          + '<button class="gate-sub" id="gateAgain">다른 비밀번호로 입력</button>';
         ask.querySelector('#gateNew').addEventListener('click', function(){ if(pending) enter(pending); });
         ask.querySelector('#gateAgain').addEventListener('click', function(){ ask.innerHTML = ''; pending = null; inp.value = ''; inp.focus(); });
       });
@@ -1479,6 +1485,12 @@ function openGate(){
       msg.textContent = '연결을 확인해 주세요';
     });
   };
+  wrap.querySelector('#gateEye').addEventListener('click', function(){
+    var on = inp.type === 'password';
+    inp.type = on ? 'text' : 'password';
+    this.textContent = on ? '숨기기' : '보기';
+    inp.focus();
+  });
   go.addEventListener('click', submit);
   inp.addEventListener('keydown', function(e){ if(e.key === 'Enter') submit(); });
   setTimeout(function(){ try{ inp.focus(); }catch(e){} }, 50);
