@@ -715,7 +715,7 @@ function renderList(s){
       + '<span class="vt"><strong>' + esc(v.title || '제목 없는 영상') + '</strong><span>' + esc(meta) + '</span></span><span class="chev">›</span></button>';
   });
   if(unlocked) h += '<button class="add" data-act="add-video">＋ 영상 추가</button>';
-  h += '<div class="foot-row">' + (unlocked ? '<button class="foot-link" data-act="import">📥 가져오기</button>' : '') + '<button class="foot-link" data-act="leave">이 폰에서 나가기</button></div>';
+  h += '<div class="foot-row">' + (unlocked ? '<button class="foot-link" data-act="import">📥 가져오기</button>' : '') + '<button class="foot-link" data-act="refresh-app">🔄 최신으로 새로고침</button><button class="foot-link" data-act="leave">이 폰에서 나가기</button></div>';
   viewEl.innerHTML = h;
 }
 
@@ -1458,6 +1458,7 @@ document.addEventListener('click', function(e){
     case 'add-lst': openListingForm(id, p, null); break;
     case 'edit-lst': openListingForm(id, p, parseInt(t.getAttribute('data-i'), 10)); break;
     case 'import': runImport(); break;
+    case 'refresh-app': refreshApp(); break;
     case 'leave': leaveRoom(); break;
     case 'noyt': toast('유튜브 링크가 아직 없어요'); break;
     case 'visit': toggleVisit(id, null, parseInt(t.getAttribute('data-i'), 10)); break;
@@ -1556,6 +1557,14 @@ function openGate(){
   inp.addEventListener('keydown', function(e){ if(e.key === 'Enter') submit(); });
   setTimeout(function(){ try{ inp.focus(); }catch(e){} }, 50);
 }
+/* 옛 화면이 붙어 있을 때 쓰는 새로고침: 앱 캐시와 서비스워커만 지운다(입장 정보·기록 모드·기록은 그대로) */
+function refreshApp(){
+  toast('최신 버전으로 새로고침 중…');
+  var jobs = [];
+  try{ if(navigator.serviceWorker) jobs.push(navigator.serviceWorker.getRegistrations().then(function(rs){ return Promise.all(rs.map(function(r){ return r.unregister(); })); })); }catch(e){}
+  try{ if(window.caches) jobs.push(caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.delete(k); })); })); }catch(e){}
+  Promise.all(jobs).catch(function(){}).then(function(){ location.reload(); });
+}
 function leaveRoom(){
   confirmBox('이 폰에서 나갈까요?', '이 폰에 저장된 입장 정보와 임시 저장본을 지워요.<br>서버의 기록은 그대로 남아 있어요.', '나가기', function(){
     try{ localStorage.removeItem(KEY_LS); localStorage.removeItem(CACHE_KEY); localStorage.removeItem(LS); }catch(e){}
@@ -1572,6 +1581,15 @@ if(/^ic[0-9a-f]{48}$/.test(savedRoom)){ ROOM = savedRoom; boot(); }
 else openGate();
 
 if('serviceWorker' in navigator){
+  /* 새 버전의 서비스워커가 일을 넘겨받으면(=앱이 업데이트되면) 한 번 새로고침해서 바로 새 화면을 보여 준다 */
+  var swHad = !!navigator.serviceWorker.controller, swReloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if(!swHad){ swHad = true; return; }   /* 처음 설치일 때는 새로고침하지 않는다 */
+    if(swReloaded) return;
+    if(sheetOpen || anyOverlayOpen()){ toast('새 버전이 있어요 — 앱을 다시 열면 적용돼요'); return; }
+    swReloaded = true;
+    location.reload();
+  });
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(){});
   });

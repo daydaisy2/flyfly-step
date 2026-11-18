@@ -1,6 +1,6 @@
 /* 리훨 임챌 서비스워커 — 마지막 화면은 오프라인에서도 열리게.
    Firebase(다른 출처) 통신은 절대 캐시하지 않는다. */
-const CACHE = 'imchall-v13';
+const CACHE = 'imchall-v14';
 const ASSETS = [
   './',
   './index.html',
@@ -41,8 +41,10 @@ self.addEventListener('fetch', (e) => {
 
   // 화면(HTML)은 네트워크 우선, 실패하면 캐시
   if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
+    /* cache:'no-cache' — 브라우저가 들고 있는 10분짜리 사본을 쓰지 않고 매번 서버에 새 버전인지 물어본다
+       (바뀌지 않았으면 가볍게 304 로 끝나고, 바뀌었으면 바로 새 화면) */
     e.respondWith(
-      fetch(req)
+      fetch(req, { cache: 'no-cache' })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
