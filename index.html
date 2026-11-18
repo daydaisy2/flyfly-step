@@ -204,12 +204,6 @@
   .tbl td.pe2{background:#E8F0FB}
   .tbl td.blue{color:#2A2DD0}
   .tbl td.strong{font-weight:900;font-size:15px}
-  .tbl .grp-e{background:#6B6B6B}
-  .tbl td.jdcell{background:var(--white)}
-  .jd{display:inline-block;padding:3px 12px;border-radius:999px;font-size:13px;font-weight:900}
-  .jd.ok{background:#C6EFCE;color:#006100}
-  .jd.no{background:#ECECEC;color:#6B6B6B}
-  .jd.ask{background:#FFEB9C;color:#7F6000}
   .tbl td.total{background:var(--navy);color:#FFE680;font-size:16px}
   .tbl td .neg{color:var(--red)}
   .setup{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -447,17 +441,6 @@ function seedOf(L){
   var ownJ = (price && jeon) ? price - jeon : null, ownL = (price && loan) ? price - loan : null;
   return { price:price, jeon:jeon, loan:loan, ownJ:ownJ, ownL:ownL, extra:extra,
     totalJ: ownJ === null ? null : ownJ + extra, totalL: ownL === null ? null : ownL + extra };
-}
-/* 조사 기준: 전용 84㎡ 국평 입주매물, 1~3층 · 세안고 제외 (탑층은 총층수를 받지 않아 직접 거른다) — 바꾸려면 아래 숫자만 고치면 된다 */
-var RULE = { area: 84, floorMax: 3 };
-function judge(L){
-  L = L || {};
-  var why = [], area = Number(L.area), fl = Number(L.floor);
-  if(!area) why.push('면적?'); else if(Math.floor(area) !== RULE.area) why.push('평형');
-  if(!fl) why.push('층?'); else if(fl <= RULE.floorMax) why.push('저층');
-  if(L.sealed === 'Y') why.push('세안고');
-  var ask = why.some(function(w){ return w.indexOf('?') > 0; });
-  return { state: !why.length ? '대상' : (ask ? '확인' : '제외'), why: why.map(function(w){ return w.replace('?', ' 입력'); }) };
 }
 
 /* ================== 사진 (Firebase 옆 노드, 방 본문과 분리) ==================
@@ -800,31 +783,31 @@ function listingPanel(vid, pid, lsts){
     return '<p class="none">' + (unlocked ? '아직 매물이 없어요. 아래 버튼으로 첫 매물을 넣어 보세요.' : '아직 매물이 없어요') + '</p>'
       + (unlocked ? '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>' : '');
   }
-  var seeds = lsts.map(seedOf), js = lsts.map(judge);
+  var seeds = lsts.map(seedOf);
   var ownCell = function(v){ return v === null ? '—' : (v < 0 ? '<span class="neg">' + fmtNum(v) + '</span>' : (v === 0 ? '0' : fmtNum(v))); };
+  var totCell = function(v){ return v === null ? '—' : fmtNum(v); };
   var rows = [
     ['정보','동 · 층','', function(L){
         return [esc(L.dong), L.floor ? esc(L.floor) + '층' : ''].filter(Boolean).join(' ') || '—'; }, 'hl txt'],
     ['','전용면적','', function(L){ return L.area ? esc(L.area) + '㎡' : '—'; }, 'hl txt'],
     ['','세안고','', function(L){ return L.sealed === 'Y' ? '예' : (L.sealed === 'N' ? '아니오' : '—'); }, 'txt'],
     ['','KB시세','', function(L){ return fmtNum(parseMoney(L.kb)); }, 'num'],
-    ['세팅','매매','', function(L, x){ return fmtNum(x.price); }, 'pe num blue'],
+    ['전세 기준','매매','', function(L, x){ return fmtNum(x.price); }, 'pe num blue'],
     ['','전세','', function(L, x){ return fmtNum(x.jeon); }, 'pe num'],
-    ['','자본','전세 기준', function(L, x){ return ownCell(x.ownJ); }, 'pe num blue strong'],
-    ['','매매','', function(L, x){ return fmtNum(x.price); }, 'pe2 num blue'],
+    ['','자본','초투', function(L, x){ return ownCell(x.ownJ); }, 'pe num blue strong'],
+    ['','부대비용','매매 × 0.5%', function(L, x){ return fmtNum(x.extra); }, 'pe num'],
+    ['','총투자금','총투 = 자본 + 부대비용', function(L, x){ return totCell(x.totalJ); }, 'total num strong'],
+    ['대출 기준','매매','', function(L, x){ return fmtNum(x.price); }, 'pe2 num blue'],
     ['','대출','', function(L, x){ return fmtNum(x.loan); }, 'pe2 num'],
-    ['','자본','대출 기준', function(L, x){ return ownCell(x.ownL); }, 'pe2 num blue strong'],
-    ['부대','부대비용','매매 × 0.5%', function(L, x){ return fmtNum(x.extra); }, 'pe num'],
-    ['합계','총투자금','전세 기준', function(L, x){ return x.totalJ === null ? '—' : fmtNum(x.totalJ); }, 'total num strong'],
-    ['','총투자금','대출 기준', function(L, x){ return x.totalL === null ? '—' : fmtNum(x.totalL); }, 'total num strong'],
-    ['판정','조사 기준',RULE.area + '㎡ · ' + (RULE.floorMax + 1) + '층↑ · 세안고 제외', function(L, x, j){
-        return '<span class="jd ' + (j.state === '대상' ? 'ok' : j.state === '확인' ? 'ask' : 'no') + '">' + j.state + '</span>' + (j.why.length ? '<small>' + esc(j.why.join(' · ')) + '</small>' : ''); }, 'jdcell']
+    ['','자본','초투', function(L, x){ return ownCell(x.ownL); }, 'pe2 num blue strong'],
+    ['','부대비용','매매 × 0.5%', function(L, x){ return fmtNum(x.extra); }, 'pe2 num'],
+    ['','총투자금','총투 = 자본 + 부대비용', function(L, x){ return totCell(x.totalL); }, 'total num strong']
   ];
   var span = {};
   rows.forEach(function(r){ if(r[0]) span[r[0]] = 0; });
   var cur = '';
   rows.forEach(function(r){ if(r[0]) cur = r[0]; span[cur]++; });
-  var gcls = { '정보':'a', '세팅':'b', '부대':'c', '합계':'d', '판정':'e' };
+  var gcls = { '정보':'a', '전세 기준':'b', '대출 기준':'d' };
   var t = '<div class="tbl-wrap"><table class="tbl"><thead><tr><th class="g"></th><th class="l corner">구분<small>(단독명의)</small></th>';
   lsts.forEach(function(L, i){
     var nm = esc([L.dong, L.floor ? L.floor + '층' : ''].filter(Boolean).join(' ') || ('매물 ' + (i + 1)));
@@ -835,11 +818,11 @@ function listingPanel(vid, pid, lsts){
     t += '<tr>';
     if(r[0]) t += '<th class="g grp-' + gcls[r[0]] + '" rowspan="' + span[r[0]] + '"><span>' + r[0] + '</span></th>';
     t += '<th class="l">' + r[1] + (r[2] ? '<small>' + r[2] + '</small>' : '') + '</th>';
-    lsts.forEach(function(L, i){ t += '<td class="' + r[4] + '">' + r[3](L, seeds[i], js[i]) + '</td>'; });
+    lsts.forEach(function(L, i){ t += '<td class="' + r[4] + '">' + r[3](L, seeds[i]) + '</td>'; });
     t += '</tr>';
   });
   t += '</tbody></table></div>';
-  t += '<p class="note">단위: 만원 · 세팅은 매매 / 전세 / 자본, 매매 / 대출 / 자본 두 가지를 나란히 봐요 (대출은 직접 입력) · 부대비용은 중개료·취득세를 묶어 매매 × 0.5% · 안 적은 쪽은 — 로 나와요</p>';
+  t += '<p class="note">단위: 만원 · 전세 기준(매매 / 전세 / 자본)과 대출 기준(매매 / 대출 / 자본)을 나란히 봐요 · 자본 = 초투(초기투자금), 총투 = 자본 + 부대비용(매매 × 0.5%) · 대출은 직접 입력 · 안 적은 쪽은 — 로 나와요</p>';
   if(unlocked) t += '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>';
   return t;
 }
