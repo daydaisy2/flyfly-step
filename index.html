@@ -131,6 +131,8 @@
     color:var(--navy);display:grid;place-items:center;font-size:15px;font-weight:900;transition:background .15s,color .15s,transform .12s}
   .circ:active{transform:scale(.9)}
   .pt.vis .circ,.circ.vis{background:var(--navy);color:#FFE680}
+  .circ.lg{font-size:12px;letter-spacing:-.05em}
+  .ptitle .circ.lg{font-size:15px}
   .pn{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;border-radius:16px;padding:10px 12px;text-align:left}
   .pn:active{background:var(--cream)}
   .pn .nm{flex:1 1 auto;min-width:0;font-size:14.5px;font-weight:900;letter-spacing:-.035em;line-height:1.3}
@@ -669,6 +671,31 @@ function paintSeasons(cur){
   if(on && on.scrollIntoView){ try{ on.scrollIntoView({ inline:'center', block:'nearest' }); }catch(e){} }
 }
 
+/* 코스 번호: '앞 지점과 같은 코스'(sub)로 묶은 지점은 1-1, 1-2 처럼 매기고, 혼자인 코스는 그냥 1, 2 */
+function pointLabels(pts){
+  var courses = [], labels = [];
+  pts.forEach(function(q, i){
+    if(i > 0 && q.sub) courses[courses.length - 1].push(i); else courses.push([i]);
+  });
+  courses.forEach(function(c, ci){ c.forEach(function(idx, k){ labels[idx] = c.length > 1 ? (ci + 1) + '-' + (k + 1) : String(ci + 1); }); });
+  return labels;
+}
+/* 지점을 목록에서 뺄 때: 묶음의 맨 앞(코스 대표)을 빼면 뒤따르던 지점이 새 코스의 대표가 된다 */
+function removeFromList(list, pid){
+  var i = -1;
+  list.forEach(function(q, k){ if(q.pid === pid) i = k; });
+  if(i < 0) return list;
+  var wasHead = !list[i].sub;
+  list.splice(i, 1);
+  if(wasHead && list[i] && list[i].sub) list[i].sub = false;
+  return list;
+}
+function splitNames(name){
+  var sep = /\s*[·・,，/／、+]\s*/;
+  var m = /^(.*?)\s*[\(（](.+)[\)）]\s*$/.exec(String(name || '').trim());
+  var src = (m && sep.test(m[2])) ? m[2] : String(name || '');
+  return src.split(sep).map(function(x){ return x.trim(); }).filter(Boolean);
+}
 function visitedCount(v){ return arr(v.points).filter(function(p){ return p.visited; }).length; }
 
 function renderList(s){
@@ -738,6 +765,7 @@ function renderVideo(id){
   if(stats.length) h += '<p class="sub">' + stats.join(' · ') + '</p>';
   h += '<div class="card">' + ytRow(v) + mapAcc(v, 1, '임장지도', '🗺️') + mapAcc(v, 2, '한 장 지도', '🧭') + '</div>';
 
+  var labels = pointLabels(pts);
   var editing = unlocked && orderMode === id && pts.length > 0;
   var insRow = function(at){ return '<button class="ins" data-act="ins-pt" data-id="' + esc(id) + '" data-at="' + at + '">＋ 여기에 지점 추가</button>'; };
   h += '<div class="card"><div class="sech"><h2>👣 지점</h2><span class="side">'
@@ -746,7 +774,7 @@ function renderVideo(id){
   if(editing){
     h += '<div class="pts ed">' + insRow(0);
     pts.forEach(function(p, i){
-      h += '<div class="pt ed"><span class="circ' + (p.visited ? ' vis' : '') + '">' + (i + 1) + '</span><span class="nm">' + esc(p.name || '이름 없는 지점') + '</span>'
+      h += '<div class="pt ed"><span class="circ' + (p.visited ? ' vis' : '') + (labels[i].indexOf('-') > 0 ? ' lg' : '') + '">' + labels[i] + '</span><span class="nm">' + esc(p.name || '이름 없는 지점') + '</span>'
         + '<span class="mv"><button class="ed" data-act="edit-point" data-id="' + esc(id) + '" data-p="' + esc(p.pid) + '" aria-label="수정">✏️</button>'
         + '<button data-act="mv" data-id="' + esc(id) + '" data-i="' + i + '" data-d="-1"' + (i === 0 ? ' disabled' : '') + ' aria-label="위로">▲</button>'
         + '<button data-act="mv" data-id="' + esc(id) + '" data-i="' + i + '" data-d="1"' + (i === pts.length - 1 ? ' disabled' : '') + ' aria-label="아래로">▼</button>'
@@ -757,7 +785,7 @@ function renderVideo(id){
     h += '<div class="pts">';
     pts.forEach(function(p, i){
       h += '<div class="pt' + (p.visited ? ' vis' : '') + '">'
-        + '<button class="circ" data-act="visit" data-id="' + esc(id) + '" data-i="' + i + '" aria-pressed="' + !!p.visited + '" aria-label="' + esc(p.name) + ' 다녀옴">' + (i + 1) + '</button>'
+        + '<button class="circ' + (labels[i].indexOf('-') > 0 ? ' lg' : '') + '" data-act="visit" data-id="' + esc(id) + '" data-i="' + i + '" aria-pressed="' + !!p.visited + '" aria-label="' + esc(p.name) + ' 다녀옴">' + labels[i] + '</button>'
         + '<button class="pn" data-act="point" data-id="' + esc(id) + '" data-p="' + esc(p.pid) + '"><span class="nm">' + esc(p.name || '이름 없는 지점') + '</span><span class="ar">›</span></button></div>';
     });
     h += '</div>';
@@ -831,7 +859,8 @@ function renderPoint(vid, pid){
   }
   var idx = arr(v.points).indexOf(p), isApt = p.kind !== 'spot';
   var h = '<button class="back" data-act="back-video" data-id="' + esc(vid) + '">← ' + esc(v.title || '영상') + '</button>';
-  h += '<div class="ptitle"><span class="circ' + (p.visited ? ' vis' : '') + '">' + (idx + 1) + '</span><h1 class="t">' + esc(p.name || '이름 없는 지점') + '</h1>'
+  var plabel = pointLabels(arr(v.points))[idx];
+  h += '<div class="ptitle"><span class="circ' + (p.visited ? ' vis' : '') + (plabel.indexOf('-') > 0 ? ' lg' : '') + '">' + plabel + '</span><h1 class="t">' + esc(p.name || '이름 없는 지점') + '</h1>'
     + (unlocked ? '<button class="pen" data-act="edit-point" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '" aria-label="지점 수정">✏️</button>' : '') + '</div>';
   var nUrl = safeUrl(p.naver), lUrl = safeUrl(p.land);
   h += '<div class="links">'
@@ -1047,7 +1076,7 @@ function removePoint(vid, pid){
   if(!q) return;
   confirmBox('이 지점을 뺄까요?', esc(q.name || '') + '<br>사진·매물 기록도 함께 사라져요.', '빼기', function(){
     var body = deep(v);
-    body.points = arr(body.points).filter(function(x){ return x.pid !== pid; });
+    body.points = removeFromList(arr(body.points), pid);
     arr(q.photos).forEach(function(ph){ delImg(vid + '_' + pid + '_' + ph).catch(function(){}); });
     saveVideo(vid, body, '지점을 뺐어요');
   });
@@ -1058,14 +1087,15 @@ function openPointForm(vid, pid, insertAt){
   var v = S.videos[vid]; if(!v) return;
   var pts = arr(v.points);
   var p = pid ? pts.filter(function(x){ return x.pid === pid; })[0] : null;
-  var data = p ? { name:p.name, kind:p.kind === 'spot' ? 'spot' : 'apt', naver:p.naver, land:p.land, hh:p.hh, built:p.built, area:p.area, park:p.park, far:p.far,
+  var data = p ? { name:p.name, grp:p.sub ? 'sub' : 'new', kind:p.kind === 'spot' ? 'spot' : 'apt', naver:p.naver, land:p.land, hh:p.hh, built:p.built, area:p.area, park:p.park, far:p.far,
       memo:p.memo }
-    : { name:'', kind:'apt', naver:'', land:'', hh:'', built:'', area:'', park:'', far:'', memo:'' };
+    : { name:'', grp:'new', kind:'apt', naver:'', land:'', hh:'', built:'', area:'', park:'', far:'', memo:'' };
   openSheet({
-    title: p ? '지점 수정' : '지점 추가', sub: (p ? (pts.indexOf(p) + 1) : ((insertAt != null ? insertAt : pts.length) + 1)) + '번 지점' + (!p && insertAt != null && insertAt < pts.length ? ' (뒤 지점은 한 칸씩 밀려요)' : ''),
+    title: p ? '지점 수정' : '지점 추가', sub: (p ? pointLabels(pts)[pts.indexOf(p)] + '번 지점' : '새 지점') + (!p && insertAt != null && insertAt < pts.length ? ' (뒤 지점은 한 칸씩 밀려요)' : ''),
     data: data,
     fields: [
       { k:'name', label:'지점 이름', placeholder:'예) 산성 포레스티아', req:true },
+      { k:'grp', label:'코스 번호', type:'select', options:[['new','새 코스 (1, 2, 3 …)'],['sub','앞 지점과 같은 코스에 묶기 (1-1, 1-2 …)']], hint:'한 코스에서 단지 여러 개를 보면 묶어서 1-1, 1-2 로 나눠요' },
       { k:'kind', label:'종류', type:'select', options:[['apt','아파트 단지 (개요·매물 세팅 있음)'],['spot','그 밖의 지점 (역·학교 등)']] },
       { k:'naver', label:'네이버지도 링크', type:'url', placeholder:'https://naver.me/…' },
       { k:'land', label:'네이버부동산 링크', type:'url', placeholder:'https://new.land.naver.com/…' },
@@ -1083,6 +1113,8 @@ function openPointForm(vid, pid, insertAt){
       if(p){ np = list.filter(function(q){ return q.pid === pid; })[0]; }
       else { np = { pid:newId('p'), photos:[] }; if(insertAt != null && insertAt >= 0 && insertAt <= list.length) list.splice(insertAt, 0, np); else list.push(np); }
       ['name','kind','hh','built','area','park','far','memo'].forEach(function(k){ np[k] = x[k]; });
+      var at = list.indexOf(np);
+      if(x.grp === 'sub' && at > 0) np.sub = true; else delete np.sub;
       np.naver = x.naver ? (safeUrl(x.naver) || safeUrl('https://' + x.naver)) : '';
       np.land = x.land ? (safeUrl(x.land) || safeUrl('https://' + x.land)) : '';
       body.points = list;
@@ -1091,12 +1123,26 @@ function openPointForm(vid, pid, insertAt){
     onDelete: p ? function(){
       confirmBox('이 지점을 삭제할까요?', esc(p.name || '') + '<br>사진 기록까지 함께 사라져요.', '삭제', function(){
         var body = deep(v);
-        body.points = arr(body.points).filter(function(q){ return q.pid !== pid; });
+        body.points = removeFromList(arr(body.points), pid);
         arr(p.photos).forEach(function(ph){ delImg(vid + '_' + pid + '_' + ph).catch(function(){}); });
         saveVideo(vid, body, '지점을 삭제했어요').then(function(ok){ if(ok && route().t === 'pt') navHash('#v=' + encodeURIComponent(vid)); });
       });
     } : null,
-    delText: '지점 삭제'
+    delText: '지점 삭제',
+    extra: p ? { text:'이름으로 나누기', fn:function(){
+      var parts = splitNames(p.name);
+      if(parts.length < 2){ toast('나눌 이름이 없어요 — 이름을 ·  ,  / 로 구분해 주세요', 'err'); return; }
+      var body = deep(v), list = arr(body.points), at = -1;
+      list.forEach(function(q, k){ if(q.pid === pid) at = k; });
+      var head = list[at]; head.name = parts[0];
+      var add = parts.slice(1).map(function(nm){ return { pid:newId('p'), name:nm, kind:head.kind === 'spot' ? 'spot' : 'apt', sub:true, photos:[], listings:[] }; });
+      Array.prototype.splice.apply(list, [at + 1, 0].concat(add));
+      var lab = pointLabels(list), preview = parts.map(function(nm, k){ return lab[at + k] + ' ' + esc(nm); }).join('<br>');
+      confirmBox(parts.length + '개로 나눌까요?', preview + '<br><span style="color:#8A8674">첫 번째에 기존 기록(메모·사진·매물)이 그대로 남아요</span>', '나누기', function(){
+        body.points = list;
+        saveVideo(vid, body, parts.length + '개로 나눴어요').then(function(ok){ if(ok && route().t === 'pt') navHash('#v=' + encodeURIComponent(vid)); });
+      });
+    } } : null
   });
 }
 
@@ -1207,6 +1253,7 @@ function cleanPoint(p, i){
   var o = { pid: ID_RE.test(String(p.pid || '')) ? String(p.pid) : newId('p') + i };
   ['name','kind','hh','built','area','park','far','visited'].forEach(function(k){ if(p[k] != null && p[k] !== '') o[k] = txt(p[k], 160); });
   o.kind = o.kind === 'spot' ? 'spot' : 'apt';
+  if(p.sub) o.sub = true;
   if(p.memo) o.memo = txt(p.memo, 4000);
   ['naver','land'].forEach(function(k){ var u = safeUrl(p[k]); if(u) o[k] = u; });
   o.photos = arr(p.photos).map(String).filter(function(x){ return ID_RE.test(x); });
