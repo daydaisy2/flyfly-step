@@ -527,7 +527,7 @@ function delImg(key){
 }
 function pickFiles(multiple, cb, accept){
   var inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = accept || 'image/*'; inp.multiple = !!multiple; inp.style.display = 'none';
+  inp.type = 'file'; if(accept !== '') inp.accept = accept || 'image/*'; inp.multiple = !!multiple; inp.style.display = 'none';
   document.body.appendChild(inp);
   inp.addEventListener('change', function(){
     var fs = Array.prototype.slice.call(inp.files || []);
@@ -1183,6 +1183,15 @@ function openListingForm(vid, pid, li){
 /* ---------- 가져오기 (파일 → 영상·지점·지도 사진) ----------
    형식: { "format":"imchall-import", "videos":{ "<영상ID>":{…} }, "images":{ "<키>":{ "data":"data:image/jpeg;base64,…", "w":0, "h":0, "ts":0 } } }
    같은 시즌·번호의 영상이 이미 있으면 덮어쓰지 않고 건너뜁니다. */
+function readText(file){
+  if(file.text) return file.text();
+  return new Promise(function(resolve, reject){
+    var r = new FileReader();
+    r.onload = function(){ resolve(r.result); };
+    r.onerror = function(){ reject(r.error || new Error('read')); };
+    r.readAsText(file);
+  });
+}
 var ID_RE = /^[A-Za-z0-9_-]{1,60}$/;
 function txt(v, max){ return String(v == null ? '' : v).slice(0, max || 2000); }
 function numOrBlank(v){ if(v === '' || v == null) return ''; var n = Number(v); return isFinite(n) ? n : ''; }
@@ -1228,9 +1237,12 @@ function parseImport(obj){
 function runImport(){
   if(needUnlock('기록 모드에서 가져올 수 있어요')) return;
   pickFiles(false, function(fs){
-    fs[0].text().then(function(t){
-      var pr;
-      try{ pr = parseImport(JSON.parse(t)); }catch(e){ toast('가져오기 파일이 아니에요', 'err'); return; }
+    var f = fs[0];
+    toast('파일을 읽는 중… ' + f.name);
+    readText(f).then(function(t){
+      var pr, raw;
+      try{ raw = JSON.parse(String(t).replace(/^\uFEFF/, '')); }catch(e){ toast('파일이 손상됐거나 JSON이 아니에요 (' + f.name + ')', 'err'); return; }
+      try{ pr = parseImport(raw); }catch(e){ toast('이 앱의 가져오기 파일이 아니에요 (' + f.name + ')', 'err'); return; }
       var exist = {};
       Object.keys(S.videos).forEach(function(id){ var v = S.videos[id]; exist[v.season + ':' + v.no] = true; });
       var add = [], skip = [];
@@ -1256,8 +1268,8 @@ function runImport(){
         chain.then(function(){ dotEl.className = 'dot live'; toast('가져왔어요 ✓ 영상 ' + add.length + '개 · 지점 ' + np + '개'); render(true); })
           .catch(function(){ dotEl.className = 'dot warn'; toast('가져오다 멈췄어요 — 연결을 확인해 주세요', 'err'); refresh(true); });
       });
-    }).catch(function(){ toast('파일을 읽지 못했어요', 'err'); });
-  }, '.json,application/json');
+    }).catch(function(err){ toast('파일을 읽지 못했어요 — ' + ((err && err.name) || '알 수 없는 오류'), 'err'); });
+  }, '');   /* 폰에 따라 .json 이 선택 창에서 막히는 일이 있어 종류를 제한하지 않는다 */
 }
 
 /* ---------- 사진 올리기 · 지우기 ---------- */
