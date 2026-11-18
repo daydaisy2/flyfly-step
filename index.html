@@ -132,6 +132,22 @@
   .pn .ar{flex:0 0 auto;font-size:18px;color:#C9C3AB;line-height:1}
   .hint{margin:0 6px;font-size:11.5px;font-weight:700;color:#6E6851;text-align:center}
 
+  .sech .side{display:flex;align-items:center;gap:6px}
+  .pill.ordbtn{background:var(--cream);color:var(--navy);font-weight:900;padding:6px 12px}
+  .pill.ordbtn.on{background:var(--navy);color:#fff}
+  .pts.ed{padding:2px 10px 10px;gap:0}
+  .pts.ed .pt::before{display:none}
+  .pt.ed{padding:3px 0}
+  .pt.ed .nm{flex:1 1 auto;min-width:0;font-size:14.5px;font-weight:900;letter-spacing:-.035em;line-height:1.3}
+  .pt.ed .circ{cursor:default}
+  .mv{display:flex;align-items:center;gap:5px;flex:0 0 auto}
+  .mv button{width:38px;height:38px;border-radius:50%;background:var(--cream);color:var(--navy);font-size:13px;font-weight:900;display:grid;place-items:center;text-align:center}
+  .mv button:disabled{opacity:.3;cursor:default}
+  .mv button:active:not(:disabled){background:#F1E8C4}
+  .mv button.rm{background:var(--red-soft);color:var(--red)}
+  .ins{display:block;width:100%;height:28px;margin:1px 0;border-radius:999px;border:1.5px dashed #D9CF9E;color:#8F8A73;font-size:11.5px;font-weight:800;text-align:center;letter-spacing:-.02em}
+  .ins:active{background:var(--cream)}
+
   /* ============ 지점 상세 ============ */
   .ptitle{display:flex;align-items:center;gap:12px;padding:2px 6px}
   .ptitle .circ{width:46px;height:46px;font-size:19px}
@@ -307,6 +323,7 @@ var sheetOpen = false;
 var lastWrite = 0;
 var es = null, pollTimer = null, refreshTimer = null;
 var openAcc = {};
+var orderMode = null;   /* 순서·편집 모드가 켜진 영상 id */
 var viewEl = document.getElementById('view');
 var layer = document.getElementById('layer');
 var dotEl = document.getElementById('dot');
@@ -691,8 +708,21 @@ function renderVideo(id){
   if(stats.length) h += '<p class="sub">' + stats.join(' · ') + '</p>';
   h += '<div class="card">' + ytRow(v) + mapAcc(v, 1, '임장지도', '🗺️') + mapAcc(v, 2, '한 장 지도', '🧭') + '</div>';
 
-  h += '<div class="card"><div class="sech"><h2>👣 지점</h2><span class="pill">' + vis + ' / ' + pts.length + '</span></div>';
-  if(pts.length){
+  var editing = unlocked && orderMode === id && pts.length > 0;
+  var insRow = function(at){ return '<button class="ins" data-act="ins-pt" data-id="' + esc(id) + '" data-at="' + at + '">＋ 여기에 지점 추가</button>'; };
+  h += '<div class="card"><div class="sech"><h2>👣 지점</h2><span class="side">'
+    + (unlocked && pts.length ? '<button class="pill ordbtn' + (editing ? ' on' : '') + '" data-act="order-mode" data-id="' + esc(id) + '">' + (editing ? '완료' : '↕ 순서·편집') + '</button>' : '')
+    + '<span class="pill">' + vis + ' / ' + pts.length + '</span></span></div>';
+  if(editing){
+    h += '<div class="pts ed">' + insRow(0);
+    pts.forEach(function(p, i){
+      h += '<div class="pt ed"><span class="circ' + (p.visited ? ' vis' : '') + '">' + (i + 1) + '</span><span class="nm">' + esc(p.name || '이름 없는 지점') + '</span>'
+        + '<span class="mv"><button data-act="mv" data-id="' + esc(id) + '" data-i="' + i + '" data-d="-1"' + (i === 0 ? ' disabled' : '') + ' aria-label="위로">▲</button>'
+        + '<button data-act="mv" data-id="' + esc(id) + '" data-i="' + i + '" data-d="1"' + (i === pts.length - 1 ? ' disabled' : '') + ' aria-label="아래로">▼</button>'
+        + '<button class="rm" data-act="rm-pt" data-id="' + esc(id) + '" data-p="' + esc(p.pid) + '" aria-label="빼기">✕</button></span></div>' + insRow(i + 1);
+    });
+    h += '</div>';
+  } else if(pts.length){
     h += '<div class="pts">';
     pts.forEach(function(p, i){
       h += '<div class="pt' + (p.visited ? ' vis' : '') + '">'
@@ -704,8 +734,9 @@ function renderVideo(id){
     h += '<p class="none" style="padding:14px 16px 18px">아직 지점이 없어요.' + (unlocked ? '' : '<br>기록 모드에서 추가할 수 있어요.') + '</p>';
   }
   h += '</div>';
-  if(pts.length) h += '<p class="hint">동그라미는 다녀옴 표시, 이름은 지점 상세로 이동</p>';
-  if(unlocked) h += '<button class="add ghost" data-act="add-point" data-id="' + esc(id) + '">＋ 지점 추가</button>';
+  if(editing) h += '<p class="hint">▲▼로 순서를 바꾸고, ＋로 중간에 끼워 넣고, ✕로 빼요. 번호는 자동으로 다시 매겨져요.</p>';
+  else if(pts.length) h += '<p class="hint">동그라미는 다녀옴 표시, 이름은 지점 상세로 이동</p>';
+  if(unlocked && !editing) h += '<button class="add ghost" data-act="add-point" data-id="' + esc(id) + '">＋ 지점 추가</button>';
   viewEl.innerHTML = h;
 }
 
@@ -970,8 +1001,29 @@ function openVideoForm(id){
   });
 }
 
+/* ---------- 지점 순서 바꾸기 · 빼기 ---------- */
+function movePoint(vid, i, d){
+  if(needUnlock()) return;
+  var v = deep(S.videos[vid]), list = arr(v.points), j = i + d;
+  if(!list[i] || j < 0 || j >= list.length) return;
+  var tmp = list[i]; list[i] = list[j]; list[j] = tmp;   /* 다녀옴·사진·매물은 지점과 함께 움직인다 */
+  v.points = list;
+  saveVideo(vid, v, '', true);
+}
+function removePoint(vid, pid){
+  if(needUnlock()) return;
+  var v = S.videos[vid], q = v && arr(v.points).filter(function(x){ return x.pid === pid; })[0];
+  if(!q) return;
+  confirmBox('이 지점을 뺄까요?', esc(q.name || '') + '<br>사진·매물 기록도 함께 사라져요.', '빼기', function(){
+    var body = deep(v);
+    body.points = arr(body.points).filter(function(x){ return x.pid !== pid; });
+    arr(q.photos).forEach(function(ph){ delImg(vid + '_' + pid + '_' + ph).catch(function(){}); });
+    saveVideo(vid, body, '지점을 뺐어요');
+  });
+}
+
 /* ---------- 지점 폼 ---------- */
-function openPointForm(vid, pid){
+function openPointForm(vid, pid, insertAt){
   var v = S.videos[vid]; if(!v) return;
   var pts = arr(v.points);
   var p = pid ? pts.filter(function(x){ return x.pid === pid; })[0] : null;
@@ -979,7 +1031,7 @@ function openPointForm(vid, pid){
       memo:p.memo }
     : { name:'', kind:'apt', naver:'', land:'', hh:'', built:'', area:'', park:'', far:'', memo:'' };
   openSheet({
-    title: p ? '지점 수정' : '지점 추가', sub: (p ? (pts.indexOf(p) + 1) : (pts.length + 1)) + '번 지점',
+    title: p ? '지점 수정' : '지점 추가', sub: (p ? (pts.indexOf(p) + 1) : ((insertAt != null ? insertAt : pts.length) + 1)) + '번 지점' + (!p && insertAt != null && insertAt < pts.length ? ' (뒤 지점은 한 칸씩 밀려요)' : ''),
     data: data,
     fields: [
       { k:'name', label:'지점 이름', placeholder:'예) 산성 포레스티아', req:true },
@@ -998,7 +1050,7 @@ function openPointForm(vid, pid){
     onSave: function(x){
       var body = deep(v), list = arr(body.points), np;
       if(p){ np = list.filter(function(q){ return q.pid === pid; })[0]; }
-      else { np = { pid:newId('p'), photos:[] }; list.push(np); }
+      else { np = { pid:newId('p'), photos:[] }; if(insertAt != null && insertAt >= 0 && insertAt <= list.length) list.splice(insertAt, 0, np); else list.push(np); }
       ['name','kind','hh','built','area','park','far','memo'].forEach(function(k){ np[k] = x[k]; });
       np.naver = x.naver ? (safeUrl(x.naver) || safeUrl('https://' + x.naver)) : '';
       np.land = x.land ? (safeUrl(x.land) || safeUrl('https://' + x.land)) : '';
@@ -1228,6 +1280,10 @@ document.addEventListener('click', function(e){
     case 'add-video': openVideoForm(null); break;
     case 'edit-video': openVideoForm(id); break;
     case 'add-point': openPointForm(id, null); break;
+    case 'ins-pt': openPointForm(id, null, parseInt(t.getAttribute('data-at'), 10)); break;
+    case 'order-mode': orderMode = (orderMode === id) ? null : id; render(true); break;
+    case 'mv': movePoint(id, parseInt(t.getAttribute('data-i'), 10), parseInt(t.getAttribute('data-d'), 10)); break;
+    case 'rm-pt': removePoint(id, p); break;
     case 'edit-point': openPointForm(id, p); break;
     case 'add-lst': openListingForm(id, p, null); break;
     case 'edit-lst': openListingForm(id, p, parseInt(t.getAttribute('data-i'), 10)); break;
@@ -1253,7 +1309,7 @@ lockBtn.addEventListener('click', function(){
     render(true); toast('다시 잠갔어요 🔒');
   } else openPin();
 });
-window.addEventListener('hashchange', function(){ render(); viewEl.scrollTop = 0; });
+window.addEventListener('hashchange', function(){ orderMode = null; render(); viewEl.scrollTop = 0; });
 document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') refresh(false); });
 
 /* ================== 시작 ================== */
