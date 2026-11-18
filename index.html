@@ -266,7 +266,8 @@
   .gate-card .gate-go{width:100%;height:54px;border-radius:999px;background:var(--navy);color:#fff;font-size:15.5px;font-weight:900;display:grid;place-items:center;margin-top:6px}
   .gate-card .gate-go:disabled{opacity:.5}
   .gate-card .gate-sub{width:100%;height:46px;border-radius:999px;background:var(--cream);color:#6E6851;font-size:14px;font-weight:900;display:grid;place-items:center;margin-top:8px}
-  .foot-link{align-self:center;margin-top:6px;padding:10px 14px;font-size:12px;font-weight:700;color:#7A7560;text-decoration:underline;text-underline-offset:3px}
+  .foot-row{align-self:center;display:flex;flex-wrap:wrap;justify-content:center;gap:2px 6px;margin-top:4px}
+  .foot-link{margin-top:2px;padding:10px 14px;font-size:12px;font-weight:700;color:#7A7560;text-decoration:underline;text-underline-offset:3px}
 
   /* PIN */
   .pin-wrap{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:22px;background:rgba(30,27,20,.45);
@@ -519,9 +520,9 @@ function delImg(key){
   delete imgCache[key];
   return fetch(imgNodeUrl(key), { method:'DELETE', cache:'no-store' }).then(function(r){ if(!r.ok) throw new Error('http ' + r.status); return true; });
 }
-function pickFiles(multiple, cb){
+function pickFiles(multiple, cb, accept){
   var inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = !!multiple; inp.style.display = 'none';
+  inp.type = 'file'; inp.accept = accept || 'image/*'; inp.multiple = !!multiple; inp.style.display = 'none';
   document.body.appendChild(inp);
   inp.addEventListener('change', function(){
     var fs = Array.prototype.slice.call(inp.files || []);
@@ -681,7 +682,7 @@ function renderList(s){
       + '<span class="vt"><strong>' + esc(v.title || '제목 없는 영상') + '</strong><span>' + esc(meta) + '</span></span><span class="chev">›</span></button>';
   });
   if(unlocked) h += '<button class="add" data-act="add-video">＋ 영상 추가</button>';
-  h += '<button class="foot-link" data-act="leave">이 폰에서 나가기</button>';
+  h += '<div class="foot-row">' + (unlocked ? '<button class="foot-link" data-act="import">📥 가져오기</button>' : '') + '<button class="foot-link" data-act="leave">이 폰에서 나가기</button></div>';
   viewEl.innerHTML = h;
 }
 
@@ -1174,6 +1175,86 @@ function openListingForm(vid, pid, li){
   });
 }
 
+/* ---------- 가져오기 (파일 → 영상·지점·지도 사진) ----------
+   형식: { "format":"imchall-import", "videos":{ "<영상ID>":{…} }, "images":{ "<키>":{ "data":"data:image/jpeg;base64,…", "w":0, "h":0, "ts":0 } } }
+   같은 시즌·번호의 영상이 이미 있으면 덮어쓰지 않고 건너뜁니다. */
+var ID_RE = /^[A-Za-z0-9_-]{1,60}$/;
+function txt(v, max){ return String(v == null ? '' : v).slice(0, max || 2000); }
+function numOrBlank(v){ if(v === '' || v == null) return ''; var n = Number(v); return isFinite(n) ? n : ''; }
+function cleanListing(L){
+  var o = {};
+  ['label','name','dong','moveIn','households','where','preset','houses'].forEach(function(k){ o[k] = txt(L[k], 120); });
+  ['gongsi','sise','peak','asking','jeonseAsk','maemae','jeonse','loanCap','loan','rate','term','feeRate','fee','tax'].forEach(function(k){ o[k] = numOrBlank(L[k]); });
+  return o;
+}
+function cleanPoint(p, i){
+  var o = { pid: ID_RE.test(String(p.pid || '')) ? String(p.pid) : newId('p') + i };
+  ['name','kind','hh','built','area','park','far','visited'].forEach(function(k){ if(p[k] != null && p[k] !== '') o[k] = txt(p[k], 160); });
+  o.kind = o.kind === 'spot' ? 'spot' : 'apt';
+  if(p.memo) o.memo = txt(p.memo, 4000);
+  ['naver','land'].forEach(function(k){ var u = safeUrl(p[k]); if(u) o[k] = u; });
+  o.photos = arr(p.photos).map(String).filter(function(x){ return ID_RE.test(x); });
+  o.listings = arr(p.listings).filter(function(L){ return L && typeof L === 'object'; }).map(cleanListing);
+  return o;
+}
+function cleanVideo(v){
+  var o = { season: Math.min(SEASONS, Math.max(1, parseInt(v.season, 10) || 1)), no: txt(v.no, 10), title: txt(v.title, 120), status: v.status === 'done' ? 'done' : 'plan' };
+  var yt = safeUrl(v.yt); if(yt) o.yt = yt;
+  ['date','km','min'].forEach(function(k){ if(v[k]) o[k] = txt(v[k], 30); });
+  ['map1','map2'].forEach(function(k){ if(v[k]) o[k] = Number(v[k]) || Date.now(); });
+  o.points = arr(v.points).filter(function(p){ return p && typeof p === 'object'; }).map(cleanPoint);
+  return o;
+}
+function parseImport(obj){
+  if(!obj || obj.format !== 'imchall-import' || !obj.videos || typeof obj.videos !== 'object') throw new Error('format');
+  var vids = {}, imgs = {};
+  Object.keys(obj.videos).forEach(function(id){
+    var v = obj.videos[id];
+    if(ID_RE.test(id) && v && typeof v === 'object') vids[id] = cleanVideo(v);
+  });
+  Object.keys(obj.images || {}).forEach(function(k){
+    var im = obj.images[k];
+    if(ID_RE.test(k) && im && typeof im.data === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(im.data) && im.data.length < 1500000){
+      imgs[k] = { data: im.data, w: Number(im.w) || 0, h: Number(im.h) || 0, ts: Number(im.ts) || 0 };
+    }
+  });
+  return { vids: vids, imgs: imgs };
+}
+function runImport(){
+  if(needUnlock('기록 모드에서 가져올 수 있어요')) return;
+  pickFiles(false, function(fs){
+    fs[0].text().then(function(t){
+      var pr;
+      try{ pr = parseImport(JSON.parse(t)); }catch(e){ toast('가져오기 파일이 아니에요', 'err'); return; }
+      var exist = {};
+      Object.keys(S.videos).forEach(function(id){ var v = S.videos[id]; exist[v.season + ':' + v.no] = true; });
+      var add = [], skip = [];
+      Object.keys(pr.vids).forEach(function(id){
+        var v = pr.vids[id];
+        if(S.videos[id] || exist[v.season + ':' + v.no]) skip.push('시즌' + v.season + ' NO.' + v.no + ' ' + v.title); else add.push(id);
+      });
+      if(!add.length){ toast(skip.length ? '이미 있는 영상이에요 — 건너뛰었어요' : '가져올 영상이 없어요', 'err'); return; }
+      var np = 0; add.forEach(function(id){ np += pr.vids[id].points.length; });
+      var wantImgs = Object.keys(pr.imgs).filter(function(k){ return add.some(function(id){ return k.indexOf(id + '_') === 0; }); });
+      var lines = add.map(function(id){ var v = pr.vids[id]; return '시즌' + v.season + ' NO.' + v.no + ' ' + esc(v.title) + ' · 지점 ' + v.points.length + '개'; });
+      confirmBox('이 내용을 가져올까요?', lines.join('<br>') + '<br>지도·사진 ' + wantImgs.length + '장'
+        + (skip.length ? '<br><span style="color:#8A8674">이미 있어서 건너뜀: ' + esc(skip.join(', ')) + '</span>' : ''), '가져오기', function(){
+        toast('가져오는 중…');
+        var chain = Promise.resolve();
+        wantImgs.forEach(function(k){
+          var im = pr.imgs[k];
+          chain = chain.then(function(){ return putImg(k, im.data, im.w, im.h, im.ts).then(function(){ imgCache[k] = { ts: im.ts, data: im.data }; }); });
+        });
+        add.forEach(function(id){
+          chain = chain.then(function(){ lastWrite = Date.now(); return api('videos/' + encodeURIComponent(id), 'PUT', pr.vids[id]).then(function(){ var v = deep(pr.vids[id]); v.id = id; v.points = arr(v.points); S.videos[id] = v; }); });
+        });
+        chain.then(function(){ dotEl.className = 'dot live'; toast('가져왔어요 ✓ 영상 ' + add.length + '개 · 지점 ' + np + '개'); render(true); })
+          .catch(function(){ dotEl.className = 'dot warn'; toast('가져오다 멈췄어요 — 연결을 확인해 주세요', 'err'); refresh(true); });
+      });
+    }).catch(function(){ toast('파일을 읽지 못했어요', 'err'); });
+  }, '.json,application/json');
+}
+
 /* ---------- 사진 올리기 · 지우기 ---------- */
 function pickMap(id, n){
   pickFiles(false, function(fs){
@@ -1310,6 +1391,7 @@ document.addEventListener('click', function(e){
     case 'edit-point': openPointForm(id, p); break;
     case 'add-lst': openListingForm(id, p, null); break;
     case 'edit-lst': openListingForm(id, p, parseInt(t.getAttribute('data-i'), 10)); break;
+    case 'import': runImport(); break;
     case 'leave': leaveRoom(); break;
     case 'noyt': toast('유튜브 링크가 아직 없어요'); break;
     case 'visit': toggleVisit(id, null, parseInt(t.getAttribute('data-i'), 10)); break;
