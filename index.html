@@ -556,7 +556,7 @@ function normalize(data){
 function videosOf(season){
   return Object.keys(S.videos).map(function(id){ return S.videos[id]; })
     .filter(function(v){ return Number(v.season) === season; })
-    .sort(function(a,b){ return (Number(b.no) || 0) - (Number(a.no) || 0); });
+    .sort(function(a,b){ return (Number(a.no) || 0) - (Number(b.no) || 0); });   /* 번호 오름차순 (NO.1 → NO.2 → …) */
 }
 function api(path, method, body){
   var opt = { method: method || 'GET', cache:'no-store', headers:{ 'Content-Type':'application/json' } };
