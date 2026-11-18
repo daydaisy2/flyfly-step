@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>리훨 부부데이지 임장챌린지</title>
 <meta name="description" content="리훨 임챌 — 훨훨의 임장챌린지를 따라 걷는 부부의 기록">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#FBE049">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -251,6 +253,21 @@
   .modal .mrow{display:flex;gap:8px;margin-top:8px}
   .modal .mrow .btn{height:48px;font-size:14.5px}
 
+  /* 입장 화면 */
+  .gate{position:fixed;inset:0;z-index:200;background:var(--yellow);display:grid;place-items:center;padding:22px;overflow-y:auto}
+  .gate-card{width:100%;max-width:360px;background:#fff;border-radius:30px;padding:30px 24px 22px;text-align:center;box-shadow:0 20px 50px rgba(60,45,0,.22)}
+  .gate-card .pin-fl{margin-bottom:2px}
+  .gate-card h2{margin:12px 0 0;font-size:21px;font-weight:900;letter-spacing:-.045em;color:var(--navy);line-height:1.25}
+  .gate-card p{margin:6px 0 0;font-size:13px;font-weight:600;color:var(--soft);line-height:1.55}
+  .gate-card input{width:100%;margin-top:18px;background:var(--cream);border:1.5px solid transparent;border-radius:16px;padding:14px 16px;font-size:17px;font-weight:700;
+    color:var(--ink);outline:none;text-align:center;letter-spacing:.04em}
+  .gate-card input:focus{border-color:var(--navy);background:#fff}
+  .gate-card .gate-msg{min-height:20px;margin-top:10px;font-size:13px;font-weight:700;color:var(--red)}
+  .gate-card .gate-go{width:100%;height:54px;border-radius:999px;background:var(--navy);color:#fff;font-size:15.5px;font-weight:900;display:grid;place-items:center;margin-top:6px}
+  .gate-card .gate-go:disabled{opacity:.5}
+  .gate-card .gate-sub{width:100%;height:46px;border-radius:999px;background:var(--cream);color:#6E6851;font-size:14px;font-weight:900;display:grid;place-items:center;margin-top:8px}
+  .foot-link{align-self:center;margin-top:6px;padding:10px 14px;font-size:12px;font-weight:700;color:#7A7560;text-decoration:underline;text-underline-offset:3px}
+
   /* PIN */
   .pin-wrap{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:22px;background:rgba(30,27,20,.45);
     backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
@@ -308,7 +325,8 @@
 
 /* ================== 상수 ================== */
 var DB = 'https://bubulife-678ac-default-rtdb.firebaseio.com';
-var ROOM = 'imchall-public-v2';
+var ROOM = null;   /* 입장 비밀번호로 계산한 비밀 방 이름 (아래 '입장') */
+var KEY_LS = 'imchall.room.v3';
 var LS = 'imchall.unlock.v1';
 var PW_HASH = '0341266d632db4ef5aeac567ed6d00f44506e1c4f73f9e7a44f8cbc21888c597';
 var SALT = 'imchall::v1::';
@@ -543,6 +561,7 @@ function api(path, method, body){
   });
 }
 function refresh(force){
+  if(!ROOM) return Promise.resolve();   /* 입장 전에는 서버를 읽지 않는다 */
   if(!force && (sheetOpen || Date.now() - lastWrite < 2500)) return Promise.resolve();
   return fetch(roomUrl(), { cache:'no-store' }).then(function(r){
     if(!r.ok) throw new Error('http ' + r.status);
@@ -662,6 +681,7 @@ function renderList(s){
       + '<span class="vt"><strong>' + esc(v.title || '제목 없는 영상') + '</strong><span>' + esc(meta) + '</span></span><span class="chev">›</span></button>';
   });
   if(unlocked) h += '<button class="add" data-act="add-video">＋ 영상 추가</button>';
+  h += '<button class="foot-link" data-act="leave">이 폰에서 나가기</button>';
   viewEl.innerHTML = h;
 }
 
@@ -1290,6 +1310,7 @@ document.addEventListener('click', function(e){
     case 'edit-point': openPointForm(id, p); break;
     case 'add-lst': openListingForm(id, p, null); break;
     case 'edit-lst': openListingForm(id, p, parseInt(t.getAttribute('data-i'), 10)); break;
+    case 'leave': leaveRoom(); break;
     case 'noyt': toast('유튜브 링크가 아직 없어요'); break;
     case 'visit': toggleVisit(id, null, parseInt(t.getAttribute('data-i'), 10)); break;
     case 'visit-here': toggleVisit(id, p, null); break;
@@ -1315,12 +1336,85 @@ lockBtn.addEventListener('click', function(){
 window.addEventListener('hashchange', function(){ orderMode = null; render(); viewEl.scrollTop = 0; });
 document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') refresh(false); });
 
+/* ================== 입장 ==================
+   처음 한 번 입장 비밀번호를 받아, 그 비밀번호로 '비밀 방 이름'을 계산합니다.
+   데이터는 그 방에만 있고(서버는 방 목록을 열어 주지 않음), 비밀번호는 코드·서버 어디에도 저장하지 않습니다.
+   한 번 입장한 폰은 방 이름만 기억해서 다음부터 바로 열립니다. */
+function deriveRoom(pw){
+  var enc = new TextEncoder();
+  return crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits']).then(function(k){
+    return crypto.subtle.deriveBits({ name:'PBKDF2', salt:enc.encode('imchall::room::v3'), iterations:200000, hash:'SHA-256' }, k, 256);
+  }).then(function(bits){
+    return 'ic' + Array.prototype.map.call(new Uint8Array(bits), function(b){ return ('0' + b.toString(16)).slice(-2); }).join('').slice(0, 48);
+  });
+}
+function boot(){
+  loadCache();
+  render();
+  refresh(true);
+  startSync();
+}
+function openGate(){
+  var wrap = document.createElement('div');
+  wrap.className = 'gate';
+  wrap.innerHTML = '<div class="gate-card"><div class="pin-fl">👣</div><h2>리훨 부부데이지<br>임장챌린지</h2>'
+    + '<p>입장 비밀번호를 입력해 주세요.<br>한 번 입장한 폰은 다음부터 바로 열려요.</p>'
+    + '<input id="gatePw" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="비밀번호" aria-label="입장 비밀번호">'
+    + '<p class="gate-msg" id="gateMsg" role="alert"></p>'
+    + '<button class="gate-go" id="gateGo">입장</button><div id="gateAsk"></div></div>';
+  document.body.appendChild(wrap);
+  var inp = wrap.querySelector('#gatePw'), msg = wrap.querySelector('#gateMsg'), go = wrap.querySelector('#gateGo'), ask = wrap.querySelector('#gateAsk');
+  var pending = null;
+  var enter = function(room){
+    try{ localStorage.setItem(KEY_LS, room); }catch(e){}
+    ROOM = room;
+    wrap.remove();
+    boot();
+  };
+  var submit = function(){
+    var pw = inp.value.trim();
+    ask.innerHTML = ''; pending = null;
+    if(pw.length < 6){ msg.textContent = '6자 이상 입력해 주세요'; return; }
+    if(!(window.crypto && crypto.subtle)){ msg.textContent = '보안 연결(https)에서만 열 수 있어요'; return; }
+    go.disabled = true; msg.textContent = '확인하는 중…';
+    deriveRoom(pw).then(function(room){
+      return fetch(DB + '/rooms/' + room + '.json?shallow=true', { cache:'no-store' }).then(function(r){
+        if(!r.ok) throw new Error('http ' + r.status);
+        return r.json();
+      }).then(function(d){
+        go.disabled = false;
+        if(d){ enter(room); return; }
+        pending = room;
+        msg.textContent = '';
+        ask.innerHTML = '<p style="margin-top:12px;color:#5D5A46">이 비밀번호로 저장된 기록이 없어요.<br>처음이라면 새로 시작하고, 아니라면 다시 입력해 주세요.</p>'
+          + '<button class="gate-sub" id="gateNew" style="background:var(--yellow);color:var(--navy)">이 비밀번호로 새로 시작</button>'
+          + '<button class="gate-sub" id="gateAgain">다시 입력</button>';
+        ask.querySelector('#gateNew').addEventListener('click', function(){ if(pending) enter(pending); });
+        ask.querySelector('#gateAgain').addEventListener('click', function(){ ask.innerHTML = ''; pending = null; inp.value = ''; inp.focus(); });
+      });
+    }).catch(function(){
+      go.disabled = false;
+      msg.textContent = '연결을 확인해 주세요';
+    });
+  };
+  go.addEventListener('click', submit);
+  inp.addEventListener('keydown', function(e){ if(e.key === 'Enter') submit(); });
+  setTimeout(function(){ try{ inp.focus(); }catch(e){} }, 50);
+}
+function leaveRoom(){
+  confirmBox('이 폰에서 나갈까요?', '이 폰에 저장된 입장 정보와 임시 저장본을 지워요.<br>서버의 기록은 그대로 남아 있어요.', '나가기', function(){
+    try{ localStorage.removeItem(KEY_LS); localStorage.removeItem(CACHE_KEY); localStorage.removeItem(LS); }catch(e){}
+    location.hash = '';
+    location.reload();
+  });
+}
+
 /* ================== 시작 ================== */
 try{ unlocked = localStorage.getItem(LS) === '1'; }catch(e){}
-loadCache();
-render();
-refresh(true);
-startSync();
+var savedRoom = '';
+try{ savedRoom = localStorage.getItem(KEY_LS) || ''; }catch(e){}
+if(/^ic[0-9a-f]{48}$/.test(savedRoom)){ ROOM = savedRoom; boot(); }
+else openGate();
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
