@@ -104,6 +104,7 @@
   .vt{flex:1 1 auto;min-width:0}
   .vt strong{display:block;font-size:15px;font-weight:900;letter-spacing:-.035em;line-height:1.3}
   .vt span{display:block;font-size:12px;font-weight:700;color:var(--soft);margin-top:1px}
+  .vdate{flex:0 0 auto;padding:5px 10px;border-radius:999px;background:var(--cream);color:var(--navy);font-size:12px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
   .chev{flex:0 0 auto;font-size:20px;color:#C9C3AB;line-height:1}
 
   /* ============ 지도·사진 ============ */
@@ -430,17 +431,22 @@ function fmtNum(n){
   n = Math.round(Number(n) || 0);
   return n ? n.toLocaleString('ko-KR') : '—';
 }
-/* 자금 세팅: 같은 매물을 두 가지로 본다
-     매매 / 전세 / 자본(= 매매 − 전세)      (전세 끼고 살 때)
-     매매 / 대출 / 자본(= 매매 − 대출)      (대출 받을 때 — 대출은 규제 때문에 자동 계산하지 않고 직접 입력)
-   부대비용 = 매매 × 0.5% (중개료·취득세를 묶음), 총투자금 = 자본 + 부대비용. 안 적은 쪽은 계산하지 않는다 */
+/* 아파트: 초투(초기투자금) = 자본, 총투 = 매매
+     전세 기준  매매 / 전세 / 자본(초투 = 매매 − 전세)
+     대출 기준  매매 / 대출 / 자본(초투 = 매매 − 대출)   — 대출은 규제 때문에 자동 계산하지 않고 직접 입력
+   부대비용(중개료·취득세를 묶은 매매 × 0.5%)은 초투·총투에 넣지 않고 따로 보여 준다. 안 적은 쪽은 계산하지 않는다 */
 function seedOf(L){
   L = L || {};
   var price = parseMoney(L.maemae), jeon = parseMoney(L.jeonse), loan = parseMoney(L.loan);
   var extra = Math.round(price * EXTRA_RATE);
   var ownJ = (price && jeon) ? price - jeon : null, ownL = (price && loan) ? price - loan : null;
-  return { price:price, jeon:jeon, loan:loan, ownJ:ownJ, ownL:ownL, extra:extra,
-    totalJ: ownJ === null ? null : ownJ + extra, totalL: ownL === null ? null : ownL + extra };
+  return { price:price, jeon:jeon, loan:loan, ownJ:ownJ, ownL:ownL, extra:extra };
+}
+/* 재개발: 초투 = 매매, 총투 = 매매가 + 추가분담금 */
+function redevOf(L){
+  L = L || {};
+  var price = parseMoney(L.maemae), hasShare = !(L.share === undefined || L.share === null || L.share === ''), share = parseMoney(L.share);
+  return { price:price, share:share, hasShare:hasShare, total:(price && hasShare) ? price + share : null };
 }
 
 /* ================== 사진 (Firebase 옆 노드, 방 본문과 분리) ==================
@@ -674,6 +680,13 @@ function splitNames(name){
   var src = (m && sep.test(m[2])) ? m[2] : String(name || '');
   return src.split(sep).map(function(x){ return x.trim(); }).filter(Boolean);
 }
+/* 지점을 모두 다녀왔을 때의 임장날짜: 영상에 적어 둔 임장한 날이 있으면 그 날, 없으면 마지막으로 다녀온 날 */
+function doneDate(v){
+  var pts = arr(v.points);
+  if(!pts.length || pts.some(function(q){ return !q.visited; })) return '';
+  var last = pts.map(function(q){ return String(q.visited); }).sort().pop();
+  return v.date || (/^\d{4}-\d{2}-\d{2}$/.test(last) ? last : '');
+}
 function visitedCount(v){ return arr(v.points).filter(function(p){ return p.visited; }).length; }
 
 function renderList(s){
@@ -690,7 +703,8 @@ function renderList(s){
     var meta = n ? ('👣 ' + vis + ' / ' + n + ' 지점 다녀옴') : (v.date ? fmtDate(v.date) : '지점 기록 전');
     h += '<button class="vrow' + (v.status === 'done' ? ' done' : '') + '" data-act="video" data-id="' + esc(v.id) + '">'
       + '<span class="no">' + esc(v.no || '·') + '</span>'
-      + '<span class="vt"><strong>' + esc(v.title || '제목 없는 영상') + '</strong><span>' + esc(meta) + '</span></span><span class="chev">›</span></button>';
+      + '<span class="vt"><strong>' + esc(v.title || '제목 없는 영상') + '</strong><span>' + esc(meta) + '</span></span>'
+      + (doneDate(v) ? '<span class="vdate">' + esc(fmtDate(doneDate(v))) + '</span>' : '') + '<span class="chev">›</span></button>';
   });
   if(unlocked) h += '<button class="add" data-act="add-video">＋ 영상 추가</button>';
   h += '<div class="foot-row">' + '<button class="foot-link" data-act="refresh-app">🔄 최신으로 새로고침</button><button class="foot-link" data-act="leave">이 폰에서 나가기</button></div>';
@@ -737,7 +751,7 @@ function renderVideo(id){
   if(v.min) stats.push(esc(v.min) + '분');
   if(pts.length) stats.push('지점 <b>' + vis + ' / ' + pts.length + '</b>');
   var h = '<button class="back" data-act="back-list">← 시즌' + esc(v.season) + '</button>';
-  h += '<div class="head"><div style="min-width:0"><div class="eyebrow">NO.' + esc(v.no || '?') + (v.date ? ' · ' + esc(fmtDate(v.date)) : '') + '</div><h1 class="t">' + esc(v.title || '제목 없는 영상') + '</h1></div>'
+  h += '<div class="head"><div style="min-width:0"><div class="eyebrow">NO.' + esc(v.no || '?') + (doneDate(v) || v.date ? ' · ' + esc(fmtDate(doneDate(v) || v.date)) : '') + '</div><h1 class="t">' + esc(v.title || '제목 없는 영상') + '</h1></div>'
     + '<div class="side"><span class="pill' + (v.status === 'done' ? ' green">임장 완료' : '">임장 예정') + '</span>'
     + (unlocked ? '<button class="pen" data-act="edit-video" data-id="' + esc(id) + '" aria-label="영상 수정">✏️</button>' : '') + '</div></div>';
   if(stats.length) h += '<p class="sub">' + stats.join(' · ') + '</p>';
@@ -777,41 +791,46 @@ function renderVideo(id){
   viewEl.innerHTML = h;
 }
 
-/* ---------- 매물 세팅 표 (정보 → 세팅[매매 / 대출 or 전세 / 내 돈] → 부대 → 합계 → 판정, 매물 하나가 한 열) ---------- */
-function listingPanel(vid, pid, lsts){
+/* ---------- 매물 세팅 표 (매물 하나가 한 열) ----------
+   아파트: 정보 → 전세 기준(매매·전세·자본) → 대출 기준(매매·대출·자본) → 부대비용     (초투 = 자본, 총투 = 매매)
+   재개발: 정보 → 매매(초투) → 추가분담금 → 총투(= 매매 + 추가분담금) */
+function listingPanel(vid, pid, lsts, kind){
+  var redev = kind === 'redev';
   if(!lsts.length){
-    return '<p class="none">' + (unlocked ? '아직 매물이 없어요. 아래 버튼으로 첫 매물을 넣어 보세요.' : '아직 매물이 없어요') + '</p>'
-      + (unlocked ? '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>' : '');
+    return '<p class="none">' + (unlocked ? '아직 ' + (redev ? '물건' : '매물') + '이 없어요. 아래 버튼으로 첫 ' + (redev ? '물건' : '매물') + '을 넣어 보세요.' : '아직 ' + (redev ? '물건' : '매물') + '이 없어요') + '</p>'
+      + (unlocked ? '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ ' + (redev ? '물건' : '매물') + ' 추가</button>' : '');
   }
-  var seeds = lsts.map(seedOf);
+  var seeds = lsts.map(redev ? redevOf : seedOf);
   var ownCell = function(v){ return v === null ? '—' : (v < 0 ? '<span class="neg">' + fmtNum(v) + '</span>' : (v === 0 ? '0' : fmtNum(v))); };
-  var totCell = function(v){ return v === null ? '—' : fmtNum(v); };
-  var rows = [
+  var info = [
     ['정보','동 · 층','', function(L){
         return [esc(L.dong), L.floor ? esc(L.floor) + '층' : ''].filter(Boolean).join(' ') || '—'; }, 'hl txt'],
-    ['','전용면적','', function(L){ return L.area ? esc(L.area) + '㎡' : '—'; }, 'hl txt'],
+    ['','전용면적','', function(L){ return L.area ? esc(L.area) + '㎡' : '—'; }, 'hl txt']
+  ];
+  var rows = redev ? info.concat([
+    ['투자','매매','초투', function(L, x){ return fmtNum(x.price); }, 'pe num blue strong'],
+    ['','추가분담금','', function(L, x){ return x.hasShare ? (x.share === 0 ? '0' : fmtNum(x.share)) : '—'; }, 'pe num'],
+    ['','총투','매매 + 추가분담금', function(L, x){ return x.total === null ? '—' : fmtNum(x.total); }, 'total num strong']
+  ]) : info.concat([
     ['','세안고','', function(L){ return L.sealed === 'Y' ? '예' : (L.sealed === 'N' ? '아니오' : '—'); }, 'txt'],
     ['','KB시세','', function(L){ return fmtNum(parseMoney(L.kb)); }, 'num'],
-    ['전세 기준','매매','', function(L, x){ return fmtNum(x.price); }, 'pe num blue'],
+    ['전세 기준','매매','총투', function(L, x){ return fmtNum(x.price); }, 'pe num blue'],
     ['','전세','', function(L, x){ return fmtNum(x.jeon); }, 'pe num'],
     ['','자본','초투', function(L, x){ return ownCell(x.ownJ); }, 'pe num blue strong'],
-    ['','부대비용','매매 × 0.5%', function(L, x){ return fmtNum(x.extra); }, 'pe num'],
-    ['','총투자금','총투 = 자본 + 부대비용', function(L, x){ return totCell(x.totalJ); }, 'total num strong'],
-    ['대출 기준','매매','', function(L, x){ return fmtNum(x.price); }, 'pe2 num blue'],
+    ['대출 기준','매매','총투', function(L, x){ return fmtNum(x.price); }, 'pe2 num blue'],
     ['','대출','', function(L, x){ return fmtNum(x.loan); }, 'pe2 num'],
     ['','자본','초투', function(L, x){ return ownCell(x.ownL); }, 'pe2 num blue strong'],
-    ['','부대비용','매매 × 0.5%', function(L, x){ return fmtNum(x.extra); }, 'pe2 num'],
-    ['','총투자금','총투 = 자본 + 부대비용', function(L, x){ return totCell(x.totalL); }, 'total num strong']
-  ];
+    ['부대','부대비용','매매 × 0.5%', function(L, x){ return fmtNum(x.extra); }, 'num']
+  ]);
   var span = {};
   rows.forEach(function(r){ if(r[0]) span[r[0]] = 0; });
   var cur = '';
   rows.forEach(function(r){ if(r[0]) cur = r[0]; span[cur]++; });
-  var gcls = { '정보':'a', '전세 기준':'b', '대출 기준':'d' };
+  var gcls = { '정보':'a', '전세 기준':'b', '대출 기준':'d', '부대':'c', '투자':'b' };
   var t = '<div class="tbl-wrap"><table class="tbl"><thead><tr><th class="g"></th><th class="l corner">구분<small>(단독명의)</small></th>';
   lsts.forEach(function(L, i){
-    var nm = esc([L.dong, L.floor ? L.floor + '층' : ''].filter(Boolean).join(' ') || ('매물 ' + (i + 1)));
-    t += '<th class="c">' + (unlocked ? '<button data-act="edit-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '" data-i="' + i + '" aria-label="매물 수정">' + nm + ' ✏️</button>' : nm) + '</th>';
+    var nm = esc([L.dong, L.floor ? L.floor + '층' : ''].filter(Boolean).join(' ') || ((redev ? '물건 ' : '매물 ') + (i + 1)));
+    t += '<th class="c">' + (unlocked ? '<button data-act="edit-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '" data-i="' + i + '" aria-label="수정">' + nm + ' ✏️</button>' : nm) + '</th>';
   });
   t += '</tr></thead><tbody>';
   rows.forEach(function(r){
@@ -822,8 +841,10 @@ function listingPanel(vid, pid, lsts){
     t += '</tr>';
   });
   t += '</tbody></table></div>';
-  t += '<p class="note">단위: 만원 · 전세 기준(매매 / 전세 / 자본)과 대출 기준(매매 / 대출 / 자본)을 나란히 봐요 · 자본 = 초투(초기투자금), 총투 = 자본 + 부대비용(매매 × 0.5%) · 대출은 직접 입력 · 안 적은 쪽은 — 로 나와요</p>';
-  if(unlocked) t += '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>';
+  t += '<p class="note">' + (redev
+    ? '단위: 만원 · 재개발 초투 = 매매, 총투 = 매매가 + 추가분담금 · 추가분담금을 안 적으면 총투는 —'
+    : '단위: 만원 · 아파트 초투 = 자본(매매 − 전세 또는 대출), 총투 = 매매 · 부대비용(매매 × 0.5%)은 초투·총투에 넣지 않고 따로 보여요 · 대출은 직접 입력 · 안 적은 쪽은 —') + '</p>';
+  if(unlocked) t += '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ ' + (redev ? '물건' : '매물') + ' 추가</button>';
   return t;
 }
 
@@ -870,10 +891,11 @@ function renderPoint(vid, pid){
   h += accHTML('photo', '📷', '현장사진', phs.length ? phs.length + '장' : '', gal);
   if(isApt){
     var lsts = arr(p.listings);
-    h += accHTML('setup', '🧮', '매물 세팅 · 아파트', lsts.length ? '매물 ' + lsts.length + '개' : '', listingPanel(vid, pid, lsts));
+    h += accHTML('setup', '🧮', '매물 세팅 · 아파트', lsts.length ? '매물 ' + lsts.length + '개' : '', listingPanel(vid, pid, lsts, 'apt'));
   }
   if(isRedev){
-    h += accHTML('redev', '🏗️', '매물 세팅 · 재개발', '형식 준비 중', '<p class="none" style="padding:10px 4px">재개발 매물 세팅 형식을 정하는 중이에요.<br>정해지면 이곳에 표가 생겨요.</p>');
+    var rls = arr(p.listings);
+    h += accHTML('redev', '🏗️', '매물 세팅 · 재개발', rls.length ? '물건 ' + rls.length + '개' : '', listingPanel(vid, pid, rls, 'redev'));
   }
   h += accHTML('memo', '📝', '메모', p.memo ? '' : '비어 있어요', p.memo ? '<div class="memo">' + esc(p.memo) + '</div>' : '<p class="none">' + (unlocked ? '✏️ 지점 수정에서 적을 수 있어요' : '아직 메모가 없어요') + '</p>');
   h += '</div>';
@@ -1237,10 +1259,58 @@ function openPointForm(vid, pid, insertAt){
   });
 }
 
+/* ---------- 재개발 물건 폼 (초투 = 매매, 총투 = 매매가 + 추가분담금) ---------- */
+function openRedevForm(vid, pid, li){
+  var v = S.videos[vid]; if(!v) return;
+  var pt = arr(v.points).filter(function(x){ return x.pid === pid; })[0]; if(!pt) return;
+  var list = arr(pt.listings), L = li == null ? null : list[li];
+  var money = function(x){ var n = parseMoney(x); return n ? n.toLocaleString('ko-KR') : (x === 0 ? '0' : ''); };
+  var blank = function(x){ return (x === undefined || x === null || x === '') ? '' : String(x); };
+  var data = L ? { dong:L.dong, floor:blank(L.floor), area:blank(L.area), maemae:money(L.maemae), share:(L.share === 0 ? '0' : money(L.share)) }
+               : { dong:'', floor:'', area:'', maemae:'', share:'' };
+  openSheet({
+    title: L ? '물건 수정' : '물건 추가', sub: (pt.name || '') + ' · 재개발', data: data,
+    fields: [
+      { head:'물건 정보' },
+      { k:'dong', label:'동', half:true, placeholder:'예) 1동' },
+      { k:'floor', label:'층', half:true, type:'num', placeholder:'예) 5' },
+      { k:'area', label:'전용면적(㎡)', half:true, type:'num', placeholder:'예) 59' },
+      { head:'세팅 — 초투 = 매매 / 총투 = 매매가 + 추가분담금' },
+      { k:'maemae', label:'매매 (만원) — 초투', placeholder:'예) 9억 5,000', hint:'12억 5,000 · 125000 모두 돼요' },
+      { k:'share', label:'추가분담금 (만원)', placeholder:'예) 1억 2,000', hint:'넣으면 총투(매매 + 추가분담금)가 계산돼요' }
+    ],
+    onSave: function(x){
+      var o = { dong:x.dong };
+      o.floor = x.floor ? (parseInt(String(x.floor).replace(/[^\d]/g, ''), 10) || '') : '';
+      o.area = x.area ? (parseFloat(String(x.area).replace(/[^\d.]/g, '')) || '') : '';
+      o.maemae = x.maemae ? parseMoney(x.maemae) : '';
+      o.share = x.share === '' ? '' : parseMoney(x.share);
+      var body = deep(v), tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0], ls = arr(tp.listings);
+      if(L) ls[li] = o; else ls.push(o);
+      tp.listings = ls;
+      saveVideo(vid, body, L ? '저장했어요 ✓' : '물건을 추가했어요 🏗️');
+    },
+    onDelete: L ? function(){
+      confirmBox('이 물건을 삭제할까요?', esc([L.dong, L.floor ? L.floor + '층' : ''].filter(Boolean).join(' ') || '이 물건'), '삭제', function(){
+        var body = deep(v), tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0];
+        tp.listings = arr(tp.listings).filter(function(_, k){ return k !== li; });
+        saveVideo(vid, body, '물건을 삭제했어요');
+      });
+    } : null,
+    delText: '물건 삭제',
+    extra: L ? { text:'복제', fn:function(){
+      var body = deep(v), tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0], ls = arr(tp.listings);
+      ls.splice(li + 1, 0, deep(L)); tp.listings = ls;
+      saveVideo(vid, body, '복제했어요 — 바꿀 곳만 고치세요');
+    } } : null
+  });
+}
+
 /* ---------- 매물 폼 ---------- */
 function openListingForm(vid, pid, li){
   var v = S.videos[vid]; if(!v) return;
   var pt = arr(v.points).filter(function(x){ return x.pid === pid; })[0]; if(!pt) return;
+  if(pointKind(pt) === 'redev') return openRedevForm(vid, pid, li);
   var list = arr(pt.listings), L = li == null ? null : list[li];
   var money = function(x){ var n = parseMoney(x); return n ? n.toLocaleString('ko-KR') : ''; };
   var blank = function(x){ return (x === undefined || x === null || x === '') ? '' : String(x); };
