@@ -200,6 +200,12 @@
   .tbl td.pe{background:#FDEAE0}
   .tbl td.blue{color:#2A2DD0}
   .tbl td.strong{font-weight:900;font-size:15px}
+  .tbl .grp-e{background:#6B6B6B}
+  .tbl td.jdcell{background:var(--white)}
+  .jd{display:inline-block;padding:3px 12px;border-radius:999px;font-size:13px;font-weight:900}
+  .jd.ok{background:#C6EFCE;color:#006100}
+  .jd.no{background:#ECECEC;color:#6B6B6B}
+  .jd.ask{background:#FFEB9C;color:#7F6000}
   .tbl td.total{background:var(--navy);color:#FFE680;font-size:16px}
   .tbl td .neg{color:var(--red)}
   .setup{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -420,57 +426,71 @@ function fmtMoney(v){
   if(man) out += (out ? ' ' : '') + man.toLocaleString('ko-KR') + '만';
   return out || '0';
 }
-/* 취득세 간이 계산 (1주택 6억↓1.1% / 6~9억 누진 / 9억↑3.5%, 다주택 8%·12%) */
-function acqTax(priceMan, houses){
+/* 취득세 간이 계산 (1주택 6억↓1.1% / 6~9억 누진 / 9억↑3.3%, 다주택 8.4%·12.4%)
+   농어촌특별세 0.2%는 전용 85㎡ 초과일 때만 더한다(85㎡ 이하 비과세). 정확한 값은 부동산계산기 결과를 직접 입력 */
+function acqTax(priceMan, houses, area){
   var p = priceMan * 10000;
   if(!p) return 0;
-  var h = String(houses || '1'), rate, edu, agri;
-  if(h === '3'){ rate = 0.12; edu = 0.004; agri = 0.002; }
-  else if(h === '2'){ rate = 0.08; edu = 0.004; agri = 0.002; }
+  var h = String(houses || '1'), rate, edu, agri = Number(area) > 85 ? 0.002 : 0;
+  if(h === '3'){ rate = 0.12; edu = 0.004; }
+  else if(h === '2'){ rate = 0.08; edu = 0.004; }
   else if(p <= 600000000){ rate = 0.01; edu = 0.001; agri = 0; }
-  else if(p <= 900000000){ rate = ((p / 100000000) * 2 / 3 - 3) / 100; edu = 0.003; agri = 0.002; }
-  else { rate = 0.03; edu = 0.003; agri = 0.002; }
+  else if(p <= 900000000){ rate = ((p / 100000000) * 2 / 3 - 3) / 100; edu = 0.003; }
+  else { rate = 0.03; edu = 0.003; }
   return Math.round(priceMan * (rate + edu + agri));
 }
 function fmtNum(n){
   n = Math.round(Number(n) || 0);
   return n ? n.toLocaleString('ko-KR') : '—';
 }
-/* 자금 세팅 전략 */
+/* 자금 세팅 전략: 앞의 셋은 '대출', 마지막은 '전세' */
 var PRESETS = [
   { k:'ltv70', t:'생초(LTV70%)', r:0.70 },
   { k:'ltv40', t:'LTV40%', r:0.40 },
-  { k:'gap', t:'전세 끼고(갭)', r:0 },
-  { k:'manual', t:'직접입력', r:null }
+  { k:'manual', t:'직접입력', r:null },
+  { k:'gap', t:'전세 끼고(갭)', r:null }
 ];
 function presetOf(k){
   for(var i=0;i<PRESETS.length;i++) if(PRESETS[i].k === k) return PRESETS[i];
   return PRESETS[0];
 }
-/* 매물 한 칸의 자금 세팅
-   대출 = 매매가 × LTV (대출 한도 · 갭을 넘으면 그 선까지) / 자본 = 매매 − 전세 − 대출
-   총투자금 = 자본 + 중개보수 + 취득세 (중개보수·취득세는 직접 넣으면 그 값) */
+/* 매물 한 칸의 자금 세팅: 매매 / 대출 or 전세 / 내 돈
+   · 대출 전략(생초 LTV70% · LTV40% · 직접입력): 조달액 = 대출 = 매매 × LTV (대출 한도가 있으면 한도까지)
+   · 전세 끼고(갭): 조달액 = 전세 금액   (대출과 전세는 함께 쓰지 않는다)
+   내 돈(자본) = 매매 − 조달액, 총투자금 = 내 돈 + 중개보수 + 취득세 (중개보수·취득세는 직접 넣으면 그 값) */
 function seedOf(L){
   L = L || {};
-  var price = parseMoney(L.maemae), jeon = parseMoney(L.jeonse), pre = presetOf(L.preset);
-  var loan = pre.r != null ? price * pre.r : parseMoney(L.loan), note = '';
-  var cap = parseMoney(L.loanCap);
-  if(cap > 0 && loan > cap){ loan = cap; note = '한도'; }
-  var room = price > 0 ? Math.max(0, price - jeon) : 0;
-  if(price > 0 && loan > room){ loan = room; note = note ? '한도·갭' : '갭'; }
-  loan = Math.max(0, Math.round(loan));
-  var capital = price - jeon - loan;
+  var price = parseMoney(L.maemae), pre = presetOf(L.preset), isJeonse = pre.k === 'gap', note = '', fund;
+  if(isJeonse) fund = parseMoney(L.jeonse);
+  else {
+    fund = pre.r != null ? price * pre.r : parseMoney(L.loan);
+    var cap = parseMoney(L.loanCap);
+    if(cap > 0 && fund > cap){ fund = cap; note = '한도'; }
+  }
+  fund = Math.max(0, Math.round(fund));
+  var own = price - fund;
   var rate = Number(L.rate) > 0 ? Number(L.rate) : 5, term = Number(L.term) > 0 ? Number(L.term) : 30;
   var mr = rate / 1200, mn = Math.round(term * 12);
-  var mPay = loan ? Math.floor(loan * mr / (1 - Math.pow(1 + mr, -mn))) : 0;   /* 만원 단위 절사 */
+  var mPay = (!isJeonse && fund) ? Math.floor(fund * mr / (1 - Math.pow(1 + mr, -mn))) : 0;   /* 대출일 때만, 만원 단위 절사 */
   var feeRate = (L.feeRate === undefined || L.feeRate === null || L.feeRate === '') ? 0.55 : Number(L.feeRate);
   var hasFee = !(L.fee === undefined || L.fee === null || L.fee === '');
   var fee = hasFee ? Math.round(Number(L.fee)) : Math.round(price * feeRate / 100);
-  var houses = L.houses || '1', taxAuto = acqTax(price, houses);
+  var houses = L.houses || '1', taxAuto = acqTax(price, houses, L.area);
   var hasTax = !(L.tax === undefined || L.tax === null || L.tax === '');
   var tax = hasTax ? Math.round(Number(L.tax)) : taxAuto;
-  return { price:price, jeon:jeon, loan:loan, capital:capital, rate:rate, term:term, mPay:mPay, note:note, feeRate:feeRate, fee:fee, hasFee:hasFee,
-    tax:tax, hasTax:hasTax, houses:houses, total:capital + fee + tax, preset:pre };
+  return { price:price, kind:isJeonse ? '전세' : '대출', fund:fund, own:own, rate:rate, term:term, mPay:mPay, note:note,
+    feeRate:feeRate, fee:fee, hasFee:hasFee, tax:tax, hasTax:hasTax, houses:houses, total:own + fee + tax, preset:pre };
+}
+/* 조사 기준: 전용 84㎡ 국평 입주매물, 1~3층 · 탑층 · 세안고 제외 (바꾸려면 아래 숫자만 고치면 된다) */
+var RULE = { area: 84, floorMax: 3 };
+function judge(L){
+  L = L || {};
+  var why = [], area = Number(L.area), fl = Number(L.floor), tf = Number(L.totalFloors);
+  if(!area) why.push('면적?'); else if(Math.floor(area) !== RULE.area) why.push('평형');
+  if(!fl) why.push('층?'); else { if(fl <= RULE.floorMax) why.push('저층'); if(tf && fl >= tf) why.push('탑층'); }
+  if(L.sealed === 'Y') why.push('세안고');
+  var ask = why.some(function(w){ return w.indexOf('?') > 0; });
+  return { state: !why.length ? '대상' : (ask ? '확인' : '제외'), why: why.map(function(w){ return w.replace('?', ' 입력'); }) };
 }
 
 /* ================== 사진 (Firebase 옆 노드, 방 본문과 분리) ==================
@@ -804,53 +824,50 @@ function renderVideo(id){
   viewEl.innerHTML = h;
 }
 
-/* ---------- 매물 세팅 표 (정보 → 세팅 → 부대 → 합계, 매물 하나가 한 열) ---------- */
+/* ---------- 매물 세팅 표 (정보 → 세팅[매매 / 대출 or 전세 / 내 돈] → 부대 → 합계 → 판정, 매물 하나가 한 열) ---------- */
 function listingPanel(vid, pid, lsts){
   if(!lsts.length){
     return '<p class="none">' + (unlocked ? '아직 매물이 없어요. 아래 버튼으로 첫 매물을 넣어 보세요.' : '아직 매물이 없어요') + '</p>'
       + (unlocked ? '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>' : '');
   }
-  var seeds = lsts.map(seedOf);
+  var seeds = lsts.map(seedOf), js = lsts.map(judge);
   var rows = [
-    ['정보','아파트명(평수)','', function(L){ return esc(L.name) || '—'; }, 'hl txt'],
-    ['','동·층향','', function(L){ return esc(L.dong) || '—'; }, 'hl txt'],
+    ['정보','동 · 층','', function(L){
+        var t = [esc(L.dong), L.floor ? esc(L.floor) + '층' : ''].filter(Boolean).join(' ');
+        return (t || '—') + (L.totalFloors ? '<small>총 ' + esc(L.totalFloors) + '층</small>' : ''); }, 'hl txt'],
+    ['','전용면적','', function(L){ return L.area ? esc(L.area) + '㎡' : '—'; }, 'hl txt'],
     ['','입주가능','', function(L){ return esc(L.moveIn) || '—'; }, 'hl txt'],
-    ['','매매','', function(L, x){ return fmtNum(x.price); }, 'hl num'],
-    ['','시군구','', function(L){ return esc(L.where) || '—'; }, 'txt'],
-    ['','세대수(연식)','', function(L){ return esc(L.households) || '—'; }, 'txt'],
-    ['','공시','', function(L){ return fmtNum(parseMoney(L.gongsi)); }, 'num'],
-    ['','시세','', function(L){ return fmtNum(parseMoney(L.sise)); }, 'num'],
-    ['','전고','', function(L){ return fmtNum(parseMoney(L.peak)); }, 'num'],
-    ['','전세','네이버최저호가', function(L){ return fmtNum(parseMoney(L.jeonseAsk)); }, 'num'],
-    ['','호가','네이버최저호가', function(L){ return fmtNum(parseMoney(L.asking)); }, 'num'],
+    ['','세안고','', function(L){ return L.sealed === 'Y' ? '예' : (L.sealed === 'N' ? '아니오' : '—'); }, 'txt'],
     ['세팅','매매','', function(L, x){ return fmtNum(x.price); }, 'pe num blue'],
-    ['','전세','', function(L, x){ return fmtNum(x.jeon); }, 'pe num'],
-    ['','대출','', function(L, x){
-        return fmtNum(x.loan) + '<small>' + esc(x.preset.t) + (x.note ? ' · ' + x.note + ' 상한' : '') + (x.mPay ? '<br>월 ' + x.mPay.toLocaleString('ko-KR') + '만원' : '') + '</small>'; }, 'pe num'],
-    ['','자본','', function(L, x){ return x.capital < 0 ? '<span class="neg">' + fmtNum(x.capital) + '</span>' : fmtNum(x.capital); }, 'pe num blue strong'],
+    ['','대출 or 전세','', function(L, x){
+        return fmtNum(x.fund) + '<small>' + (x.kind === '전세' ? '전세 끼고' : '대출 · ' + esc(x.preset.t) + (x.note ? ' · ' + x.note : '') + (x.mPay ? '<br>월 ' + x.mPay.toLocaleString('ko-KR') + '만원' : '')) + '</small>'; }, 'pe num'],
+    ['','내 돈','자본', function(L, x){ return x.own < 0 ? '<span class="neg">' + fmtNum(x.own) + '</span>' : fmtNum(x.own); }, 'pe num blue strong'],
     ['부대','중개','', function(L, x){ return fmtNum(x.fee) + '<small>' + (x.hasFee ? '직접 입력' : x.feeRate + '% 기준') + '</small>'; }, 'pe num'],
     ['','취득','', function(L, x){ return fmtNum(x.tax) + '<small>' + (x.hasTax ? '직접 입력' : (x.houses === '1' ? '1주택' : x.houses + '주택') + ' 간이계산') + '</small>'; }, 'pe num'],
-    ['합계','총투자금','자본+중개+취득', function(L, x){ return fmtNum(x.total); }, 'total num strong']
+    ['합계','총투자금','내 돈+중개+취득', function(L, x){ return fmtNum(x.total); }, 'total num strong'],
+    ['판정','조사 기준',RULE.area + '㎡ · ' + (RULE.floorMax + 1) + '층↑ · 탑층·세안고 제외', function(L, x, j){
+        return '<span class="jd ' + (j.state === '대상' ? 'ok' : j.state === '확인' ? 'ask' : 'no') + '">' + j.state + '</span>' + (j.why.length ? '<small>' + esc(j.why.join(' · ')) + '</small>' : ''); }, 'jdcell']
   ];
   var span = {};
   rows.forEach(function(r){ if(r[0]) span[r[0]] = 0; });
   var cur = '';
   rows.forEach(function(r){ if(r[0]) cur = r[0]; span[cur]++; });
+  var gcls = { '정보':'a', '세팅':'b', '부대':'c', '합계':'d', '판정':'e' };
   var t = '<div class="tbl-wrap"><table class="tbl"><thead><tr><th class="g"></th><th class="l corner">구분<small>(단독명의)</small></th>';
   lsts.forEach(function(L, i){
-    var nm = esc(L.label || L.name || ('매물 ' + (i + 1)));
+    var nm = esc(L.label || [L.dong, L.floor ? L.floor + '층' : ''].filter(Boolean).join(' ') || L.name || ('매물 ' + (i + 1)));
     t += '<th class="c">' + (unlocked ? '<button data-act="edit-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '" data-i="' + i + '" aria-label="매물 수정">' + nm + ' ✏️</button>' : nm) + '</th>';
   });
   t += '</tr></thead><tbody>';
   rows.forEach(function(r){
     t += '<tr>';
-    if(r[0]) t += '<th class="g grp-' + (r[0] === '정보' ? 'a' : r[0] === '세팅' ? 'b' : r[0] === '부대' ? 'c' : 'd') + '" rowspan="' + span[r[0]] + '"><span>' + r[0] + '</span></th>';
+    if(r[0]) t += '<th class="g grp-' + gcls[r[0]] + '" rowspan="' + span[r[0]] + '"><span>' + r[0] + '</span></th>';
     t += '<th class="l">' + r[1] + (r[2] ? '<small>' + r[2] + '</small>' : '') + '</th>';
-    lsts.forEach(function(L, i){ t += '<td class="' + r[4] + '">' + r[3](L, seeds[i]) + '</td>'; });
+    lsts.forEach(function(L, i){ t += '<td class="' + r[4] + '">' + r[3](L, seeds[i], js[i]) + '</td>'; });
     t += '</tr>';
   });
   t += '</tbody></table></div>';
-  t += '<p class="note">단위: 만원 · 월 금액은 원리금(금리·기간은 매물마다 수정) · 자본 = 매매 − 전세 − 대출</p>';
+  t += '<p class="note">단위: 만원 · 세팅은 매매 / 대출 or 전세 / 내 돈 (대출과 전세는 함께 쓰지 않아요) · 월 금액은 대출일 때의 원리금</p>';
   if(unlocked) t += '<button class="add ghost" data-act="add-lst" data-id="' + esc(vid) + '" data-p="' + esc(pid) + '">＋ 매물 추가</button>';
   return t;
 }
@@ -875,10 +892,17 @@ function renderPoint(vid, pid){
 
   h += '<div class="card">';
   if(isApt){
-    var spec = [['세대수', p.hh], ['입주', p.built], ['평형', p.area], ['주차', p.park], ['용적률', p.far]].filter(function(x){ return x[1]; });
+    var mn = function(x){ return x ? fmtNum(parseMoney(x)) : ''; };
+    var askS = parseMoney(p.askS), askJ = parseMoney(p.askJ), pk = parseMoney(p.peak);
+    var spec = [['시군구', p.sgg], ['읍면동', p.emd], ['연식', p.built], ['세대수', p.hh],
+                ['최고가', mn(p.peak)], ['실거래가(매매)', mn(p.dealS)], ['실거래가(전세)', mn(p.dealJ)], ['매매호가', mn(p.askS)], ['전세호가', mn(p.askJ)],
+                ['갭(매매호가−전세호가)', (askS && askJ) ? fmtNum(askS - askJ) : ''],
+                ['최고가 대비 매매호가', (askS && pk) ? (Math.round((askS / pk - 1) * 1000) / 10) + '%' : ''],
+                ['평형', p.area], ['주차', p.park], ['용적률', p.far]].filter(function(x){ return x[1]; });
     var sp = spec.length ? '<div class="spec">' + spec.map(function(x){ return '<div class="sp"><small>' + x[0] + '</small><b>' + esc(x[1]) + '</b></div>'; }).join('') + '</div>'
+        + '<p class="note">금액 단위 만원 · 네이버부동산 기준' + (p.asof ? ' · 조회기준일 ' + esc(fmtDate(p.asof)) : '') + '</p>'
       : '<p class="none">아직 입력한 개요가 없어요</p>';
-    h += accHTML('spec', '🏢', '기본 아파트 개요', '', sp);
+    h += accHTML('spec', '🏢', '기본 아파트 개요', p.asof ? '조회 ' + esc(fmtDate(p.asof)) : '', sp);
   }
   var phs = arr(p.photos);
   var gal = '<div class="photos">' + phs.map(function(ph){
@@ -1183,9 +1207,11 @@ function openPointForm(vid, pid, insertAt){
   var v = S.videos[vid]; if(!v) return;
   var pts = arr(v.points);
   var p = pid ? pts.filter(function(x){ return x.pid === pid; })[0] : null;
-  var data = p ? { name:p.name, grp:p.sub ? 'sub' : 'new', kind:p.kind === 'spot' ? 'spot' : 'apt', naver:p.naver, land:p.land, hh:p.hh, built:p.built, area:p.area, park:p.park, far:p.far,
-      memo:p.memo }
-    : { name:'', grp:'new', kind:'apt', naver:'', land:'', hh:'', built:'', area:'', park:'', far:'', memo:'' };
+  var mny = function(x){ var n = parseMoney(x); return n ? n.toLocaleString('ko-KR') : ''; };
+  var data = p ? { name:p.name, grp:p.sub ? 'sub' : 'new', kind:p.kind === 'spot' ? 'spot' : 'apt', naver:p.naver, land:p.land,
+      sgg:p.sgg, emd:p.emd, built:p.built, hh:p.hh, peak:mny(p.peak), dealS:mny(p.dealS), dealJ:mny(p.dealJ), askS:mny(p.askS), askJ:mny(p.askJ), asof:p.asof,
+      area:p.area, park:p.park, far:p.far, memo:p.memo }
+    : { name:'', grp:'new', kind:'apt', naver:'', land:'', sgg:'', emd:'', built:'', hh:'', peak:'', dealS:'', dealJ:'', askS:'', askJ:'', asof:'', area:'', park:'', far:'', memo:'' };
   openSheet({
     title: p ? '지점 수정' : '지점 추가', sub: (p ? pointLabels(pts)[pts.indexOf(p)] + '번 지점' : '새 지점') + (!p && insertAt != null && insertAt < pts.length ? ' (뒤 지점은 한 칸씩 밀려요)' : ''),
     data: data,
@@ -1195,9 +1221,18 @@ function openPointForm(vid, pid, insertAt){
       { k:'kind', label:'종류', type:'select', options:[['apt','아파트 단지 (개요·매물 세팅 있음)'],['spot','그 밖의 지점 (역·학교 등)']] },
       { k:'naver', label:'네이버지도 링크', type:'url', placeholder:'https://naver.me/…' },
       { k:'land', label:'네이버부동산 링크', type:'url', placeholder:'https://new.land.naver.com/…' },
-      { head:'기본 아파트 개요' },
-      { k:'hh', label:'세대수', half:true, placeholder:'예) 4,089세대' },
-      { k:'built', label:'입주', half:true, placeholder:'예) 2020.7' },
+      { head:'기본 정보 (네이버부동산 기준 · 단위 만원)' },
+      { k:'sgg', label:'시군구', half:true, placeholder:'예) 경기도 하남시' },
+      { k:'emd', label:'읍면동', half:true, placeholder:'예) 망월동' },
+      { k:'built', label:'연식', half:true, placeholder:'예) 2015.12' },
+      { k:'hh', label:'세대수', half:true, placeholder:'예) 1,541세대' },
+      { k:'peak', label:'최고가', half:true, placeholder:'예) 12억 5,000' },
+      { k:'dealS', label:'실거래가(매매)', half:true, placeholder:'예) 12억' },
+      { k:'dealJ', label:'실거래가(전세)', half:true, placeholder:'예) 7억' },
+      { k:'askS', label:'매매호가', half:true, placeholder:'예) 11억 8,000' },
+      { k:'askJ', label:'전세호가', half:true, placeholder:'예) 7억 2,000' },
+      { k:'asof', label:'조회기준일', type:'date', half:true, hint:'호가·실거래가는 시점마다 바뀌어요' },
+      { head:'추가 정보 (선택)' },
       { k:'area', label:'평형', half:true, placeholder:'예) 59·84㎡' },
       { k:'park', label:'주차', half:true, placeholder:'예) 1.1대' },
       { k:'far', label:'용적률', placeholder:'예) 230%' },
@@ -1208,7 +1243,8 @@ function openPointForm(vid, pid, insertAt){
       var body = deep(v), list = arr(body.points), np;
       if(p){ np = list.filter(function(q){ return q.pid === pid; })[0]; }
       else { np = { pid:newId('p'), photos:[] }; if(insertAt != null && insertAt >= 0 && insertAt <= list.length) list.splice(insertAt, 0, np); else list.push(np); }
-      ['name','kind','hh','built','area','park','far','memo'].forEach(function(k){ np[k] = x[k]; });
+      ['name','kind','sgg','emd','built','hh','asof','area','park','far','memo'].forEach(function(k){ np[k] = x[k]; });
+      ['peak','dealS','dealJ','askS','askJ'].forEach(function(k){ np[k] = x[k] ? parseMoney(x[k]) : ''; });
       var at = list.indexOf(np);
       if(x.grp === 'sub' && at > 0) np.sub = true; else delete np.sub;
       np.naver = x.naver ? (safeUrl(x.naver) || safeUrl('https://' + x.naver)) : '';
@@ -1250,48 +1286,45 @@ function openListingForm(vid, pid, li){
   var money = function(x){ var n = parseMoney(x); return n ? n.toLocaleString('ko-KR') : ''; };
   var blank = function(x){ return (x === undefined || x === null || x === '') ? '' : String(x); };
   var data = L ? {
-      label:L.label, name:L.name, dong:L.dong, moveIn:L.moveIn, households:L.households, where:L.where,
-      gongsi:money(L.gongsi), sise:money(L.sise), peak:money(L.peak), asking:money(L.asking), jeonseAsk:money(L.jeonseAsk),
-      maemae:money(L.maemae), jeonse:money(L.jeonse), preset:L.preset || 'ltv70', loanCap:money(L.loanCap), loan:money(L.loan),
+      label:L.label, dong:L.dong, floor:blank(L.floor), totalFloors:blank(L.totalFloors), area:blank(L.area), moveIn:L.moveIn, sealed:L.sealed || 'N',
+      maemae:money(L.maemae), preset:L.preset || 'ltv70', loanCap:money(L.loanCap), loan:money(L.loan), jeonse:money(L.jeonse),
       rate:blank(L.rate), term:blank(L.term), feeRate:blank(L.feeRate), fee:blank(L.fee), houses:L.houses || '1', tax:blank(L.tax)
     } : {
-      label:'', name:'', dong:'', moveIn:'', households:'', where:'', gongsi:'', sise:'', peak:'', asking:'', jeonseAsk:'',
-      maemae:'', jeonse:'', preset:'ltv70', loanCap:'', loan:'', rate:'', term:'', feeRate:'', fee:'', houses:'1', tax:''
+      label:'', dong:'', floor:'', totalFloors:'', area:'', moveIn:'', sealed:'N',
+      maemae:'', preset:'ltv70', loanCap:'', loan:'', jeonse:'', rate:'', term:'', feeRate:'', fee:'', houses:'1', tax:''
     };
   var save = function(body, msg){ return saveVideo(vid, body, msg); };
   openSheet({
     title: L ? '매물 수정' : '매물 추가', sub: pt.name || '', data: data,
     fields: [
-      { head:'매물 정보' },
-      { k:'label', label:'열 이름 (표 맨 위)', placeholder:'예) 장위', hint:'비워 두면 아파트명이 들어가요' },
-      { k:'name', label:'아파트명 (평수)', placeholder:'예) 꿈의숲아이파크(59)' },
-      { k:'dong', label:'동 · 층향', half:true, placeholder:'예) 713동 9층' },
-      { k:'moveIn', label:'입주가능', half:true, placeholder:'예) 2028년 1월' },
-      { k:'households', label:'세대수 (연식)', half:true, placeholder:'예) 1,711(2022)' },
-      { k:'where', label:'시 · 구 · 동', half:true, placeholder:'예) 성북구 장위동' },
-      { k:'gongsi', label:'공시 (만원)', half:true, placeholder:'예) 68,600' },
-      { k:'sise', label:'시세 (만원)', half:true, placeholder:'예) 117,500' },
-      { k:'peak', label:'전고점 (만원)', half:true, placeholder:'예) 125,000' },
-      { k:'asking', label:'매매 호가 (만원)', half:true, placeholder:'예) 125,000' },
-      { k:'jeonseAsk', label:'전세 호가 (만원)', placeholder:'예) 75,000' },
-      { head:'세팅' },
-      { k:'maemae', label:'매매 (만원)', half:true, placeholder:'예) 125,000', hint:'12억 5,000 · 125000 모두 돼요' },
-      { k:'jeonse', label:'전세 (만원)', half:true, placeholder:'예) 57,000' },
-      { k:'preset', label:'대출 전략', type:'select', options:PRESETS.map(function(x){ return [x.k, x.t]; }) },
-      { k:'loanCap', label:'대출 한도 (만원, 선택)', half:true, placeholder:'예) 25,250', hint:'넘으면 이 금액까지만' },
-      { k:'loan', label:'대출 (직접입력용)', half:true, placeholder:'예) 20,000', hint:'전략이 직접입력일 때만' },
+      { head:'매물 정보 (실제 매물)' },
+      { k:'label', label:'열 이름 (표 맨 위)', placeholder:'예) 713동 9층', hint:'비워 두면 동·층이 들어가요' },
+      { k:'dong', label:'동', half:true, placeholder:'예) 713동' },
+      { k:'floor', label:'층', half:true, type:'num', placeholder:'예) 12' },
+      { k:'totalFloors', label:'총층수', half:true, type:'num', placeholder:'예) 25', hint:'층과 같으면 탑층으로 봐요' },
+      { k:'area', label:'전용면적(㎡)', half:true, type:'num', placeholder:'예) 84.97' },
+      { k:'moveIn', label:'입주가능', half:true, placeholder:'예) 즉시 / 2027-03' },
+      { k:'sealed', label:'세안고', type:'select', half:true, options:[['N','아니오 (입주 가능)'],['Y','예 (세입자 안고 파는 매물)']] },
+      { head:'세팅 — 매매 / 대출 or 전세 / 내 돈' },
+      { k:'maemae', label:'매매 (만원)', placeholder:'예) 12억 5,000', hint:'12억 5,000 · 125000 모두 돼요' },
+      { k:'preset', label:'자금 조달 방식 (대출 or 전세)', type:'select', options:PRESETS.map(function(x){ return [x.k, x.k === 'manual' ? '직접입력 (대출)' : x.t]; }) },
+      { k:'loanCap', label:'대출 한도 (만원, 선택)', half:true, placeholder:'예) 50,000', hint:'대출일 때만 · 넘으면 이 금액까지' },
+      { k:'loan', label:'대출 직접입력 (만원)', half:true, placeholder:'예) 20,000', hint:'직접입력일 때만' },
+      { k:'jeonse', label:'전세 (만원)', placeholder:'예) 57,000', hint:'전세 끼고(갭)일 때만 — 이때는 대출을 쓰지 않아요' },
       { k:'rate', label:'금리 (%)', half:true, placeholder:'5' },
       { k:'term', label:'기간 (년)', half:true, placeholder:'30' },
       { head:'부대' },
       { k:'feeRate', label:'중개 요율 (%)', half:true, placeholder:'0.55' },
-      { k:'fee', label:'중개보수 직접 (만원)', half:true, placeholder:'비우면 자동', hint:'' },
+      { k:'fee', label:'중개보수 직접 (만원)', half:true, placeholder:'비우면 자동' },
       { k:'houses', label:'취득세 기준', type:'select', half:true, options:[['1','1주택'],['2','2주택'],['3','3주택+']] },
-      { k:'tax', label:'취득세 직접 (만원)', half:true, placeholder:'비우면 간이계산', hint:'' }
+      { k:'tax', label:'취득세 직접 (만원)', half:true, placeholder:'비우면 간이계산', hint:'부동산계산기 값을 넣으면 그 값을 써요' }
     ],
     onSave: function(x){
       var o = {};
-      ['label','name','dong','moveIn','households','where','preset','houses'].forEach(function(k){ o[k] = x[k]; });
-      ['gongsi','sise','peak','asking','jeonseAsk','maemae','jeonse','loanCap','loan'].forEach(function(k){ o[k] = x[k] ? parseMoney(x[k]) : ''; });
+      ['label','dong','moveIn','sealed','preset','houses'].forEach(function(k){ o[k] = x[k]; });
+      ['floor','totalFloors'].forEach(function(k){ o[k] = x[k] ? (parseInt(String(x[k]).replace(/[^\d]/g, ''), 10) || '') : ''; });
+      o.area = x.area ? (parseFloat(String(x.area).replace(/[^\d.]/g, '')) || '') : '';
+      ['maemae','loanCap','loan','jeonse'].forEach(function(k){ o[k] = x[k] ? parseMoney(x[k]) : ''; });
       o.rate = parseFloat(String(x.rate).replace(/[^\d.]/g, '')) || '';
       o.term = parseInt(String(x.term).replace(/[^\d]/g, ''), 10) || '';
       o.feeRate = x.feeRate ? (parseFloat(String(x.feeRate).replace(/[^\d.]/g, '')) || '') : '';
@@ -1305,7 +1338,7 @@ function openListingForm(vid, pid, li){
       save(body, L ? '저장했어요 ✓' : '매물을 추가했어요 🏢');
     },
     onDelete: L ? function(){
-      confirmBox('이 매물을 삭제할까요?', esc(L.label || L.name || '이 매물'), '삭제', function(){
+      confirmBox('이 매물을 삭제할까요?', esc(L.label || L.dong || '이 매물'), '삭제', function(){
         var body = deep(v), tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0];
         tp.listings = arr(tp.listings).filter(function(_, k){ return k !== li; });
         save(body, '매물을 삭제했어요');
@@ -1315,8 +1348,8 @@ function openListingForm(vid, pid, li){
     extra: L ? { text: (L.preset === 'ltv40' ? 'LTV70% 복제' : 'LTV40% 복제'), fn:function(){
       var body = deep(v), tp = arr(body.points).filter(function(q){ return q.pid === pid; })[0], ls = arr(tp.listings);
       var c = deep(L), to = (L.preset === 'ltv40') ? 'ltv70' : 'ltv40';
-      c.preset = to; c.loan = ''; c.loanCap = to === 'ltv40' ? '' : c.loanCap;
-      var base = String(L.label || L.name || '').replace(/\s*·\s*LTV\d+%$/, '');
+      c.preset = to; c.loan = '';
+      var base = String(L.label || [L.dong, L.floor ? L.floor + '층' : ''].filter(Boolean).join(' ') || '').replace(/\s*·\s*(LTV\d+%|전세)$/, '');
       c.label = base ? base + ' · ' + (to === 'ltv40' ? 'LTV40%' : 'LTV70%') : '';
       ls.splice(li + 1, 0, c); tp.listings = ls;
       save(body, (to === 'ltv40' ? 'LTV40%' : 'LTV70%') + ' 기준으로 복제했어요');
