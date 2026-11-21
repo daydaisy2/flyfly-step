@@ -1012,7 +1012,10 @@ table.tbl .sub{display:block;font-size:11px;color:var(--muted);font-weight:600;m
   var err = document.getElementById('err');
 
   function saved(){
-    try { return localStorage.getItem(STORE_KEY) === '1'; } catch(e){ return false; }
+    try {
+      if (/[?&]relock(=1)?(&|$)/.test(location.search)) { localStorage.removeItem(STORE_KEY); return false; }
+      return localStorage.getItem(STORE_KEY) === '1';
+    } catch(e){ return false; }
   }
   function remember(){
     try { localStorage.setItem(STORE_KEY, '1'); } catch(e){}
