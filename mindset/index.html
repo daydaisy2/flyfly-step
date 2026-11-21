@@ -55,6 +55,17 @@ body{
   opacity:.5;
 }
 
+
+/* faint slide number (desktop) */
+@media (min-width: 861px){
+  .slide::after{
+    content:attr(data-num);
+    position:absolute;top:26px;right:40px;
+    font-size:86px;font-weight:900;line-height:1;letter-spacing:-.05em;
+    color:rgba(28,43,75,.055);pointer-events:none;user-select:none;
+  }
+}
+
 /* cover */
 .cover-wrap{flex:1;display:grid;grid-template-columns:1.5fr .5fr;gap:44px;align-items:center;margin:-10px 0 0}
 .cover-left{min-width:0}
@@ -1053,6 +1064,7 @@ table.tbl .sub{display:block;font-size:11px;color:var(--muted);font-weight:600;m
   var edgeNext = document.getElementById('edgeNext');
 
   totNum.textContent = total;
+  slides.forEach(function(s, i){ s.setAttribute('data-num', String(i+1).padStart(2,'0')); });
 
   function clamp(n){ return Math.max(0, Math.min(total-1, n)); }
 
