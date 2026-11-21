@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#1C2B4B">
+<title>마인드세팅 · 부자지도 서울권 정규강의</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231C2B4B'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23F5C400'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#1C2B4B; --ink2:#35476B; --muted:#78849B;
+  --gold:#F5C400; --gold-deep:#E0A800; --gold-soft:#FFF8D6; --gold-line:#F0E1A4;
+  --paper:#FBF8F1; --card:#FFFFFF; --line:#E7DFCB; --line2:#F1EBDB;
+  --navy:#16233E; --navy2:#22314F;
+  --scale:1;
+  --pad-x:56px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:#E9E2D2;
+  color:var(--ink);
+  font-family:'Noto Sans CJK KR','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic','Helvetica Neue',Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  word-break:keep-all;
+  line-height:1.5;
+}
+.viewport{
+  position:fixed;inset:0;
+  background:
+    radial-gradient(1200px 700px at 12% 0%, #F6F1E4 0%, rgba(246,241,228,0) 60%),
+    radial-gradient(900px 600px at 100% 100%, #F1EAD9 0%, rgba(241,234,217,0) 65%),
+    #EAE3D3;
+  overflow:hidden;
+}
+.stage{
+  position:absolute; left:50%; top:50%;
+  width:1280px; height:720px;
+  transform:translate(-50%,-50%) scale(var(--scale));
+  transform-origin:center center;
+  background:var(--paper);
+  border-radius:18px;
+  box-shadow:0 30px 90px rgba(22,35,62,.26), 0 2px 0 rgba(255,255,255,.7) inset;
+  overflow:hidden;
+  touch-action:pan-y;
+}
+.stage::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(28,43,75,.055) 1px, transparent 1px);
+  background-size:22px 22px;
+  background-position:-1px -1px;
+  opacity:.5;
+}
+
+/* cover */
+.cover-wrap{flex:1;display:grid;grid-template-columns:1.5fr .5fr;gap:44px;align-items:center;margin:-10px 0 0}
+.cover-left{min-width:0}
+.cover-index{border-left:1px solid var(--line);padding-left:26px;display:flex;flex-direction:column;gap:9px}
+.ci-head{font-size:10.5px;font-weight:900;letter-spacing:.2em;color:#A08A3E;margin:0 0 6px;text-transform:uppercase}
+.ci{display:flex;gap:10px;text-decoration:none;color:inherit;padding:8px 9px;border-radius:9px;transition:background .18s}
+.ci:hover{background:#F7F2E2}
+.ci .n{font-size:11px;font-weight:900;color:#B9A56A;font-variant-numeric:tabular-nums;padding-top:2px}
+.ci b{display:block;font-size:13px;font-weight:900;color:var(--ink);letter-spacing:-.01em;line-height:1.35}
+.ci em{display:block;font-style:normal;font-size:11px;color:var(--muted);font-weight:600;margin-top:1px;line-height:1.4}
+.ci-foot{font-size:10.5px;color:#BDB6A6;font-weight:700;letter-spacing:.02em;margin:10px 0 0;padding-left:9px}
+
+/* ---------- slides ---------- */
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  padding:42px var(--pad-x) 62px;
+  opacity:0;visibility:hidden;transform:translateX(26px);
+  transition:opacity .34s ease, transform .42s cubic-bezier(.22,.7,.3,1), visibility .34s;
+}
+.slide.active{opacity:1;visibility:visible;transform:none;z-index:2}
+.slide.left{transform:translateX(-26px)}
+
+.s-head{flex:0 0 auto;margin-bottom:18px}
+.kicker{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:800;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin:0}
+.kicker b{background:var(--ink);color:#fff;border-radius:5px;padding:3px 7px;letter-spacing:.08em;font-size:11px}
+.kicker .part{color:var(--muted);font-weight:700;letter-spacing:.14em}
+h2{
+  font-size:37px;line-height:1.24;letter-spacing:-.025em;font-weight:900;
+  margin:9px 0 0;color:var(--ink);
+}
+h2 .hl{background:linear-gradient(to top, var(--gold-soft) 44%, rgba(255,248,214,0) 44%);padding:0 2px}
+h2 .gold{color:#B98A00}
+.lede{font-size:16px;line-height:1.62;color:var(--ink2);margin:9px 0 0;max-width:1080px}
+.lede b{color:var(--ink);font-weight:800}
+
+.body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.foot{
+  flex:0 0 auto;display:flex;justify-content:space-between;gap:20px;align-items:baseline;
+  font-size:11.5px;color:var(--muted);padding-top:9px;margin-top:auto;
+  border-top:1px solid rgba(28,43,75,.07);
+}
+.foot .src{letter-spacing:.02em}
+.foot .msg{font-weight:700;color:var(--ink2)}
+
+/* ---------- building blocks ---------- */
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g23{grid-template-columns:1.15fr .85fr}
+.g32{grid-template-columns:.85fr 1.15fr}
+
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:13px;
+  padding:14px 16px;display:flex;flex-direction:column;gap:5px;min-width:0;
+  justify-content:center;
+}
+.card h3{margin:0;font-size:15px;font-weight:900;letter-spacing:-.015em;color:var(--ink);display:flex;align-items:baseline;gap:7px}
+.card p{margin:0;font-size:13.2px;line-height:1.56;color:var(--ink2)}
+.card p b{color:var(--ink);font-weight:800}
+.card .taga{font-size:10.5px;font-weight:800;color:#9A7600;background:var(--gold-soft);border:1px solid var(--gold-line);border-radius:20px;padding:2px 7px;letter-spacing:.02em;align-self:flex-start}
+.card.soft{background:#FEFCF4;border-color:var(--line)}
+.card.gold{background:var(--gold-soft);border-color:var(--gold-line)}
+.card.dark{background:var(--navy);border-color:var(--navy);color:#fff}
+.card.dark h3{color:#fff}
+.card.dark p{color:rgba(255,255,255,.78)}
+.card.dark .taga{background:rgba(245,196,0,.16);border-color:rgba(245,196,0,.35);color:#FFD84D}
+.card.tight{padding:12px 14px}
+
+.callout{
+  display:flex;gap:11px;align-items:flex-start;
+  background:var(--gold-soft);border-left:4px solid var(--gold);
+  border-radius:0 11px 11px 0;padding:11px 15px;
+  font-size:14.6px;font-weight:800;line-height:1.5;color:#3A3218;
+}
+.callout .ic{color:#B98A00;font-weight:900}
+.callout.dark{background:var(--navy);color:#FDFBF4;border-left-color:var(--gold)}
+.callout.dark .ic{color:var(--gold)}
+.callout.plain{background:#fff;border-left-color:var(--navy);color:var(--ink);font-weight:700}
+
+.quote{font-size:17px;font-weight:800;line-height:1.45;color:var(--ink);letter-spacing:-.02em}
+.quote::before{content:"“";color:var(--gold-deep);font-weight:900}
+.quote::after{content:"”";color:var(--gold-deep);font-weight:900}
+
+.stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 15px;display:flex;flex-direction:column;gap:2px}
+.stat .v{font-size:31px;font-weight:900;letter-spacing:-.03em;line-height:1.12;color:var(--ink);font-variant-numeric:tabular-nums}
+.stat .v small{font-size:15px;font-weight:800;margin-left:2px;color:var(--ink2)}
+.stat .k{font-size:11.5px;font-weight:800;color:#9A7600;letter-spacing:.02em}
+.stat .d{font-size:12.2px;color:var(--muted);line-height:1.45;margin-top:2px}
+.stat.gold{background:var(--gold-soft);border-color:var(--gold-line)}
+.stat.navy{background:var(--navy);border-color:var(--navy)}
+.stat.navy .v{color:#fff}
+.stat.navy .k{color:var(--gold)}
+.stat.navy .d{color:rgba(255,255,255,.7)}
+
+ul.bul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+ul.bul li{position:relative;padding-left:12px;font-size:13.2px;line-height:1.55;color:var(--ink2)}
+ul.bul li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+ul.bul li b{color:var(--ink);font-weight:800}
+ul.bul.tight li{font-size:12.6px}
+
+ol.num{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+ol.num li{display:flex;gap:9px;font-size:13.2px;line-height:1.5;color:var(--ink2)}
+ol.num li .n{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;margin-top:1px}
+ol.num li b{color:var(--ink);font-weight:800}
+
+.tablewrap{background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden}
+table.tbl{width:100%;border-collapse:collapse;font-size:13px}
+table.tbl th{
+  background:#F7F2E2;color:var(--ink);font-weight:900;font-size:11.5px;letter-spacing:.05em;
+  text-align:left;padding:9px 13px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+table.tbl td{padding:10px 13px;border-bottom:1px solid var(--line2);vertical-align:middle;line-height:1.45;color:var(--ink2)}
+table.tbl tr:last-child td{border-bottom:0}
+table.tbl td b{color:var(--ink);font-weight:800}
+table.tbl td.n{font-variant-numeric:tabular-nums;font-weight:800;color:var(--ink);white-space:nowrap}
+table.tbl td.hi{background:#FFFCEB}
+table.tbl .sub{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-top:1px}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;font-weight:700;padding:5px 10px;border-radius:20px;background:#fff;border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+.chip.gold{background:var(--gold-soft);border-color:var(--gold-line);color:#6E5400;font-weight:800}
+.chip.navy{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:800}
+.chip.lite{background:#F7F3E7;border-color:#EDE5D2;color:var(--muted)}
+
+.flow{display:flex;align-items:stretch;gap:8px}
+.flow .node{flex:1;background:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 12px;text-align:center}
+.flow .node b{display:block;font-size:13.5px;font-weight:900;color:var(--ink);margin-bottom:2px}
+.flow .node span{font-size:11.5px;color:var(--muted);line-height:1.4;display:block}
+.flow .arw{align-self:center;color:var(--gold-deep);font-weight:900;font-size:16px;flex:0 0 auto}
+
+/* ladder */
+.ladder{display:flex;flex-direction:column;gap:5px}
+.rung{display:flex;align-items:center;gap:10px;border-radius:9px;padding:8px 12px;color:#fff;font-weight:900;font-size:14px;letter-spacing:-.01em}
+.rung small{margin-left:auto;font-size:11px;font-weight:700;opacity:.85;letter-spacing:.02em}
+.r1{background:var(--navy)}
+.r2{background:#3A4E77}
+.r3{background:#5C6E93}
+.r4{background:#8593B0}
+.r5{background:#AFB9CC;color:#22314F}
+
+/* timeline */
+.timeline{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:0;padding-top:26px}
+.timeline::before{content:"";position:absolute;left:2%;right:2%;top:34px;height:2px;background:linear-gradient(90deg,rgba(28,43,75,.15),var(--gold),rgba(28,43,75,.15))}
+.tl{position:relative;padding:0 7px;text-align:center}
+.tl .dot{width:13px;height:13px;border-radius:50%;background:#fff;border:3px solid var(--ink);margin:0 auto 10px;position:relative;z-index:2}
+.tl.hot .dot{background:var(--gold);border-color:var(--gold-deep);box-shadow:0 0 0 4px rgba(245,196,0,.22)}
+.tl .yr{font-size:12px;font-weight:900;color:#9A7600;letter-spacing:.04em}
+.tl .tt{font-size:13px;font-weight:900;color:var(--ink);line-height:1.35;margin:3px 0 3px}
+.tl .dd{font-size:11.5px;color:var(--muted);line-height:1.42}
+
+/* ---------- HUD ---------- */
+.topbar{position:absolute;top:0;left:0;right:0;height:4px;background:rgba(28,43,75,.07);z-index:6}
+.topbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-deep));transition:width .35s ease}
+.hud{
+  position:absolute;left:0;right:0;bottom:0;height:56px;z-index:7;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;pointer-events:none;
+}
+.hud > *{pointer-events:auto}
+.btn{
+  appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.86);
+  color:var(--ink);font-family:inherit;font-size:12.5px;font-weight:800;letter-spacing:.02em;
+  border-radius:20px;padding:7px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:background .18s,border-color .18s,transform .12s;
+  backdrop-filter:blur(6px);
+}
+.btn:hover{background:#fff;border-color:var(--gold-line)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.pager{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;font-weight:700}
+.pager b{color:var(--ink);font-size:14px;font-weight:900}
+.pager .bar{width:70px;height:3px;border-radius:3px;background:rgba(28,43,75,.12);overflow:hidden}
+.pager .bar i{display:block;height:100%;background:var(--ink);width:0;transition:width .3s}
+.brandmini{font-size:11px;letter-spacing:.16em;color:var(--muted);font-weight:800;text-transform:uppercase}
+
+.edge{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:7;
+  width:38px;height:38px;border-radius:50%;border:1px solid var(--line);
+  background:rgba(255,255,255,.9);color:var(--ink);font-size:20px;line-height:1;
+  display:grid;place-items:center;cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 14px rgba(22,35,62,.08);transition:background .18s,transform .12s;
+}
+.edge:hover{background:#fff}
+.edge:active{transform:translateY(-50%) scale(.94)}
+.edge.prev{left:9px;padding-right:2px}
+.edge.next{right:9px;padding-left:2px}
+.edge[disabled]{opacity:.28;cursor:default}
+
+/* ---------- TOC ---------- */
+.scrim{position:absolute;inset:0;background:rgba(22,35,62,.34);opacity:0;visibility:hidden;transition:opacity .28s,visibility .28s;z-index:8;border-radius:18px}
+.scrim.on{opacity:1;visibility:visible}
+.toc{
+  position:absolute;top:0;right:0;bottom:0;width:372px;max-width:88%;
+  background:#FEFCF6;border-left:1px solid var(--line);z-index:9;
+  transform:translateX(102%);transition:transform .34s cubic-bezier(.22,.7,.3,1);
+  display:flex;flex-direction:column;box-shadow:-20px 0 50px rgba(22,35,62,.14);
+}
+.toc.on{transform:none}
+.toc-head{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;border-bottom:1px solid var(--line2)}
+.toc-head p{margin:0;font-size:13px;font-weight:900;letter-spacing:.14em;color:var(--ink);text-transform:uppercase}
+.toc-list{flex:1;overflow-y:auto;padding:10px 12px 22px;margin:0;list-style:none}
+.toc-list li{margin:0}
+.toc-item{
+  display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;
+  border:0;background:transparent;font-family:inherit;cursor:pointer;
+  padding:9px 10px;border-radius:9px;color:var(--ink2);
+}
+.toc-item:hover{background:#F6F1E3}
+.toc-item.on{background:var(--gold-soft)}
+.toc-item .no{font-size:11px;font-weight:900;color:var(--muted);min-width:20px;font-variant-numeric:tabular-nums}
+.toc-item.on .no{color:#8A6A00}
+.toc-item .tt{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.35;letter-spacing:-.01em}
+.toc-item .pt{display:block;font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:1px}
+
+/* ---------- lock ---------- */
+.lock{
+  position:absolute;inset:0;z-index:30;display:grid;place-items:center;
+  background:
+    radial-gradient(800px 500px at 50% -10%, #FFFDF6 0%, rgba(255,253,246,0) 60%),
+    var(--paper);
+  transition:opacity .45s ease, visibility .45s;
+}
+.lock.hide{opacity:0;visibility:hidden}
+.lock-card{width:400px;max-width:86vw;text-align:center}
+.lock-kicker{font-size:11px;font-weight:900;letter-spacing:.28em;color:#A08A3E;margin:0 0 12px}
+.lock-title{font-size:40px;font-weight:900;letter-spacing:-.035em;margin:0;color:var(--ink);line-height:1.15}
+.lock-rule{width:44px;height:3px;background:var(--gold);border-radius:2px;margin:16px auto}
+.lock-sub{font-size:12.5px;line-height:1.6;color:var(--muted);margin:0 0 24px;font-weight:600}
+.lock-field{display:flex;gap:8px;align-items:stretch;justify-content:center}
+.lock input{
+  flex:1;min-width:0;font-family:inherit;font-size:19px;font-weight:800;letter-spacing:.42em;text-align:center;
+  padding:12px 8px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);
+  outline:none;transition:border-color .18s,box-shadow .18s;
+}
+.lock input::placeholder{color:#C9C3B4;letter-spacing:.3em}
+.lock input:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(245,196,0,.16)}
+.lock button{
+  flex:0 0 auto;font-family:inherit;font-size:13.5px;font-weight:900;color:var(--navy);
+  background:var(--gold);border:0;border-radius:11px;padding:0 22px;cursor:pointer;transition:filter .18s;
+}
+.lock button:hover{filter:brightness(.96)}
+.lock .err{min-height:18px;margin:12px 0 0;font-size:12px;font-weight:800;color:#B4453C;letter-spacing:.01em}
+.lock-note{margin:20px 0 0;font-size:10.5px;color:#BDB6A6;letter-spacing:.06em;font-weight:700}
+.shake{animation:shake .38s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+
+/* ---------- mobile ---------- */
+@media (max-width:860px){
+  .stage{
+    left:0;top:0;width:100vw;height:100vh;height:100dvh;
+    transform:none;border-radius:0;box-shadow:none;
+    touch-action:pan-y;
+  }
+  .stage::before{background-size:18px 18px;opacity:.4}
+  :root{--pad-x:18px}
+  .slide{padding:calc(20px + env(safe-area-inset-top)) 18px calc(74px + env(safe-area-inset-bottom))}
+  .s-head{margin-bottom:12px}
+  .kicker{font-size:10px;letter-spacing:.12em;gap:7px}
+  .kicker b{font-size:9.5px;padding:2px 5px}
+  h2{font-size:24px;line-height:1.28;margin-top:7px}
+  .lede{font-size:13px;line-height:1.58;margin-top:7px}
+  .body{gap:9px}
+  .grid{gap:9px}
+  .g2,.g3,.g4,.g23,.g32{grid-template-columns:1fr}
+  .card{padding:12px 13px;border-radius:11px}
+  .card h3{font-size:14px}
+  .card p{font-size:12.6px;line-height:1.55}
+  .callout{font-size:13px;padding:10px 12px;border-left-width:3px}
+  .stat .v{font-size:26px}
+  .stat .d{font-size:11.6px}
+  .quote{font-size:15px}
+  .foot{font-size:10px;gap:10px;flex-direction:column;align-items:flex-start}
+  .foot .msg{align-order:0}
+  .flow{flex-direction:column}
+  .flow .arw{transform:rotate(90deg)}
+  .timeline{grid-template-columns:1fr;padding-top:0;gap:0}
+  .timeline::before{left:6px;right:auto;top:6px;bottom:6px;width:2px;height:auto;background:linear-gradient(180deg,rgba(28,43,75,.15),var(--gold),rgba(28,43,75,.15))}
+  .tl{display:grid;grid-template-columns:16px 1fr;column-gap:10px;text-align:left;padding:0 0 12px 0}
+  .tl .dot{grid-row:1/span 3;margin:3px auto 0;width:11px;height:11px;border-width:2px}
+  .tl .yr{font-size:11px}
+  .tl .tt{font-size:13px;margin:1px 0 1px}
+  .tl .dd{font-size:11.4px}
+  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.tbl{min-width:520px;font-size:12px}
+  table.tbl th{font-size:10.5px;padding:8px 10px}
+  table.tbl td{padding:9px 10px}
+  .body{overflow-y:auto;overscroll-behavior:contain;padding-bottom:4px;padding-right:2px;justify-content:flex-start}
+  .body::-webkit-scrollbar{width:3px}
+  .body::-webkit-scrollbar-thumb{background:rgba(28,43,75,.16);border-radius:3px}
+  .hud{height:64px;padding:0 12px calc(env(safe-area-inset-bottom) * .5) 12px}
+  .brandmini{display:none}
+  .edge{display:none}
+  .pager .bar{width:44px}
+  .btn{font-size:12px;padding:6px 12px}
+  .toc{width:86%;border-radius:0}
+  .toc-list{padding-bottom:30px}
+  .cover-wrap{grid-template-columns:1fr;gap:0;margin-top:0}
+  .cover-index{display:none}
+  .cover-left h2{font-size:44px!important}
+  .lock-card{max-width:88vw}
+  .lock-title{font-size:30px}
+  .lock input{font-size:17px;letter-spacing:.34em}
+  .scrim,.toc{border-radius:0}
+}
+@media (max-width:390px){
+  h2{font-size:22px}
+  :root{--pad-x:15px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .slide,.toc,.scrim,.lock{transition:none}
+}
+
+/* ---------- print ---------- */
+@media print{
+  @page{size:A4 landscape;margin:0}
+  body{overflow:visible;background:#fff}
+  .viewport{position:static;background:#fff;display:block}
+  .stage{position:static;transform:none!important;width:100%;height:auto;box-shadow:none;border-radius:0;overflow:visible}
+  .slide{position:relative!important;inset:auto;opacity:1!important;visibility:visible!important;transform:none!important;
+         height:720px;page-break-after:always;break-after:page;padding:38px 48px 50px}
+  .slide:last-child{page-break-after:auto}
+  .topbar,.hud,.edge,.toc,.scrim,.lock{display:none!important}
+  .stage::before{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="viewport" id="viewport">
+  <div class="stage" id="stage">
+
+    <!-- ============ 01 COVER ============ -->
+    <section class="slide" data-title="표지 · 마인드세팅" data-part="표지">
+      <div class="cover-wrap">
+        <div class="cover-left">
+          <p class="kicker" style="color:#9A7600"><b style="background:var(--gold);color:#22314F">2024</b><span class="part">훨훨 부자지도 · 서울권 정규강의</span></p>
+          <h2 style="font-size:78px;line-height:1.02;letter-spacing:-.05em;margin:18px 0 0">마인드<span class="gold">세팅</span></h2>
+          <div style="width:64px;height:5px;background:var(--gold);border-radius:3px;margin:24px 0 18px"></div>
+          <p class="lede" style="font-size:18px;max-width:700px">40페이지 필기노트를 <b>16장</b>으로 다시 읽기.<br>강의를 듣고, 임장을 가고, 복습하라 — 서울이 눈에 안 들어올 수가 없다.</p>
+          <p class="quote" style="margin:24px 0 0;font-size:21px">언제 살까? 보다 무엇을, 어떻게 살까?</p>
+          <div class="chips" style="margin-top:26px">
+            <span class="chip navy">서울</span>
+            <span class="chip gold">신축 · 설인경</span>
+            <span class="chip">10년 · 세 번의 갈아타기</span>
+            <span class="chip lite">원문 2024.07.01</span>
+          </div>
+        </div>
+        <aside class="cover-index">
+          <p class="ci-head">이 덱의 세 문장</p>
+          <a class="ci" href="#s2"><span class="n">02</span><span><b>사야 할 집은 정해져 있다</b><em>심플한 원칙 · 서울 · 설인경</em></span></a>
+          <a class="ci" href="#s9"><span class="n">09</span><span><b>10년에 세 번, 타고 오른다</b><em>2억에서 70억 펜트까지</em></span></a>
+          <a class="ci" href="#s16"><span class="n">16</span><span><b>찐똘 두 채 + 월 천만원</b><em>10년 플랜과 체크리스트</em></span></a>
+          <p class="ci-foot">전체 16장 · ☰ 목차로 바로 이동</p>
+        </aside>
+      </div>
+      <div class="foot" style="border-top-color:rgba(28,43,75,.1)">
+        <span class="src">필기노트 40p 원문 전체 정리 · 세은 님 열람용</span>
+        <span class="msg">← → · 스와이프로 넘기기</span>
+      </div>
+    </section>
+
+    <!-- ============ 02 ============ -->
+    <section class="slide" data-title="결론: 사야 할 집은 정해져 있다" data-part="프레임">
+      <div class="s-head">
+        <p class="kicker"><b>01</b><span class="part">프레임</span></p>
+        <h2>부동산은 진짜 심플하다 — <span class="hl">사야 할 집은 정해져 있다</span></h2>
+        <p class="lede">어렵게 생각하지 말고, 누구나 아는 <b>대표성을 띄는 아파트</b>를 예산에 맞춰 <b>급지를 바꿔가며</b> 사면 된다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g3">
+          <div class="card"><h3>서울부터 시작</h3><p>지방부터 시작하지 말고 <b>수요가 많은 설인경</b>에서 매수. 첫 집이라면 더더욱 그렇다.</p></div>
+          <div class="card"><h3>설인경</h3><p><b>서울 · 역세권 · 신축 · 대단지.</b> 뭘 사야 하는지는 정해져 있다 — 비싸고 좋은 APT.</p></div>
+          <div class="card"><h3>서울엔 신축이 없다</h3><p>아파트 지을 땅이 없다. <b>신축 품귀 · 금리인하 · 전세가 상승 · 매매수요 증가</b>가 겹쳤다.</p></div>
+          <div class="card"><h3>대표성</h3><p>틈새단지는 사지 마라. 급지를 조금 낮추더라도 <b>많은 사람이 후보로 생각하는 선명한 단지</b>가 낫다.</p></div>
+          <div class="card"><h3>대단지가 급하게 빠지는 이유</h3><p>하락장에도 거래가 되기 때문. 대부분 <b>상급지 갈아타기용 매도</b>다. 가장 무서운 건 팔고 싶어도 못 파는 것.</p></div>
+          <div class="card gold"><h3>한 채 싸움의 시대</h3><p>서울은 전국구 — <b>비규제 · 거주 의무 없음 · 2년 보유 비과세.</b> 9억에 사서 12억까지 보유하면 완전 비과세.</p></div>
+        </div>
+        <div class="callout"><span class="ic">→</span><span>84가 11~12억이면 59는 9억 정도. 수익률이 높다고 개수를 늘리지 말고, <b>1~2주택으로 좋은 것</b>을 하면 된다.</span></div>
+      </div>
+      <div class="foot"><span class="src">원문 p.1–2, p.17</span><span class="msg">“한 채를 잘 사는 것으로 충분하다”</span></div>
+    </section>
+
+    <!-- ============ 03 ============ -->
+    <section class="slide" data-title="왜 서울인가 — 숫자로 보는 판" data-part="판">
+      <div class="s-head">
+        <p class="kicker"><b>02</b><span class="part">판</span></p>
+        <h2>왜 지금 서울인가 — <span class="hl">숫자로 보는 판</span></h2>
+        <p class="lede">단기 등락은 있어도 10·20·30년은 오른다. 이 전제를 깔고 <b>무엇을 살지</b>를 공부한다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g4">
+          <div class="stat"><span class="k">서울 아파트 평균가</span><span class="v">13<small>억</small></span><span class="d">2021년 전고점 13.8억에 거의 근접</span></div>
+          <div class="stat"><span class="k">서울 전세가율</span><span class="v">54.6<small>%</small></span><span class="d">전고점 2016년 71.7% · 60% 넘으면 매수 움직임</span></div>
+          <div class="stat"><span class="k">서울 신규공급 중 정비사업</span><span class="v">85~90<small>%</small></span><span class="d">신축은 재개발·재건축에서 나온다</span></div>
+          <div class="stat gold"><span class="k">10년 뒤 최소 상승 가정</span><span class="v">2~3<small>배</small></span><span class="d">2014년 대비 지금 이미 2~4배</span></div>
+        </div>
+        <div class="grid g2">
+          <div class="card"><h3>이미 올라온 것</h3><ul class="bul tight">
+            <li>하위급지 제외 <b>전고점 95% 이상</b> 회복</li>
+            <li>연초 “10~12억 구간이 좋다” 했더니 <b>1~2억 상승</b></li>
+            <li>경기 성남·광명 <b>12억</b>도 시장이 받아준다</li>
+            <li>장위뉴타운도 <b>12억</b>을 뚫었다 · 9~10억대는 당연히 올랐다</li>
+          </ul></div>
+          <div class="card"><h3>아직 남은 것</h3><ul class="bul tight">
+            <li><b>여의도 · 목동 · 압구정 · 성수 · 한남</b> 다 남아있다</li>
+            <li>갈아타기 <b>세 번</b>이면 가고 싶은 곳에 닿는다</li>
+            <li>파도를 타고 있어야 다음 파도를 탄다 (구리 · 강동 · 잠실)</li>
+            <li>고점을 빨리 회복한 단지가 미래가치도 좋다</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.2, p.5, p.21, p.33</span><span class="msg">시장에 참여해야 파도를 탄다</span></div>
+    </section>
+
+    <!-- ============ 04 ============ -->
+    <section class="slide" data-title="시기를 버리고, 두 질문만" data-part="프레임">
+      <div class="s-head">
+        <p class="kicker"><b>03</b><span class="part">프레임</span></p>
+        <h2>시기를 판단하지 마라 — <span class="hl">남는 건 두 질문뿐</span></h2>
+        <p class="lede">아무도 저점을 모른다. 데이터 분석 전문가조차. 내가 제어할 수 있는 <b>입지력</b>과 <b>대출력</b>에 집중한다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card" style="border-color:#EDD9D5;background:#FDF8F7">
+            <h3 style="color:#9C4A3E">버릴 질문</h3>
+            <ul class="bul tight">
+              <li>“언제 사요? 보던 아파트가 벌써 1억 올랐어요”</li>
+              <li>저점·상투 맞추기 — <b>판단할 수 없고, 필요도 없다</b></li>
+              <li>“저평가된 걸 사세요” — <b>저평가는 없다, 저가치만 있다</b></li>
+            </ul>
+          </div>
+          <div class="card gold">
+            <h3>남길 질문</h3>
+            <ul class="bul tight">
+              <li><b>무엇을</b> 살까 — 좋은 상품, 좋은 입지</li>
+              <li><b>어떻게</b> 살까 — 대출 세팅, 자본 구조</li>
+              <li>내가 <b>준비됐을 때</b> — 공부 + 자본 + 대출 가능</li>
+            </ul>
+          </div>
+        </div>
+        <div class="grid g3">
+          <div class="card tight"><h3>입지력</h3><p>어떤 것을 살지 선택하는 힘. 급지표·상품·세팅값을 비교하는 눈.</p></div>
+          <div class="card tight"><h3>대출력</h3><p>어떤 방법으로 살지. <b>대출을 알면 입지가 달라진다.</b></p></div>
+          <div class="card tight"><h3>시간</h3><p>2년 · 4년 · 6년 보유. 10년을 버티는 게 아니라 <b>타고 밟고 올라간다.</b></p></div>
+        </div>
+        <div class="callout dark"><span class="ic">!</span><span>3개월 후에 떨어지더라도 <b>10년 후에 올라 있을 집</b>을 산다. 좋은 집은 살 수 있을 때 사는 것.</span></div>
+      </div>
+      <div class="foot"><span class="src">원문 p.1, p.12–13</span><span class="msg">2024년은 2034년에게 기회다</span></div>
+    </section>
+
+    <!-- ============ 05 ============ -->
+    <section class="slide" data-title="서울 급지표" data-part="판">
+      <div class="s-head">
+        <p class="kicker"><b>04</b><span class="part">판</span></p>
+        <h2>기본은 <span class="hl">서울 급지 순위</span>를 알고 있는 것</h2>
+        <p class="lede">2024년 6월 기준. 급지를 바꿔가며 그 안에서 가장 좋은 단지를 사는 것이 기본 세팅이다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g32">
+          <div>
+            <div class="ladder">
+              <div class="rung r1">강서용송<small>항상 상위</small></div>
+              <div class="rung r2">성양광마<small>성동 · 양천 · 광진 · 마포</small></div>
+              <div class="rung r3">영종강중동<small>영등포 · 종로 · 강동 · 중랑 · 동작</small></div>
+              <div class="rung r4">서강동은성관노<small>서대문 · 강북 · 동대문 · 은평 · 성북 · 관악 · 노원</small></div>
+              <div class="rung r5">구중금강도<small>구로 · 중구 · 금천 · 강서 · 도봉</small></div>
+            </div>
+            <p style="font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.5">항상 상위 <b>강서용송</b> / 항상 중간 <b>중구</b> / 항상 하위 <b>노도강금관구 + 중랑</b></p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="card tight"><h3>경기 아파트 BIG 5</h3>
+              <div class="chips" style="margin-top:4px">
+                <span class="chip gold">과천</span><span class="chip gold">성남(분당·수정)</span><span class="chip gold">하남</span><span class="chip gold">광명</span><span class="chip gold">안양(동안)</span>
+              </div>
+            </div>
+            <div class="card tight"><h3>인천</h3>
+              <div class="chips" style="margin-top:4px"><span class="chip">연수구(송도)</span><span class="chip">서구 일대</span></div>
+              <p style="margin-top:6px;font-size:12px">원문 표기 “청가루검” — 서구 내 주요 생활권 묶음</p>
+            </div>
+            <div class="callout plain" style="font-size:13px"><span class="ic">✓</span><span>서울 하위 vs 경기 상위는 <b>지역 대 지역</b>이 아니라 <b>물건 대 물건</b>으로 비교한다. 첫 집은 아무리 못해도 경기 BIG5 아래로 내려오지 말 것. <b>그런데 지금은 서울 할 때다.</b></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.3</span><span class="msg">급지를 바꿔가며 대표단지를 산다</span></div>
+    </section>
+
+    <!-- ============ 06 ============ -->
+    <section class="slide" data-title="같은 20억, 다른 세팅값" data-part="상품">
+      <div class="s-head">
+        <p class="kicker"><b>05</b><span class="part">상품</span></p>
+        <h2>같은 20억, <span class="hl">완전히 다른 세팅값</span></h2>
+        <p class="lede">세팅값 = 전세가(무이자 레버리지) + 대출 + 자기자본. 같은 값이라도 <b>내 돈이 5억이냐 18억이냐</b>가 전부를 바꾼다.</p>
+      </div>
+      <div class="body">
+        <div class="tablewrap">
+          <table class="tbl">
+            <thead><tr><th>단지</th><th>유형</th><th>전세</th><th>대출</th><th>자기자본</th><th>합계</th><th>읽는 법</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><b>헬리오시티</b></td><td>신축 · 등기<span class="sub">송파 · 대단지</span></td>
+                <td class="n">10.0</td><td class="n">후순위 5.0</td><td class="n hi">5.0</td><td class="n">20.0</td>
+                <td>자가 5억으로 20억 자산 · <b>전세가가 레버리지</b></td>
+              </tr>
+              <tr>
+                <td><b>올림픽파크포레온</b></td><td>입주권 · 미등기<span class="sub">둔촌주공</span></td>
+                <td class="n">—</td><td class="n">이주비 2.0</td><td class="n hi">18.0</td><td class="n">20.0</td>
+                <td>전세를 못 끼니 <b>자기자본이 커진다</b></td>
+              </tr>
+              <tr>
+                <td><b>올림픽선수촌</b></td><td>재건축<span class="sub">기축 · 대단지</span></td>
+                <td class="n">7.0</td><td class="n">—</td><td class="n hi">13.0</td><td class="n">20.0</td>
+                <td>전세 7억이 <b>자본 부담을 덜어준다</b></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="grid g3">
+          <div class="card tight"><h3>세팅값이 곧 수익률</h3><p>같은 20억이라도 내 돈은 5억~18억. <b>전세가 높은 단지</b>가 무이자 레버리지를 준다.</p></div>
+          <div class="card tight"><h3>입히기 어려우면 놓아준다</h3><p>세팅값을 입히기 어려운 단지는 미련 없이 버리고, <b>내 세팅이 되는 물건</b>을 찾는다.</p></div>
+          <div class="card tight"><h3>비교는 매물로</h3><p>쌍둥이 단지 앞에서 고민하지 말고 <b>매매가 · 전세가 · 매전갭 · 동향층</b>으로 비교.</p></div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.2 · 단위 억원 · 합계는 전세+대출+자기자본 단순 합(원문은 자기자본만 표기)</span><span class="msg">부동산은 비교의 학문</span></div>
+    </section>
+
+    <!-- ============ 07 ============ -->
+    <section class="slide" data-title="생초갭투 — 3.3억으로 16.5억" data-part="자금">
+      <div class="s-head">
+        <p class="kicker"><b>06</b><span class="part">자금</span></p>
+        <h2>생초는 진짜 큰 혜택 — <span class="hl">3.3억으로 16.5억</span></h2>
+        <p class="lede">1금융권 최대 6억, 집값 제한 없음. <b>호흡은 2년·4년으로 짧게</b>, 세입자가 있을 때 판다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g32">
+          <div class="card dark">
+            <span class="taga">실전 예시 · 센트라스</span>
+            <h3 style="font-size:16px">매매 16.5억 갭투자</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:8px;font-size:13px;color:rgba(255,255,255,.9)">
+              <span>매매가 <b style="color:#fff">16.5</b></span><span>전세가 <b style="color:#fff">10.0</b></span>
+              <span>대출 <b style="color:#fff">3.2</b></span><span>자기자본 <b style="color:var(--gold)">3.3</b></span>
+            </div>
+            <p style="margin-top:10px;font-size:12.5px;color:rgba(255,255,255,.8)">이자 120만 + 실거주 80만 = 월 200만 → <b style="color:#fff">2년 5,000만원</b><br>그 사이 자본차익 <b style="color:var(--gold)">5,000만원 이상</b></p>
+          </div>
+          <div class="tablewrap">
+            <table class="tbl">
+              <thead><tr><th>가격대</th><th>자기자본</th><th>대출</th><th>전세</th><th>결과</th></tr></thead>
+              <tbody>
+                <tr><td><b>11~13억</b><span class="sub">가장 많이 하는 구간</span></td><td class="n">2~3</td><td class="n">2~3</td><td class="n">6~7</td><td>4년 뒤 상급지 갈아타기</td></tr>
+                <tr><td><b>59 · 9억대</b><span class="sub">1억으로 시작</span></td><td class="n">1</td><td class="n">2</td><td class="n">6</td><td>4년 보유 → <b>12억</b> (3억 비과세)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="grid g4">
+          <div class="card tight"><h3>짧은 호흡</h3><p>2년 뒤 안 오르면 4년. <b>세입자 나가기 전에</b> 파는 게 가장 좋다.</p></div>
+          <div class="card tight"><h3>중하위급지 신축</h3><p>입주물량 많은 곳도 OK. <b>전세 1~2억 싸게</b> 사면 다 나간다.</p></div>
+          <div class="card tight"><h3>금호 · 고덕</h3><p>2024 상반기 많이 했다. 2억이면 20평대 2배, <b>3억이면 30평대 3배</b>.</p></div>
+          <div class="card gold tight"><h3>혼인신고 전 각각</h3><p>부부가 각자 생초를 쓰는 게 <b>가장 큰 세팅</b>. 순서를 설계하라.</p></div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.7, p.17, p.22</span><span class="msg">2억을 모으는 것보다 2억을 빌리는 게 낫다</span></div>
+    </section>
+
+    <!-- ============ 08 ============ -->
+    <section class="slide" data-title="뿌리자산 = 베이스캠프" data-part="자금">
+      <div class="s-head">
+        <p class="kicker"><b>07</b><span class="part">자금</span></p>
+        <h2>첫 집은 <span class="hl">뿌리자산</span> — 두 번째 집이 여기서 나온다</h2>
+        <p class="lede">자산의 볼륨(케파)을 높일 수 있는 뿌리자산을 만들어라. 내가 빼 쓴 돈은 내가 갚는 게 아니라 <b>집이 갚는다.</b></p>
+      </div>
+      <div class="body">
+        <div class="flow">
+          <div class="node"><b>첫 집</b><span>예산 안에서 가장 좋은 집<br>예선전</span></div>
+          <span class="arw">→</span>
+          <div class="node" style="background:var(--gold-soft);border-color:var(--gold-line)"><b>뿌리자산</b><span>베이스캠프 · 본좌 · ATM<br>비빌 언덕 · 투자금</span></div>
+          <span class="arw">→</span>
+          <div class="node"><b>2호기</b><span>1채 더 갭투 · 관리처분 입주권<br>상급지 갈아타기</span></div>
+          <span class="arw">→</span>
+          <div class="node"><b>자산의 볼륨</b><span>84 = 30억<br>펜트 = 70억</span></div>
+        </div>
+        <div class="grid g2">
+          <div class="card"><h3>15억 서신대 → 8년 후 25억</h3><ul class="bul tight">
+            <li>매도 후 <b>28억</b>으로 갈아타기</li>
+            <li>담보가치로 <b>재개발(대체주택)</b> 취득</li>
+            <li>담보가치로 <b>서신대 한 채 더</b></li>
+            <li>목표: 찐똘 아파트 1 + 찐똘 재건축 1 = <b>2채로 비과세 세팅 완료</b></li>
+          </ul></div>
+          <div class="card" style="border-color:#EDD9D5;background:#FDF8F7">
+            <h3 style="color:#9C4A3E">이해만 하고, 하지 말 것</h3>
+            <p style="margin-bottom:4px">10억 집 → 7.5억 대출 → 2.5억 잼으로 3채 → 순식간에 40억 자산가. <b>로직은 이해하되 실행하지 않는다.</b></p>
+            <ul class="bul tight">
+              <li>12억 대출이자 감당 불가</li>
+              <li>같은 10억대 매물 여러 개 보유</li>
+              <li>하락기에 가장 먼저 무너지는 구조</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.3, p.7</span><span class="msg">좋은 상품 + 부동산 삼각편대(정책·대출·세금)</span></div>
+    </section>
+
+    <!-- ============ 09 ============ -->
+    <section class="slide" data-title="10년, 세 번의 갈아타기" data-part="사례">
+      <div class="s-head">
+        <p class="kicker"><b>08</b><span class="part">사례</span></p>
+        <h2>10년, 세 번의 갈아타기 — <span class="hl">70억 펜트하우스까지</span></h2>
+        <p class="lede">씨를 뿌린 게 아니라 <b>레버리지로 묘목을 심었다</b>(매매 2억 · 대출 2억). 38세에 시작해 10년.</p>
+      </div>
+      <div class="body">
+        <div class="timeline">
+          <div class="tl"><div class="dot"></div><div class="yr">2014</div><div class="tt">강남보금자리</div><div class="dd">매매 2억 · 대출 2억<br>무피 투자 · 첫 집</div></div>
+          <div class="tl"><div class="dot"></div><div class="yr">2016</div><div class="tt">전세 6억</div><div class="dd">비닐하우스로 복귀<br>6억으로 경매·택지 도전</div></div>
+          <div class="tl"><div class="dot"></div><div class="yr">2017</div><div class="tt">잠실 미성</div><div class="dd">9억 재건축 매수<br>경매 2등 후 즉시 매수</div></div>
+          <div class="tl"><div class="dot"></div><div class="yr">2017</div><div class="tt">고덕그라시움</div><div class="dd">8억 분양권<br>공무원 외출 중 줍줍</div></div>
+          <div class="tl"><div class="dot"></div><div class="yr">2018</div><div class="tt">공무원 사직</div><div class="dd">부동산 집중<br>자기성장·자본성장</div></div>
+          <div class="tl hot"><div class="dot"></div><div class="yr">2024</div><div class="tt">잠실래미안아이파크</div><div class="dd">80평대 펜트하우스<br>70억 입성</div></div>
+        </div>
+        <div class="grid g3">
+          <div class="stat"><span class="k">권리가액</span><span class="v">10<small>억</small></span><span class="d">조합원분양가 30억 · 순위 444 / 1,200</span></div>
+          <div class="stat"><span class="k">펜트 배정 경쟁</span><span class="v">14<small>/5,000</small></span><span class="d">단층이 아닌 <b>틈새 복층 펜트</b>를 노렸다</span></div>
+          <div class="stat navy"><span class="k">그 사이</span><span class="v">+10<small>억</small></span><span class="d">고덕그라시움 8억 → 감정 14억 → 18억, 하락기 13억 매도 후 둔촌주공 갈아타기(자본수익 10억)</span></div>
+        </div>
+        <div class="callout"><span class="ic">→</span><span>청약도 ABC가 아니라 <b>EF만</b> 노렸다. 매 순간 최선의 선택을 고민하고, <b>방법이 없는지</b>를 계속 물었다.</span></div>
+      </div>
+      <div class="foot"><span class="src">원문 p.14–15</span><span class="msg">70억짜리 ATM 기계가 생긴 것이다</span></div>
+    </section>
+
+    <!-- ============ 10 ============ -->
+    <section class="slide" data-title="서신대 vs 재개발·재건축" data-part="상품">
+      <div class="s-head">
+        <p class="kicker"><b>09</b><span class="part">상품</span></p>
+        <h2>서신대가 기본, <span class="hl">재재는 비교해서 고른다</span></h2>
+        <p class="lede">“누가 더 좋아?”가 아니라 <b>“그래서 나랑 뭐가 잘 맞아?”</b> — 상품이 아니라 내 자본과 상황에 맞춰 판단한다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card"><h3>서신대 (서울·신축·대단지)</h3><ul class="bul tight">
+            <li>기축은 <b>모멘텀이 약하다</b> — 자본이 적을수록 신축에서 빠르게</li>
+            <li>소규모는 거래량이 적어 <b>하락기에 안 팔린다</b></li>
+            <li>세팅값을 잘 입힐 수 있다 — <b>전세가가 높은 단지</b></li>
+            <li>입주 2~4년차: 커뮤니티·엘베호출·드랍오프존·수영장·카페·독서실</li>
+            <li>자본이 부족한 첫 집은 <b>서신대가 가장 좋다</b></li>
+          </ul></div>
+          <div class="card"><h3>재개발 · 재건축</h3><ul class="bul tight">
+            <li>서울 신규공급의 <b>85~90%</b>가 정비사업</li>
+            <li><b>조합원분양가 10억 시대</b> (송파 15억, 잠실주공5 25억)</li>
+            <li>초투가 낮다 · 대신 <b>시간을 투입</b>한다</li>
+            <li>입주 시 인근 단지 대비 <b>퀀텀점프</b></li>
+            <li>재개발 15~25년(평균 20년), <b>관리처분 → 입주 6~8년</b></li>
+          </ul></div>
+        </div>
+        <div class="grid g2">
+          <div class="card gold tight"><h3>행당7 푸르지오써밋 vs 서리자</h3><p>84는 일반분양이 없어 <b>입주권으로만</b> 가능. 실거주자이고 돈이 있다면 <b>행당7</b>(입주권 매수 후 실거주), 레버리지가 필요하면 <b>서리자</b>.</p></div>
+          <div class="card tight"><h3>판단 기준</h3><p>재개발은 <b>초투가 싸거나 총매가가 싸거나</b> 둘 중 하나는 싸야 한다. 아니면 <b>그냥 신축</b>으로 가라. 지금은 대체로 신축이 유리.</p></div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.4–6, p.12, p.25</span><span class="msg">콩이 구르는 것과 수박이 구르는 것은 다르다</span></div>
+    </section>
+
+    <!-- ============ 11 ============ -->
+    <section class="slide" data-title="정비사업 읽는 법" data-part="상품">
+      <div class="s-head">
+        <p class="kicker"><b>10</b><span class="part">상품</span></p>
+        <h2>정비사업 <span class="hl">읽는 법</span> — 용어와 5단계</h2>
+        <p class="lede">불편하고 복잡하더라도 재건축·재개발은 알고 넘어가야 한다. 지역의 판이 여기서 바뀐다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card"><h3>두 개의 총액</h3>
+            <p><b>조피총</b> = 조합원분양가 + 프리미엄<br><b>매추총</b> = 은집(기존집) 매매가 + 추가분담금</p>
+            <p style="margin-top:4px">조합원분양가가 높으면 <b>초투가 낮다</b>. 프리미엄은 <b>단계마다 오른다.</b></p>
+          </div>
+          <div class="card gold"><h3>매물 수치 읽기 (실예시)</h3>
+            <p style="display:flex;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums">
+              <span>공주가 <b>1.27</b></span><span>감평예상 <b>1.52</b></span><span>프리미엄 <b>1.48</b></span><span>매매가 <b>3.0</b></span><span style="color:#8A6A00">초투 <b>2.7</b></span>
+            </p>
+            <p style="margin-top:4px">사시 전이면 감정가가 없어 <b>추정</b>해야 한다. 단위 억원.</p>
+          </div>
+        </div>
+        <div class="grid g23">
+          <div class="card"><h3>원픽 찾는 5단계</h3>
+            <ol class="num" style="margin-top:2px">
+              <li><span class="n">1</span><span><b>정비구역 확인</b> — 아실 · 부자지도</span></li>
+              <li><span class="n">2</span><span><b>물건 검색</b> — 네이버부동산 (피 얼마 붙었나)</span></li>
+              <li><span class="n">3</span><span><b>감정가 · 프리미엄 · 분담금 · 총매가</b> 확인</span></li>
+              <li><span class="n">4</span><span><b>임장</b> — 부동산 최소 2곳</span></li>
+              <li><span class="n">5</span><span><b>인근 신축과 비교</b> → 다른 지역·다른 상품과 비교</span></li>
+            </ol>
+          </div>
+          <div class="card" style="border-color:#EDD9D5;background:#FDF8F7">
+            <h3 style="color:#9C4A3E">뚜껑 (무허가 주택)</h3>
+            <ul class="bul tight">
+              <li>권리가액이 낮고 <b>프리미엄만</b> 붙어 있다 → <b>초투가 적다</b></li>
+              <li>신림 1구역 · 상계 1·2구역에 많다</li>
+              <li>감정가 0.1억 + 프리미엄 3.5억 → <b>1천만원 증여</b>로 10년 뒤 15억 아파트</li>
+              <li>대신 나중에 <b>분담금을 많이</b> 낸다</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.5, p.18, p.20, p.35–36</span><span class="msg">나중에는 설인경이 한 판으로 보인다</span></div>
+    </section>
+
+    <!-- ============ 12 ============ -->
+    <section class="slide" data-title="규제와 함정" data-part="판">
+      <div class="s-head">
+        <p class="kicker"><b>11</b><span class="part">판</span></p>
+        <h2>규제와 함정 — <span class="hl">들어가기 전에 알고 들어간다</span></h2>
+        <p class="lede">하락기에는 재개발 물건이 제일 많이 떨어진다. 규제를 모르면 초투가 아니라 <b>손절</b>이 된다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card"><h3>토지거래허가구역 · 실거주 2년</h3>
+            <p><b>압목여성 · 잠삼대청</b> — 세팅값 입히기 어렵다. 집 있고 돈 있는 사람의 영역.</p>
+            <p><b>신통기획</b>은 토허 + 실거주 의무, <b>모아타운</b>은 토허 X → 갭투 가능. 3080·공공재개발은 어렵다.</p>
+          </div>
+          <div class="card"><h3>투기과열지구 조합원 지위양도 제한</h3>
+            <p style="margin-bottom:4px">강남3구 + 용산 · 조합설립인가 이후:</p>
+            <ul class="bul tight">
+              <li><b>5년 이상 거주 + 10년 이상 보유 + 1주택자</b></li>
+              <li>그래서 압구정 현대·잠실주공5·은마 같은 물건이 <b>안 나온다</b></li>
+              <li>단 인가 후 <b>3년 내 사시를 못 받으면</b> 제한이 일시 해제된다</li>
+            </ul>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="card tight"><h3>다주택자라면</h3><p><b>철거된 물건</b>을 사는 게 맞다. 취득세·보유세 계산이 달라진다.</p></div>
+          <div class="card tight"><h3>무주택자라면</h3><p><b>미철거 물건</b>이 낫다 — 1~3% 취득세. 무주택자가 입주권부터 하면 할 수 있는 게 없다.</p></div>
+        </div>
+        <div class="callout dark"><span class="ic">!</span><span>지금은 규제가 조금 완화돼 <b>관리처분인가 후 재개발도 거래</b>된다. 다만 “판이 바뀐다”고 꼭 지금 들어갈 필요는 없다 — 기회는 순환하며 계속 나온다.</span></div>
+      </div>
+      <div class="foot"><span class="src">원문 p.9, p.19–20</span><span class="msg">급지를 높이는 게 먼저다</span></div>
+    </section>
+
+    <!-- ============ 13 ============ -->
+    <section class="slide" data-title="서울 뉴타운 순위와 12억대" data-part="상품">
+      <div class="s-head">
+        <p class="kicker"><b>12</b><span class="part">상품</span></p>
+        <h2>지금 손에 잡히는 <span class="hl">뉴타운 순위</span>와 12억대</h2>
+        <p class="lede">길음역 > 이문휘경 > 가재울·수색증산 > 장위. 자본이 없으면 장위, 있으면 이문휘경 분양권·입주권.</p>
+      </div>
+      <div class="body">
+        <div class="ladder">
+          <div class="rung r1">길음역<small>한 채로 할 수 있는 게 너무 많다</small></div>
+          <div class="rung r2">이문휘경<small>장위 + 1 = 휘경 · 2025년 입주물량 몰림</small></div>
+          <div class="rung r3">가재울 · 수색증산<small>아직 한바퀴 안 돌았다 · 디센자 15억</small></div>
+          <div class="rung r4">장위<small>24,000세대 · 가장 크고 가장 싸다</small></div>
+        </div>
+        <div class="grid g3">
+          <div class="card tight"><h3>장위</h3><p>동북선(왕십리 직결, 2026 하반기 목표) · 광운대 GTX-C · 북서울꿈의숲. <b>6구역 12억</b> — 지금 사서 2년 뒤 매도면 개통 후.</p></div>
+          <div class="card tight"><h3>이문휘경</h3><p>입주물량이 몰리면 <b>전세가는 보합·하락</b>, 매매가는 상승 가능. “2025년에 문 닫으면” 이후가 기회.</p></div>
+          <div class="card tight"><h3>12억대 비교</h3>
+            <div class="chips" style="margin-top:3px"><span class="chip">중랑 사센아</span><span class="chip">관악 이편한세상서울대입구</span><span class="chip">금천 롯데캐슬</span><span class="chip">가재울 파크뷰자이</span><span class="chip">신정 목센아 11억</span></div>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="card gold tight"><h3>20억 클럽</h3><div class="chips" style="margin-top:3px"><span class="chip gold">마포 신축</span><span class="chip gold">옥수</span><span class="chip gold">경희궁자이</span><span class="chip gold">둔주</span><span class="chip gold">서리자</span><span class="chip gold">헬리오</span><span class="chip gold">고덕그라시움</span><span class="chip gold">성수 기축</span><span class="chip gold">흑석·노량진</span></div></div>
+          <div class="card tight"><h3>서울 4대 녹지축</h3><p>마포(노을·하늘공원) · 송파(올림픽공원) · 성북(북서울꿈의숲) · 성수(서울숲)</p></div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.13, p.20, p.22</span><span class="msg">서울 12억 이하는 조금 유의해서 볼 것</span></div>
+    </section>
+
+    <!-- ============ 14 ============ -->
+    <section class="slide" data-title="대출 전략" data-part="자금">
+      <div class="s-head">
+        <p class="kicker"><b>13</b><span class="part">자금</span></p>
+        <h2>대출은 <span class="hl">해줄 때 받는다</span></h2>
+        <p class="lede">대출을 알면 입지가 달라진다. 단, <b>이자를 감당할 현금흐름</b>이 없으면 대출은 무기가 아니라 족쇄.</p>
+      </div>
+      <div class="body">
+        <div class="grid g2">
+          <div class="card"><h3>추가담보대출 (추담대)</h3><ul class="bul tight">
+            <li><b>DSR을 보지 않는다</b> · 집값의 75%까지</li>
+            <li>집값의 <b>25%만 있으면</b> 집을 사는 것과 같은 효과</li>
+            <li>이자만 낸다 · 원금은 나중에 · <b>번거롭다</b></li>
+            <li>“번거로운 걸 해야 돈이 된다”</li>
+          </ul></div>
+          <div class="card"><h3>생초 · 실거주</h3><ul class="bul tight">
+            <li>1금융권 <b>최대 6억</b>, 집값 제한 없음</li>
+            <li>실거주는 70%까지 가능하나 현실적으로 어렵다</li>
+            <li>이자 <b>2~4년치를 대출 통장에</b> 미리 받아두는 방법</li>
+            <li>동일 날짜에 전세 + 대출은 이제 어렵다 → <b>대출 먼저</b></li>
+          </ul></div>
+        </div>
+        <div class="grid g3">
+          <div class="stat"><span class="k">대출 10억 · 연 5%</span><span class="v">5,000<small>만원/년</small></span><span class="d">이만큼의 사업소득을 만들어야 한다</span></div>
+          <div class="stat"><span class="k">월 현금흐름 목표</span><span class="v">100~1,000<small>만원</small></span><span class="d">10억 아파트에서도 300만원은 가능</span></div>
+          <div class="stat gold"><span class="k">대출 규모 결정</span><span class="v">3<small>단계</small></span><span class="d">자기자본 분석 → 지출 통제 → 원리금 상환 능력</span></div>
+        </div>
+        <div class="callout"><span class="ic">!</span><span>상승기에는 금액이 부족할 때 급지를 낮추기보다 <b>평형을 낮추는 전략</b>을 쓴다. 자신의 그릇과 담력만큼만 산다.</span></div>
+      </div>
+      <div class="foot"><span class="src">원문 p.7–8, p.17, p.22, p.29</span><span class="msg">대출은 무조건 집이 갚아준다 — 단, 버틸 현금흐름이 있을 때</span></div>
+    </section>
+
+    <!-- ============ 15 ============ -->
+    <section class="slide" data-title="임장과 브리핑" data-part="실행">
+      <div class="s-head">
+        <p class="kicker"><b>14</b><span class="part">실행</span></p>
+        <h2>임장은 <span class="hl">짧게, 밀도 있게</span> — 그리고 부동산에 들어간다</h2>
+        <p class="lede">많이 걷는다고 되는 게 아니다. <b>브리핑을 받아내고 정리</b>해야 내 실력이 된다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g3">
+          <div class="card"><h3>분양권 · 입주권</h3><ul class="bul tight" style="font-size:12.2px">
+            <li>“분양권에 관심이 있는데요”</li>
+            <li>전매가 언제 풀리나요?</li>
+            <li>지금 계약 중인가요?</li>
+            <li>프리미엄이 얼마 형성됐나요?</li>
+            <li>실거주하고 싶은데요 → 방문예약</li>
+          </ul></div>
+          <div class="card"><h3>재개발 · 재건축</h3><ul class="bul tight" style="font-size:12.2px">
+            <li>이주비 얼마나 나갔어요?</li>
+            <li>프리미엄 얼마예요?</li>
+            <li>이주비대출은 얼마 나왔나요?</li>
+            <li>그럼 초투가 00이겠네요?</li>
+            <li>평형신청·동호수 추첨은 했나요?</li>
+          </ul></div>
+          <div class="card gold"><h3>브리핑 이끌기</h3><ul class="bul tight" style="font-size:12.2px">
+            <li>“네이버에서 보고 왔는데 이 매물 있나요?”</li>
+            <li>“그거 너무 비싼데 혹시 옆단지는요?”</li>
+            <li>“초투가 낮은 매물이 있나요?”</li>
+            <li><b>단지부터 시작</b>해 슬금슬금 확장</li>
+          </ul></div>
+        </div>
+        <div class="grid g3">
+          <div class="card tight"><h3>하지 말 것</h3><p>부동산에서 <b>호재를 묻는 건 부린</b>. 실거주자는 호재라는 말을 쓰지 않는다. 사장님 말에 반박하지 말고 듣고 와라.</p></div>
+          <div class="card tight"><h3>임장노트</h3><p>매매 · 전세 · 호가를 그 자리에서 기록. 아실·호갱노노 실거래까지. <b>몰아서 하지 말고 자주.</b></p></div>
+          <div class="card tight"><h3>호가는 거짓말</h3><p>하락기엔 호가보다 싼 물건, 상승기엔 더 비싼 물건이 있다. <b>그래서 부동산을 가봐야 한다.</b></p></div>
+        </div>
+      </div>
+      <div class="foot"><span class="src">원문 p.6, p.10–11, p.37</span><span class="msg">부동산 문 여는 것만 두려워하지 않으면 된다</span></div>
+    </section>
+
+    <!-- ============ 16 ============ -->
+    <section class="slide" data-title="10년 플랜과 체크리스트" data-part="실행">
+      <div class="s-head">
+        <p class="kicker"><b>15</b><span class="part">실행</span></p>
+        <h2>10년 안에 <span class="hl">찐똘 두 채 + 월 천만원</span></h2>
+        <p class="lede">아파트(뼈대) + 현금흐름(살). 뼈대를 세우고 살을 붙이기를 반복한다. 부동산은 목표가 아니라 <b>수단</b>이다.</p>
+      </div>
+      <div class="body">
+        <div class="grid g23">
+          <div class="card gold">
+            <h3 style="font-size:16px">10년 플랜</h3>
+            <p style="font-size:13.5px;line-height:1.6">찐똘 아파트 <b>1</b> + 찐똘 재건축 <b>1</b><br>→ 여기서 <b>월 현금흐름 1,000만원</b><br>→ 그 위에 건물·사업으로 확장</p>
+            <p style="margin-top:6px;font-size:12px">“찐똘 두 채 있어도 천만원 못 꺼내면 삶이 피폐해진다”</p>
+          </div>
+          <div class="card">
+            <h3>이번 달 체크리스트</h3>
+            <ol class="num" style="margin-top:2px">
+              <li><span class="n">1</span><span>내 <b>종잣돈 · 최대대출 · 원리금 상환능력</b> 숫자로 확정</span></li>
+              <li><span class="n">2</span><span>서울 <b>급지표</b> 외우고, 지금 내가 갈 수 있는 급지 1개 정하기</span></li>
+              <li><span class="n">3</span><span><b>12억대 3단지</b> 매매·전세·매전갭 비교표 만들기</span></li>
+              <li><span class="n">4</span><span>뉴타운 1곳 <b>임장 + 부동산 2곳</b> 브리핑 받기</span></li>
+              <li><span class="n">5</span><span>생초·추담대 <b>내 조건</b>으로 가능한지 확인 (혼인신고 전 각각)</span></li>
+              <li><span class="n">6</span><span>청약통장 <b>월 25만원</b>으로 올리기 · 자녀 명의도</span></li>
+            </ol>
+          </div>
+        </div>
+        <div class="grid g3">
+          <div class="card tight"><h3>첫 집은 예선전</h3><p>첫 집 이후의 <b>얼개</b>가 10년 후를 결정한다.</p></div>
+          <div class="card tight"><h3>공부 안 됐으면 사지 마라</h3><p>아웃풋을 내야 한다. 스스로 판단할 수 있을 때 산다.</p></div>
+          <div class="card tight"><h3>내가 사는 곳은 3대에</h3><p>좋은 환경을 자녀에게 노출시키는 것도 <b>유산</b>이다.</p></div>
+        </div>
+        <div class="callout dark" style="justify-content:center"><span class="ic">→</span><span>오늘 이후 가장 빠른 날은 <b>오늘</b>. 강의를 더 듣지 말고, 한 장 들고 현장에 나가라.</span></div>
+      </div>
+      <div class="foot"><span class="src">원문 p.38–40</span><span class="msg">이 수업이 시작이고, 이제 자습이다</span></div>
+    </section>
+
+    <!-- HUD -->
+    <div class="topbar"><i id="topProgress"></i></div>
+
+    <button class="edge prev" id="edgePrev" aria-label="이전 슬라이드">‹</button>
+    <button class="edge next" id="edgeNext" aria-label="다음 슬라이드">›</button>
+
+    <div class="hud">
+      <button class="btn" id="tocBtn" aria-haspopup="dialog" aria-controls="toc">☰ 목차</button>
+      <div class="pager">
+        <button class="btn ghost" id="prevBtn" aria-label="이전">‹</button>
+        <span><b id="curNum">1</b> / <span id="totNum">16</span></span>
+        <div class="bar"><i id="barFill"></i></div>
+        <button class="btn ghost" id="nextBtn" aria-label="다음">›</button>
+      </div>
+      <span class="brandmini">훨훨 부자지도 · 2024</span>
+    </div>
+
+    <!-- TOC -->
+    <div class="scrim" id="scrim"></div>
+    <aside class="toc" id="toc" role="dialog" aria-modal="true" aria-label="목차">
+      <div class="toc-head">
+        <p>목차 · 16</p>
+        <button class="btn ghost" id="tocClose" aria-label="목차 닫기">닫기 ✕</button>
+      </div>
+      <ol class="toc-list" id="tocList"></ol>
+    </aside>
+
+    <!-- LOCK -->
+    <div class="lock" id="lock">
+      <form class="lock-card" id="lockForm" autocomplete="off">
+        <p class="lock-kicker">PRIVATE NOTE</p>
+        <h1 class="lock-title">마인드세팅</h1>
+        <div class="lock-rule"></div>
+        <p class="lock-sub">훨훨 부자지도 · 서울권 정규강의 필기노트 정리<br>비밀번호 6자리를 입력하세요</p>
+        <div class="lock-field">
+          <input id="pw" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" placeholder="••••••" aria-label="비밀번호" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <button type="submit">열기</button>
+        </div>
+        <p class="err" id="err" role="alert"></p>
+        <p class="lock-note">개인 열람용 · 검색 비공개</p>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- gate ---------- */
+  var GATE_SALT = 'bujamap-deck::';
+  var GATE_HASH = '9577d271b254eb531d737a32226b94dfeca62a90b1ed50bdc274f49560f45a0e';
+  var STORE_KEY = 'bujamap.deck.open.v1';
+
+  function digest(str){
+    if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest){
+      return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+        .then(function(buf){
+          var b = new Uint8Array(buf), out = '';
+          for (var i=0;i<b.length;i++){ out += ('00'+b[i].toString(16)).slice(-2); }
+          return out;
+        });
+    }
+    return Promise.resolve(null);
+  }
+
+  var lock = document.getElementById('lock');
+  var lockForm = document.getElementById('lockForm');
+  var pw = document.getElementById('pw');
+  var err = document.getElementById('err');
+
+  function saved(){
+    try { return localStorage.getItem(STORE_KEY) === '1'; } catch(e){ return false; }
+  }
+  function remember(){
+    try { localStorage.setItem(STORE_KEY, '1'); } catch(e){}
+    try { sessionStorage.setItem(STORE_KEY, '1'); } catch(e){}
+  }
+
+  function openDeck(){
+    lock.classList.add('hide');
+    document.body.classList.add('unlocked');
+    setTimeout(function(){ lock.setAttribute('aria-hidden','true'); }, 500);
+    go(initialIndex(), true);
+    buildToc();
+  }
+
+  lockForm.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var val = (pw.value || '').replace(/\s+/g,'');
+    if (!val){ err.textContent = '비밀번호를 입력해 주세요.'; return; }
+    digest(GATE_SALT + val).then(function(h){
+      var ok = (h === GATE_HASH) || (h === null && val === '261213');
+      if (ok){
+        err.textContent = '';
+        remember();
+        openDeck();
+      } else {
+        err.textContent = '비밀번호가 맞지 않습니다.';
+        pw.value = '';
+        lockForm.classList.remove('shake');
+        void lockForm.offsetWidth;
+        lockForm.classList.add('shake');
+        pw.focus();
+      }
+    });
+  });
+
+  /* ---------- deck ---------- */
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var index = 0;
+  var toc = document.getElementById('toc');
+  var scrim = document.getElementById('scrim');
+  var tocList = document.getElementById('tocList');
+  var curNum = document.getElementById('curNum');
+  var totNum = document.getElementById('totNum');
+  var barFill = document.getElementById('barFill');
+  var topProgress = document.getElementById('topProgress');
+  var edgePrev = document.getElementById('edgePrev');
+  var edgeNext = document.getElementById('edgeNext');
+
+  totNum.textContent = total;
+
+  function clamp(n){ return Math.max(0, Math.min(total-1, n)); }
+
+  function go(n, instant){
+    n = clamp(n);
+    var prev = index;
+    index = n;
+    slides.forEach(function(s, i){
+      s.classList.toggle('active', i === n);
+      s.classList.toggle('left', i < n);
+      s.setAttribute('aria-hidden', i === n ? 'false' : 'true');
+      if (i === n){
+        var b = s.querySelector('.body');
+        if (b) b.scrollTop = 0;
+      }
+    });
+    curNum.textContent = n + 1;
+    var pct = ((n + 1) / total) * 100;
+    barFill.style.width = pct + '%';
+    topProgress.style.width = pct + '%';
+    edgePrev.disabled = (n === 0);
+    edgeNext.disabled = (n === total - 1);
+    Array.prototype.forEach.call(tocList.children, function(li, i){
+      li.firstChild.classList.toggle('on', i === n);
+      li.firstChild.setAttribute('aria-current', i === n ? 'true' : 'false');
+    });
+    if (!instant){
+      try { history.replaceState(null, '', '#s' + (n + 1)); } catch(e){}
+    }
+    if (prev !== n){
+      try { document.title = (n+1) + ' / ' + total + ' · 마인드세팅'; } catch(e){}
+    }
+  }
+
+  function initialIndex(){
+    var m = /#s(\d+)/.exec(location.hash || '');
+    if (m){ return clamp(parseInt(m[1],10) - 1); }
+    return 0;
+  }
+
+  function buildToc(){
+    if (tocList.children.length) return;
+    slides.forEach(function(s, i){
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'toc-item';
+      b.innerHTML = '<span class="no">' + String(i+1).padStart(2,'0') + '</span>' +
+                    '<span><span class="pt">' + (s.dataset.part || '') + '</span>' +
+                    '<span class="tt">' + (s.dataset.title || ('슬라이드 ' + (i+1))) + '</span></span>';
+      b.addEventListener('click', function(){ closeToc(); go(i); });
+      li.appendChild(b);
+      tocList.appendChild(li);
+    });
+    var cur = tocList.querySelectorAll('.toc-item')[index];
+    if (cur) cur.classList.add('on');
+  }
+
+  function openToc(){ buildToc(); toc.classList.add('on'); scrim.classList.add('on'); tocBtn.setAttribute('aria-expanded','true'); }
+  function closeToc(){ toc.classList.remove('on'); scrim.classList.remove('on'); tocBtn.setAttribute('aria-expanded','false'); }
+
+  var tocBtn = document.getElementById('tocBtn');
+  tocBtn.addEventListener('click', function(){ toc.classList.contains('on') ? closeToc() : openToc(); });
+  document.getElementById('tocClose').addEventListener('click', closeToc);
+  scrim.addEventListener('click', closeToc);
+
+  document.getElementById('prevBtn').addEventListener('click', function(){ go(index - 1); });
+  document.getElementById('nextBtn').addEventListener('click', function(){ go(index + 1); });
+  edgePrev.addEventListener('click', function(){ go(index - 1); });
+  edgeNext.addEventListener('click', function(){ go(index + 1); });
+
+  document.addEventListener('keydown', function(ev){
+    if (lock && !lock.classList.contains('hide')) return;
+    var t = ev.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    var k = ev.key;
+    if (k === 'Escape'){ closeToc(); return; }
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Spacebar'){
+      ev.preventDefault(); go(index + 1);
+    } else if (k === 'ArrowLeft' || k === 'PageUp'){
+      ev.preventDefault(); go(index - 1);
+    } else if (k === 'Home'){ ev.preventDefault(); go(0); }
+    else if (k === 'End'){ ev.preventDefault(); go(total - 1); }
+  });
+
+  /* swipe (pointer events: works for touch + mouse) */
+  var sx = 0, sy = 0, tracking = false, t0 = 0;
+  stage.addEventListener('pointerdown', function(ev){
+    if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+    var el = ev.target;
+    if (el && el.closest && el.closest('button, a, input, .toc, .hud, .edge')) return;
+    sx = ev.clientX; sy = ev.clientY; tracking = true; t0 = Date.now();
+  }, {passive:true});
+
+  stage.addEventListener('pointerup', function(ev){
+    if (!tracking) return;
+    tracking = false;
+    var dx = ev.clientX - sx, dy = ev.clientY - sy, dt = Date.now() - t0;
+    if (dt > 900) return;
+    if (Math.abs(dx) > 52 && Math.abs(dx) > Math.abs(dy) * 1.4){
+      dx < 0 ? go(index + 1) : go(index - 1);
+    }
+  }, {passive:true});
+
+  stage.addEventListener('pointercancel', function(){ tracking = false; }, {passive:true});
+
+  /* resize / fit */
+  function fit(){
+    var w = window.innerWidth, h = window.innerHeight;
+    if (w > 860){
+      var s = Math.min(w / 1280, (h - 16) / 720);
+      document.documentElement.style.setProperty('--scale', String(Math.max(0.3, s)));
+    } else {
+      document.documentElement.style.setProperty('--scale', '1');
+    }
+  }
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', function(){ setTimeout(fit, 120); });
+  fit();
+
+  window.addEventListener('hashchange', function(){
+    var m = /#s(\d+)/.exec(location.hash || '');
+    if (m){ var n = clamp(parseInt(m[1],10) - 1); if (n !== index) go(n, true); }
+  });
+
+  /* boot: lock or open */
+  if (saved()){
+    lock.classList.add('hide');
+    lock.setAttribute('aria-hidden','true');
+    document.body.classList.add('unlocked');
+    go(initialIndex(), true);
+    buildToc();
+  } else {
+    setTimeout(function(){ try { pw.focus({preventScroll:true}); } catch(e){ pw.focus(); } }, 400);
+  }
+})();
+</script>
+</body>
+</html>
