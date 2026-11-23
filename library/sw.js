@@ -1,4 +1,4 @@
-/* 세은 책장 서비스워커 — 오프라인에서도 마지막 화면은 열리게.
+/* 세은 독서 서비스워커 — 오프라인에서도 마지막 화면은 열리게.
    캐시 이름은 seeun-library- 로 시작한다. 같은 daydaisy2.github.io 안의 다른 앱(bubudaily·부부 할일·리훨 임챌)
    캐시는 절대 건드리지 않는다. */
 const CACHE = 'seeun-library-v1';
