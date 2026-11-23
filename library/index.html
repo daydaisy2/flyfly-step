@@ -1,0 +1,1249 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>세은 독서</title>
+<meta name="description" content="양평도서관에서 읽고 싶은 책과 독서 기록을 담아 두는 세은의 독서 노트.">
+<meta name="theme-color" content="#FBE049">
+<meta name="seeun-library-version" content="v1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow, noarchive">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="세은 독서">
+<style>
+  :root{
+    --yellow:#FBE049;
+    --yellow-deep:#F3D22F;
+    --navy:#1B2358;
+    --ink:#20201C;
+    --muted:#8A8674;
+    --line:#EFEAD6;
+    --cream:#FDF8E7;
+    --pad:14px;
+    --r:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--yellow);color:var(--ink);
+    font-family:"Pretendard","Apple SD Gothic Neo",-apple-system,BlinkMacSystemFont,"Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
+    overflow:hidden;overscroll-behavior:none;
+  }
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+  a{color:inherit;text-decoration:none}
+  input,select,textarea{font:inherit;color:inherit}
+  .hidden{display:none !important}
+
+  /* ---------- app ---------- */
+  #app{
+    height:100vh;height:100dvh;max-width:520px;margin:0 auto;
+    display:flex;flex-direction:column;
+    padding-top:calc(env(safe-area-inset-top) + 10px);
+  }
+  .top{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 var(--pad)}
+  .top h1{margin:0;display:flex;align-items:center;gap:7px;
+    font-size:clamp(20px,5.4vw,23px);font-weight:900;letter-spacing:-.035em;line-height:1.2}
+  .top h1 .em{font-size:1.06em;line-height:1}
+  .top-right{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+  .dot{width:8px;height:8px;border-radius:50%;background:#B9B39A;transition:background .3s}
+  .dot.live{background:#2E9E52}
+  .dot.warn{background:#D08A17}
+  .dot.off{background:#A9A497}
+  .icon-btn{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.6);display:grid;place-items:center;font-size:16px;line-height:1}
+  .add-btn{height:40px;padding:0 15px;border-radius:13px;background:var(--navy);color:#fff;
+    font-weight:900;font-size:15px;letter-spacing:-.02em;box-shadow:0 2px 6px rgba(27,35,88,.2)}
+  .add-btn:active{transform:translateY(1px)}
+
+  .pane{flex:1;min-height:0;display:flex;flex-direction:column;padding-top:11px}
+  .search{position:relative;margin:0 var(--pad)}
+  .search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;
+    stroke:#B4AE95;fill:none;stroke-width:2.2;stroke-linecap:round}
+  .search input{width:100%;height:50px;border-radius:15px;border:0;background:#fff;
+    padding:0 14px 0 42px;font-size:15.5px;font-weight:700;color:var(--ink);
+    box-shadow:0 2px 8px rgba(90,72,0,.06);outline:none}
+  .search input::placeholder{color:#B9B39A;font-weight:700}
+
+  .chips{display:flex;gap:7px;overflow-x:auto;padding:11px var(--pad) 2px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;height:38px;padding:0 15px;border-radius:999px;background:#fff;color:#3B382E;
+    font-weight:800;font-size:14px;letter-spacing:-.02em;box-shadow:0 1px 4px rgba(90,72,0,.07);
+    white-space:nowrap;transition:background .15s,color .15s}
+  .chip.on{background:var(--navy);color:#fff;box-shadow:0 3px 8px rgba(27,35,88,.22)}
+
+  .quick{display:flex;align-items:center;justify-content:flex-end;gap:8px;
+    padding:7px var(--pad) 0;font-size:11.5px;font-weight:800;color:#4A4436;letter-spacing:-.01em}
+  .quick a{opacity:.7}
+  .quick a:active{opacity:1}
+  .quick .sep{width:1px;height:9px;background:rgba(27,35,88,.2)}
+
+  .scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:9px var(--pad) 108px}
+  .list{display:flex;flex-direction:column;gap:11px}
+
+  /* ---------- 책 카드 ---------- */
+  .card{display:grid;grid-template-columns:1fr auto;gap:10px;
+    background:#fff;border-radius:var(--r);padding:15px 13px 15px 16px;
+    box-shadow:0 2px 9px rgba(90,72,0,.07);cursor:pointer}
+  .card:active{background:#FFFDF5}
+  .card .t{font-size:17.5px;font-weight:900;letter-spacing:-.035em;line-height:1.32;word-break:keep-all}
+  .card .a{margin-top:3px;font-size:13px;color:var(--muted);font-weight:700}
+  .card .tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .tag{background:#E9F1FA;color:#2C5A8C;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:8px;letter-spacing:-.01em}
+  .st{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;
+    padding:3px 9px 3px 8px;border-radius:8px;letter-spacing:-.01em;white-space:nowrap}
+  .st i{width:6px;height:6px;border-radius:50%;display:block;flex:0 0 auto}
+  .st.available{background:#E7F6E9;color:#2C6B3A}.st.available i{background:#2E9E52}
+  .st.out{background:#FBEAE5;color:#A04128}.st.out i{background:#C4553A}
+  .st.ill{background:#E8EAF7;color:#1B2358}.st.ill i{background:#1B2358}
+  .st.hope{background:#FDF0CE;color:#8A5F00}.st.hope i{background:#C08A10}
+  .call{display:inline-flex;align-items:center;gap:5px;margin-top:9px;
+    background:#FBF8EC;border:1px solid #EFE9D2;border-radius:9px;padding:4px 9px;
+    font-size:13px;font-weight:800;color:#2B2A24;letter-spacing:.01em}
+  .call svg{width:13px;height:13px;fill:#6B6450;flex:0 0 auto}
+  .side{display:flex;flex-direction:column;gap:6px;width:84px;flex:0 0 auto}
+  .fav{height:50px;border-radius:14px;background:var(--yellow);display:grid;place-items:center;
+    font-size:24px;line-height:1;color:var(--navy);box-shadow:0 2px 6px rgba(243,210,47,.5)}
+  .fav.off{color:#C0B383;box-shadow:none}
+  .done-btn{height:38px;border-radius:12px;border:1.5px solid #DFD8C0;background:#fff;
+    display:grid;place-items:center;font-size:13px;font-weight:900;color:#5B5544;letter-spacing:-.02em}
+  .done-btn.done{background:var(--navy);border-color:var(--navy);color:#fff}
+
+  /* ---------- 독서 기록 ---------- */
+  .rec-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 var(--pad) 2px}
+  .rec-head .n{font-size:12.5px;font-weight:800;color:#5B5544}
+  .rec-add{height:34px;padding:0 12px;border-radius:11px;background:#fff;font-weight:900;font-size:13px;
+    color:var(--navy);box-shadow:0 1px 4px rgba(90,72,0,.08)}
+  .rec{background:#fff;border-radius:var(--r);padding:14px 15px;box-shadow:0 2px 9px rgba(90,72,0,.07);cursor:pointer}
+  .rec:active{background:#FFFDF5}
+  .rec .d{font-size:12px;font-weight:800;color:#9A947E;letter-spacing:.01em}
+  .rec .rt{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-top:2px}
+  .rec .t{font-size:16.5px;font-weight:900;letter-spacing:-.035em;line-height:1.32;word-break:keep-all}
+  .rec .stars{font-size:12.5px;color:var(--yellow-deep);letter-spacing:.08em;white-space:nowrap;padding-top:3px}
+  .rec .a{font-size:12.5px;color:var(--muted);font-weight:700;margin-top:2px}
+  .rec .m{margin-top:8px;font-size:13.5px;line-height:1.62;color:#3B382E;white-space:pre-wrap;word-break:keep-all}
+  .rec img.ph{margin-top:10px;width:100%;max-height:170px;object-fit:cover;border-radius:12px;display:block;background:#F7F4E6}
+
+  .empty{background:rgba(255,255,255,.74);border-radius:var(--r);padding:34px 22px;text-align:center;
+    color:#6B6450;font-size:13.5px;font-weight:700;line-height:1.75;word-break:keep-all}
+  .empty .e{font-size:30px;display:block;margin-bottom:8px;line-height:1}
+
+  /* ---------- 하단 탭 ---------- */
+  .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:30;
+    display:flex;gap:8px;padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+    background:linear-gradient(rgba(251,224,73,0),var(--yellow) 46%)}
+  .tabbar button{flex:1;height:52px;border-radius:15px;background:#fff;color:var(--navy);
+    font-weight:900;font-size:14.5px;letter-spacing:-.03em;display:flex;align-items:center;justify-content:center;gap:6px;
+    box-shadow:0 2px 8px rgba(90,72,0,.10)}
+  .tabbar button.on{background:var(--navy);color:#fff;box-shadow:0 4px 12px rgba(27,35,88,.24)}
+
+  /* ---------- 입장 잠금 ---------- */
+  #lock{position:fixed;inset:0;z-index:100;background:var(--yellow);
+    display:flex;align-items:center;justify-content:center;padding:22px}
+  .lock-card{width:100%;max-width:340px;background:#fff;border-radius:24px;padding:26px 20px 20px;
+    text-align:center;box-shadow:0 8px 28px rgba(90,72,0,.16)}
+  .lock-fl{font-size:34px;line-height:1}
+  .lock-title{margin-top:7px;font-size:21px;font-weight:900;letter-spacing:-.035em}
+  .lock-tag{margin:4px 0 0;font-size:13px;color:var(--muted);font-weight:700}
+  .lock-badge{display:inline-block;margin-top:10px;background:var(--cream);border-radius:999px;
+    padding:4px 11px;font-size:11.5px;font-weight:800;color:#6B6450}
+  .lock-dots{display:flex;justify-content:center;gap:10px;margin:18px 0 4px}
+  .lock-dots i{width:11px;height:11px;border-radius:50%;background:#EDE7D2;display:block}
+  .lock-dots i.on{background:var(--navy)}
+  .lock-msg{min-height:18px;margin:6px 0 10px;font-size:12.5px;font-weight:800;color:#C4553A}
+  .lock-msg.ok{color:#2C6B3A}
+  .lock-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .lock-key{height:50px;border-radius:14px;background:var(--cream);font-size:20px;font-weight:900;color:var(--ink)}
+  .lock-key:active{background:#F3ECD6}
+  .lock-key.ghost{font-size:13px;color:#6B6450}
+  .lock-foot{margin:12px 0 0;font-size:11.5px;line-height:1.6;color:#9A947E;font-weight:700}
+  .shake{animation:shake .32s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  /* ---------- 방 연결 ---------- */
+  #gate{position:fixed;inset:0;z-index:90;background:var(--yellow);
+    display:flex;align-items:center;justify-content:center;padding:22px}
+  .gate-card{width:100%;max-width:340px;background:#fff;border-radius:24px;padding:26px 20px;
+    text-align:center;box-shadow:0 8px 28px rgba(90,72,0,.16)}
+  .gate-card .ge{font-size:32px;line-height:1}
+  .gate-card h1{font-size:19px;margin:8px 0 4px;letter-spacing:-.03em}
+  .gate-card p{font-size:12.5px;color:var(--muted);font-weight:700;line-height:1.65;margin:0 0 14px;word-break:keep-all}
+  .gate-row{display:flex;gap:8px}
+  .gate-row input{flex:1;min-width:0;height:46px;border-radius:12px;border:1.5px solid var(--line);
+    background:#FFFDF7;padding:0 12px;font-size:13.5px;font-weight:700;outline:none}
+  .gate-row button{height:46px;padding:0 14px;border-radius:12px;background:var(--navy);color:#fff;font-weight:900;font-size:14px}
+
+  /* ---------- 시트 ---------- */
+  .sheet-wrap{position:fixed;inset:0;z-index:80;display:flex;align-items:flex-end;justify-content:center;
+    background:rgba(27,35,88,.36)}
+  .sheet{width:100%;max-width:520px;background:#fff;border-radius:22px 22px 0 0;max-height:92dvh;
+    display:flex;flex-direction:column;animation:up .2s ease-out}
+  @keyframes up{from{transform:translateY(26px);opacity:.55}to{transform:none;opacity:1}}
+  .sheet-hd{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px 2px}
+  .grab{width:40px;height:4px;border-radius:2px;background:#E7E1CB;margin:0 auto}
+  .x{width:34px;height:34px;border-radius:11px;background:#F7F4E6;display:grid;place-items:center!important;
+    font-size:15px;color:#6B6450;margin-left:auto;line-height:1}
+  .sheet-bd{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:4px 16px calc(18px + env(safe-area-inset-bottom))}
+  .sh-title{margin:2px 0 0;font-size:18px;font-weight:900;letter-spacing:-.035em}
+
+  .f{margin-top:12px;min-width:0}
+  .f label{display:block;font-size:12px;font-weight:800;color:#8A8674;margin-bottom:5px;letter-spacing:-.01em}
+  .f input,.f select,.f textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;
+    background:#FFFDF7;padding:11px 12px;font-size:14.5px;font-weight:700;outline:none}
+  .f textarea{min-height:76px;resize:vertical;line-height:1.58;font-weight:600}
+  .f input:focus,.f select:focus,.f textarea:focus{border-color:#C6C9E8;background:#fff}
+  .f input[type=date]{-webkit-appearance:none;appearance:none;min-height:46px;padding:0 12px;line-height:46px}
+  .frow{display:flex;gap:10px}
+  .frow>.f{flex:1 1 0}
+  .hint{font-size:11.5px;color:#A9A28A;font-weight:700;margin-top:6px;line-height:1.5}
+
+  .sec{margin:19px 0 9px;font-size:13px;font-weight:900;color:var(--navy);letter-spacing:-.02em}
+
+  .dcat{display:inline-block;background:#E9F1FA;color:#2C5A8C;font-size:11.5px;font-weight:800;
+    padding:3px 9px;border-radius:8px}
+  .dtitle{margin:8px 0 0;font-size:22px;font-weight:900;letter-spacing:-.04em;line-height:1.25;word-break:keep-all}
+  .dauthor{margin-top:3px;font-size:13.5px;color:var(--muted);font-weight:700}
+  .pills{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+  .pill{height:33px;padding:0 12px;border-radius:10px;background:#F4F1E4;font-weight:900;font-size:12.5px;
+    color:#5B5544;letter-spacing:-.01em}
+  .pill.on{background:var(--yellow);color:var(--navy)}
+  .dmemo{margin-top:12px;background:var(--cream);border-radius:12px;padding:11px 12px;
+    font-size:13.5px;line-height:1.62;font-weight:600;white-space:pre-wrap;word-break:keep-all;color:#3B382E}
+
+  table.spec{width:100%;border-collapse:collapse;background:#FFFDF7;border-radius:12px;overflow:hidden}
+  table.spec th,table.spec td{padding:9px 11px;font-size:13px;text-align:left;
+    border-bottom:1px solid #F2EDDA;vertical-align:middle}
+  table.spec tr:last-child th,table.spec tr:last-child td{border-bottom:0}
+  table.spec th{width:72px;color:#8A8674;font-weight:800;font-size:12px;white-space:nowrap;background:#FCF9EE}
+  table.spec td{font-weight:700;color:#2B2A24;word-break:break-all}
+  .stchips{display:flex;flex-wrap:wrap;gap:5px}
+  .stchips button{padding:5px 9px;border-radius:8px;font-size:11.5px;font-weight:800;background:#F4F1E4;color:#8A8674}
+  .stchips button.on{background:var(--navy);color:#fff}
+
+  .links{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .lk{display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border-radius:13px;
+    background:var(--navy);color:#fff;font-weight:900;font-size:14px;letter-spacing:-.02em}
+  .lks{display:flex;gap:8px}
+  .lks a{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;height:44px;border-radius:12px;
+    background:#F4F1E4;color:#3B382E;font-weight:900;font-size:12.5px;letter-spacing:-.02em;
+    text-align:center;line-height:1.25;padding:0 6px}
+
+  .acts{display:flex;gap:8px;margin-top:17px}
+  .btn{flex:1;height:48px;border-radius:14px;font-weight:900;font-size:15px;
+    background:var(--yellow);color:var(--navy);letter-spacing:-.02em}
+  .btn.navy{background:var(--navy);color:#fff}
+  .btn.ghost{background:#F4F1E4;color:#5B5544}
+  .btn.red{background:#FBEAE5;color:#A04128}
+
+  .readbox{display:flex;gap:8px;align-items:center}
+  .readbox input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;background:#FFFDF7;
+    padding:0 12px;height:46px;font-size:14px;font-weight:700;outline:none;-webkit-appearance:none;appearance:none;line-height:46px}
+  .readbox button{flex:0 0 auto;height:46px;padding:0 13px;border-radius:12px;background:var(--navy);color:#fff;
+    font-weight:900;font-size:13px;letter-spacing:-.02em;white-space:nowrap}
+
+  .starset{display:flex;gap:4px}
+  .starset button{font-size:27px;line-height:1.1;color:#E4DDBF}
+  .starset button.on{color:var(--yellow-deep)}
+
+  .ph-btn{height:42px;padding:0 13px;border-radius:12px;background:#F4F1E4;font-weight:900;font-size:13px;color:#5B5544}
+  .ph-prev{position:relative;margin-top:9px}
+  .ph-prev img{width:100%;max-height:180px;object-fit:cover;border-radius:12px;display:block;background:#F7F4E6}
+  .ph-del{position:absolute;top:6px;right:6px;width:30px;height:30px;border-radius:10px;
+    background:rgba(27,35,88,.74);color:#fff;font-size:13px;display:grid;place-items:center;line-height:1}
+
+  .note{display:flex;gap:8px;align-items:flex-start;background:#FFFDF7;border:1px solid #F2EDDA;
+    border-radius:12px;padding:10px 11px;margin-top:8px}
+  .note .nt{flex:1;min-width:0;font-size:13px;font-weight:600;line-height:1.55;color:#3B382E;
+    white-space:pre-wrap;word-break:keep-all}
+  .note .nd{font-size:11px;font-weight:800;color:#A9A28A;margin-top:4px}
+  .note .nx{width:24px;height:24px;border-radius:8px;background:#F4F1E4;color:#8A8674;font-size:12px;display:grid;place-items:center;flex:0 0 auto;line-height:1}
+
+  .toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    background:rgba(27,35,88,.95);color:#fff;font-size:13px;font-weight:800;padding:11px 16px;border-radius:12px;
+    z-index:120;box-shadow:0 6px 18px rgba(27,35,88,.3);max-width:88vw;text-align:center;line-height:1.45;
+    word-break:keep-all}
+  .toast.bad{background:rgba(164,54,30,.95)}
+
+  #confirm{position:fixed;inset:0;z-index:110;display:flex;align-items:center;justify-content:center;
+    background:rgba(27,35,88,.46);padding:24px}
+  #confirm .box{width:100%;max-width:300px;background:#fff;border-radius:18px;padding:20px 18px;text-align:center;
+    box-shadow:0 10px 30px rgba(27,35,88,.24)}
+  #confirm p{font-size:14px;font-weight:800;line-height:1.55;margin:0 0 15px;color:#2B2A24;word-break:keep-all}
+  #confirm .row{display:flex;gap:8px}
+</style>
+</head>
+<body>
+
+<!-- 입장 잠금 -->
+<div id="lock" role="dialog" aria-modal="true" aria-label="입장 비밀번호">
+  <div class="lock-card" id="lockCard">
+    <div class="lock-fl">📚</div>
+    <div class="lock-title">세은 독서</div>
+    <p class="lock-tag">읽고 싶은 책과 독서 기록</p>
+    <span class="lock-badge">🔒 나만의 책장</span>
+    <div class="lock-dots" id="lockDots"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="lock-msg" id="lockMsg"></p>
+    <div class="lock-pad" id="lockPad">
+      <button type="button" class="lock-key" data-k="1">1</button><button type="button" class="lock-key" data-k="2">2</button><button type="button" class="lock-key" data-k="3">3</button>
+      <button type="button" class="lock-key" data-k="4">4</button><button type="button" class="lock-key" data-k="5">5</button><button type="button" class="lock-key" data-k="6">6</button>
+      <button type="button" class="lock-key" data-k="7">7</button><button type="button" class="lock-key" data-k="8">8</button><button type="button" class="lock-key" data-k="9">9</button>
+      <button type="button" class="lock-key ghost" data-k="clear">전체</button><button type="button" class="lock-key" data-k="0">0</button><button type="button" class="lock-key ghost" data-k="del" aria-label="지우기">←</button>
+    </div>
+    <p class="lock-foot">나만 아는 6자리 비밀번호를 입력하면<br>이 기기에서는 다음부터 바로 열려요</p>
+  </div>
+</div>
+
+<!-- 방 연결 -->
+<div id="gate" class="hidden">
+  <div class="gate-card">
+    <div class="ge">📚</div>
+    <h1>세은 독서</h1>
+    <p>초대 링크로 들어오면 바로 시작할 수 있어요.<br>방 코드를 알고 있다면 아래에 붙여 넣어 주세요.</p>
+    <div class="gate-row">
+      <input id="roomInput" placeholder="방 코드" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button id="roomGo" type="button">들어가기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 앱 -->
+<div id="app" class="hidden">
+  <header class="top">
+    <h1><span class="em">📚</span> 세은 독서</h1>
+    <div class="top-right">
+      <i id="dot" class="dot" title="연결 중"></i>
+      <button id="memoBtn" class="icon-btn" type="button" aria-label="수정 요청 메모장" title="수정 요청 메모장">📝</button>
+      <button id="addBtn" class="add-btn" type="button">＋ 추가</button>
+    </div>
+  </header>
+
+  <section id="paneBooks" class="pane">
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+      <input id="qBooks" type="search" placeholder="제목·작가로 찾기" autocomplete="off" enterkeyhint="search">
+    </div>
+    <div class="chips" id="chips">
+      <button class="chip on" type="button" data-f="all">전체</button>
+      <button class="chip" type="button" data-f="fav">찜한 책</button>
+      <button class="chip" type="button" data-f="소설">소설</button>
+      <button class="chip" type="button" data-f="에세이">에세이</button>
+      <button class="chip" type="button" data-f="경제·투자">경제·투자</button>
+      <button class="chip" type="button" data-f="기타">기타</button>
+    </div>
+    <div class="quick">
+      <a href="https://www.yplib.go.kr/" target="_blank" rel="noopener">🏛 양평도서관</a>
+      <span class="sep"></span>
+      <a href="https://www.yplib.go.kr/" target="_blank" rel="noopener">📮 희망도서 · ↔️ 상호대차 신청</a>
+    </div>
+    <div class="scroll"><div class="list" id="bookList"></div></div>
+  </section>
+
+  <section id="paneRecords" class="pane hidden">
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+      <input id="qRecords" type="search" placeholder="제목·작가·감상으로 찾기" autocomplete="off" enterkeyhint="search">
+    </div>
+    <div class="rec-head" style="margin-top:12px">
+      <span class="n" id="recCount">기록 0개</span>
+      <button id="addRecBtn" class="rec-add" type="button">＋ 책 기록</button>
+    </div>
+    <div class="scroll"><div class="list" id="recList"></div></div>
+  </section>
+
+  <nav class="tabbar">
+    <button type="button" data-tab="books" class="on">📚 읽고 싶은 책</button>
+    <button type="button" data-tab="records">📖 독서 기록</button>
+  </nav>
+</div>
+
+<div id="sheetWrap" class="sheet-wrap hidden"></div>
+<div id="confirm" class="hidden">
+  <div class="box">
+    <p id="confirmMsg"></p>
+    <div class="row">
+      <button class="btn ghost" type="button" data-cf="0">취소</button>
+      <button class="btn red" type="button" data-cf="1">삭제</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   설정
+   ============================================================ */
+const DB = 'https://bubulife-678ac-default-rtdb.firebaseio.com';
+const ROOM_RE = /^[A-Za-z0-9_-]{8,64}$/;
+const CATS = ['소설', '에세이', '경제·투자', '기타'];
+const STATUS = {
+  available: { label: '대출가능', say: '대출가능으로', cls: 'available' },
+  out:       { label: '대출중',   say: '대출중으로',   cls: 'out' },
+  ill:       { label: '상호대차', say: '상호대차로',   cls: 'ill' },
+  hope:      { label: '희망도서', say: '희망도서로',   cls: 'hope' }
+};
+const STATUS_ORDER = ['available', 'out', 'ill', 'hope'];
+const YPLIB = 'https://www.yplib.go.kr/';
+const yplibSearch = (title) => 'https://www.yplib.go.kr/searchResult?keyword=' + encodeURIComponent(title || '');
+
+const params = new URLSearchParams(location.search);
+let ROOM = (params.get('room') || '').trim();
+if (!ROOM_RE.test(ROOM)) {
+  const saved = localStorage.getItem('seeun.library.room') || '';
+  ROOM = ROOM_RE.test(saved) ? saved : '';
+}
+
+const ST = { books: {}, records: {}, notes: {} };
+let es = null, retry = 0, pollTimer = null, gotSnapshot = false;
+let Q = '', F = 'all', QR = '';
+let TAB = 'books';
+let sheetPushed = false;
+let recPhoto = '', recStars = 0;
+let confirmCb = null;
+
+/* ============================================================
+   도우미
+   ============================================================ */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function newId() { return 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function kstToday() { return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); }
+const WD = ['일', '월', '화', '수', '목', '금', '토'];
+function fmtDate(d) {
+  if (!d) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d));
+  if (!m) return String(d);
+  return m[1] + '.' + m[2] + '.' + m[3];
+}
+function fmtDateWd(d) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d || ''));
+  if (!m) return fmtDate(d);
+  const t = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+  return fmtDate(d) + ' ' + WD[t.getUTCDay()];
+}
+function toast(msg, bad) {
+  const old = $('.toast'); if (old) old.remove();
+  const el = document.createElement('div');
+  el.className = 'toast' + (bad ? ' bad' : '');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.remove(), 2400);
+}
+function askConfirm(msg, cb) {
+  confirmCb = cb;
+  $('#confirmMsg').textContent = msg;
+  $('#confirm').classList.remove('hidden');
+}
+function closeConfirm(ok) {
+  $('#confirm').classList.add('hidden');
+  const cb = confirmCb; confirmCb = null;
+  if (ok && cb) cb();
+}
+
+/* ============================================================
+   Firebase — rooms/{room}/library
+   ============================================================ */
+const libUrl = () => DB + '/rooms/' + ROOM + '/library.json';
+const nodeUrl = (p) => DB + '/rooms/' + ROOM + '/library/' + p + '.json';
+function setLive(state) {
+  const el = $('#dot'); if (!el) return;
+  el.className = 'dot ' + state;
+  el.title = state === 'live' ? '실시간 연결됨' : state === 'warn' ? '다시 연결 중' : state === 'off' ? '오프라인' : '연결 중';
+}
+function applyAll(d) {
+  d = d || {};
+  ST.books = (d.books && typeof d.books === 'object') ? d.books : {};
+  ST.records = (d.records && typeof d.records === 'object') ? d.records : {};
+  ST.notes = (d.notes && typeof d.notes === 'object') ? d.notes : {};
+  gotSnapshot = true;
+}
+function setAt(path, data) {
+  const segs = String(path || '').split('/').filter(Boolean);
+  if (!segs.length) { applyAll(data); return; }
+  const root = segs[0];
+  if (!ST[root] || typeof ST[root] !== 'object') ST[root] = {};
+  let obj = ST[root];
+  for (let i = 1; i < segs.length - 1; i++) {
+    if (!obj[segs[i]] || typeof obj[segs[i]] !== 'object') obj[segs[i]] = {};
+    obj = obj[segs[i]];
+  }
+  const last = segs[segs.length - 1];
+  if (data === null || data === undefined) delete obj[last];
+  else obj[last] = data;
+}
+function connect() {
+  if (es) { try { es.close(); } catch (e) {} es = null; }
+  if (!ROOM) return;
+  setLive(retry ? 'warn' : 'connecting');
+  try { es = new EventSource(libUrl()); } catch (e) { setLive('off'); return; }
+
+  es.addEventListener('put', (ev) => {
+    let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+    if (m.path === '/' || m.path === '') {
+      applyAll(m.data);
+    } else {
+      setAt(m.path, m.data);
+    }
+    retry = 0; setLive('live'); stopPolling(); scheduleRender();
+  });
+  es.addEventListener('patch', (ev) => {
+    let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+    const base = (m.path === '/' ? '' : m.path);
+    Object.keys(m.data || {}).forEach((k) => setAt(base + '/' + k, m.data[k]));
+    gotSnapshot = true; setLive('live'); scheduleRender();
+  });
+  es.addEventListener('cancel', () => { setLive('warn'); reconnect(); });
+  es.onopen = () => { retry = 0; setLive('live'); stopPolling(); if (!gotSnapshot) syncNow(true); };
+  es.onerror = () => { setLive(navigator.onLine ? 'warn' : 'off'); reconnect(); startPolling(); };
+}
+function reconnect() {
+  if (es) { try { es.close(); } catch (e) {} es = null; }
+  retry = Math.min(retry + 1, 6);
+  const wait = Math.min(1000 * Math.pow(1.7, retry), 15000);
+  setTimeout(() => { if (!es && ROOM) connect(); }, wait);
+}
+function startPolling() { if (!pollTimer) pollTimer = setInterval(() => { if (!es) syncNow(true); }, 9000); }
+function stopPolling() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+async function syncNow(quiet) {
+  if (!ROOM) return;
+  try {
+    const r = await fetch(libUrl() + '?ts=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    applyAll(await r.json());
+    if (!es) setLive('live');
+    render();
+    stopPolling();
+  } catch (e) {
+    if (!quiet) toast('연결을 확인해 주세요', true);
+    setLive(navigator.onLine ? 'warn' : 'off');
+  }
+}
+async function api(path, method, body) {
+  const opt = { method, cache: 'no-store' };
+  if (body !== undefined) { opt.headers = { 'Content-Type': 'application/json' }; opt.body = JSON.stringify(body); }
+  const r = await fetch(nodeUrl(path), opt);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return true;
+}
+function putNode(path, val) { return api(path, 'PUT', val); }
+function patchNode(path, val) { return api(path, 'PATCH', val); }
+function delNode(path) { return api(path, 'DELETE'); }
+
+/* ============================================================
+   그리기
+   ============================================================ */
+let renderT = null;
+function scheduleRender() { clearTimeout(renderT); renderT = setTimeout(render, 70); }
+function render() { renderBooks(); renderRecords(); }
+
+const BOOK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="3.4" height="16" rx="1"/><rect x="8.4" y="4" width="3.4" height="16" rx="1"/><rect x="13.8" y="5.4" width="3.2" height="14.6" rx="1" transform="rotate(11 15.4 12.7)"/></svg>';
+function statusOf(b) { return STATUS[b && b.status] ? b.status : 'available'; }
+function statusBadge(st) {
+  const s = STATUS[st] || STATUS.available;
+  return '<span class="st ' + s.cls + '"><i></i>' + s.label + '</span>';
+}
+function statusBadgeBtn(st, id) {
+  const s = STATUS[st] || STATUS.available;
+  return '<button type="button" class="st ' + s.cls + '" data-toggle="' + id + '" aria-label="대출상태 바꾸기">'
+    + '<i></i>' + s.label + '</button>';
+}
+function statusChips(st, id) {
+  return STATUS_ORDER.map((k) =>
+    '<button type="button" data-setst="' + id + '" data-st="' + k + '" class="' + (k === st ? 'on' : '') + '">'
+    + STATUS[k].label + '</button>').join('');
+}
+
+function bookArr() {
+  return Object.keys(ST.books).map((id) => Object.assign({ id }, ST.books[id] || {}));
+}
+function bookList() {
+  const q = Q.trim().toLowerCase();
+  let arr = bookArr();
+  if (F === 'fav') arr = arr.filter((b) => !!b.fav);
+  else if (F === '기타') arr = arr.filter((b) => !b.cat || b.cat === '기타');
+  else if (F !== 'all') arr = arr.filter((b) => b.cat === F);
+  if (q) arr = arr.filter((b) => ((b.title || '') + ' ' + (b.author || '')).toLowerCase().includes(q));
+  arr.sort((a, b) => (b.created || 0) - (a.created || 0));
+  return arr;
+}
+function renderBooks() {
+  const box = $('#bookList'); if (!box) return;
+  const arr = bookList();
+  if (!arr.length) {
+    const all = bookArr().length;
+    box.innerHTML = '<div class="empty"><span class="e">📚</span>'
+      + (all ? '찾는 책이 없어요.<br>검색어나 분야를 바꿔 보세요.' : '아직 담은 책이 없어요.<br><b>＋ 추가</b>로 읽고 싶은 책을 담아 보세요.')
+      + '</div>';
+    return;
+  }
+  box.innerHTML = arr.map((b) => {
+    const st = statusOf(b);
+    return '<div class="card" data-open="' + b.id + '">'
+      + '<div class="main">'
+      +   '<div class="t">' + esc(b.title || '(제목 없음)') + '</div>'
+      +   (b.author ? '<div class="a">' + esc(b.author) + '</div>' : '')
+      +   '<div class="tags">'
+      +     (b.cat ? '<span class="tag">' + esc(b.cat) + '</span>' : '')
+      +     statusBadgeBtn(st, b.id)
+      +   '</div>'
+      +   (b.callNo ? '<div class="call">' + BOOK_ICON + esc(b.callNo) + '</div>' : '')
+      + '</div>'
+      + '<div class="side">'
+      +   '<button type="button" class="fav' + (b.fav ? '' : ' off') + '" data-fav="' + b.id + '" aria-label="찜하기">' + (b.fav ? '★' : '☆') + '</button>'
+      +   '<button type="button" class="done-btn' + (b.read ? ' done' : '') + '" data-read="' + b.id + '">✓ 읽음</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function recArr() {
+  return Object.keys(ST.records).map((id) => Object.assign({ id }, ST.records[id] || {}));
+}
+function recList() {
+  const q = QR.trim().toLowerCase();
+  let arr = recArr();
+  if (q) arr = arr.filter((r) => ((r.title || '') + ' ' + (r.author || '') + ' ' + (r.memo || '')).toLowerCase().includes(q));
+  arr.sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || (b.created || 0) - (a.created || 0));
+  return arr;
+}
+function renderRecords() {
+  const box = $('#recList'); if (!box) return;
+  const arr = recList();
+  const cnt = $('#recCount');
+  if (cnt) cnt.textContent = '기록 ' + recArr().length + '개';
+  if (!arr.length) {
+    box.innerHTML = '<div class="empty"><span class="e">📖</span>'
+      + (recArr().length ? '찾는 기록이 없어요.' : '아직 독서 기록이 없어요.<br>책을 다 읽으면 <b>✓ 읽음</b>으로 남겨 보세요.')
+      + '</div>';
+    return;
+  }
+  box.innerHTML = arr.map((r) => {
+    const stars = r.rating ? '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) : '';
+    return '<div class="rec" data-recopen="' + r.id + '">'
+      + '<div class="d">' + esc(fmtDateWd(r.date) || '날짜 없음') + '</div>'
+      + '<div class="rt"><div class="t">' + esc(r.title || '(제목 없음)') + '</div>'
+      + (stars ? '<div class="stars">' + stars + '</div>' : '') + '</div>'
+      + (r.author ? '<div class="a">' + esc(r.author) + '</div>' : '')
+      + (r.memo ? '<div class="m">' + esc(r.memo) + '</div>' : '')
+      + (r.photo ? '<img class="ph" src="' + esc(r.photo) + '" alt="책 사진">' : '')
+      + '</div>';
+  }).join('');
+}
+
+/* ============================================================
+   시트 열고 닫기 (뒤로가기로 닫기)
+   ============================================================ */
+const wrap = () => $('#sheetWrap');
+function openSheet(html) {
+  const w = wrap();
+  w.innerHTML = html;
+  w.classList.remove('hidden');
+  w.scrollTop = 0;
+  const bd = $('.sheet-bd', w); if (bd) bd.scrollTop = 0;
+  if (!sheetPushed) {
+    sheetPushed = true;
+    try { history.pushState({ libSheet: 1 }, ''); } catch (e) {}
+  }
+}
+function hideSheet(fromPop) {
+  const w = wrap();
+  if (w) { w.classList.add('hidden'); w.innerHTML = ''; }
+  if (!fromPop && sheetPushed) { sheetPushed = false; history.back(); }
+  else sheetPushed = false;
+}
+window.addEventListener('popstate', () => {
+  if (sheetPushed) { sheetPushed = false; hideSheet(true); return; }
+  if (!$('#confirm').classList.contains('hidden')) closeConfirm(false);
+});
+
+/* ============================================================
+   찜 · 대출상태
+   ============================================================ */
+async function toggleFav(id) {
+  const b = ST.books[id]; if (!b) return;
+  const v = b.fav ? 0 : 1;
+  b.fav = v;
+  renderBooks(); syncFavUI(id);
+  try { await patchNode('books/' + id, { fav: v }); }
+  catch (e) { b.fav = v ? 0 : 1; renderBooks(); toast('저장하지 못했어요', true); }
+}
+function syncFavUI(id) {
+  const b = ST.books[id] || {};
+  $$('[data-dfav="' + id + '"]').forEach((el) => {
+    el.classList.toggle('on', !!b.fav);
+    el.textContent = b.fav ? '★ 찜한 책' : '☆ 찜하기';
+  });
+}
+async function setStatus(id, st) {
+  const b = ST.books[id]; if (!b) return;
+  const at = kstToday();
+  const prev = { status: b.status, checkedAt: b.checkedAt };
+  b.status = st; b.checkedAt = at;
+  renderBooks();
+  $$('[data-setst="' + id + '"]').forEach((el) => el.classList.toggle('on', el.dataset.st === st));
+  const chk = $('#chkDate'); if (chk) chk.textContent = fmtDate(at) + ' 확인';
+  try { await patchNode('books/' + id, { status: st, checkedAt: at }); toast('대출상태를 ' + STATUS[st].say + ' 바꿨어요'); }
+  catch (e) {
+    b.status = prev.status; b.checkedAt = prev.checkedAt;
+    renderBooks(); toast('저장하지 못했어요', true);
+  }
+}
+
+/* ============================================================
+   책 상세
+   ============================================================ */
+function openDetail(id) {
+  const b = ST.books[id]; if (!b) return;
+  const st = statusOf(b);
+  const html = '<div class="sheet"><div class="sheet-hd"><div class="grab"></div>'
+    + '<button type="button" class="x" data-close aria-label="닫기">✕</button></div>'
+    + '<div class="sheet-bd">'
+    + '<div>' + (b.cat ? '<span class="dcat">' + esc(b.cat) + '</span>' : '<span class="dcat">기타</span>') + '</div>'
+    + '<h2 class="dtitle">' + esc(b.title || '') + '</h2>'
+    + (b.author ? '<div class="dauthor">' + esc(b.author) + '</div>' : '')
+    + '<div class="pills">'
+    +   '<button type="button" class="pill' + (b.fav ? ' on' : '') + '" data-dfav="' + id + '">' + (b.fav ? '★ 찜한 책' : '☆ 찜하기') + '</button>'
+    +   '<span class="pill' + (b.read ? ' on' : '') + '">' + (b.read ? '✓ 읽은 책' : '아직 안 읽음') + '</span>'
+    + '</div>'
+    + (b.memo ? '<div class="dmemo">' + esc(b.memo) + '</div>' : '')
+
+    + '<div class="sec">📖 읽은 책으로 남기기</div>'
+    + '<div class="readbox">'
+    +   '<input type="date" id="dDate" value="' + esc(b.readDate || kstToday()) + '" aria-label="읽은 날짜">'
+    +   '<button type="button" data-doread="' + id + '">읽음 체크 · 기록에 추가</button>'
+    + '</div>'
+    + '<div class="hint">' + (b.readDate ? fmtDateWd(b.readDate) + '에 읽음 · 기록 탭에 남아 있어요' : '날짜를 그대로 두고 누르면 오늘 읽은 책으로 기록돼요') + '</div>'
+
+    + '<div class="sec">🏛 소장 정보</div>'
+    + '<table class="spec">'
+    +   '<tr><th>도서관</th><td>' + esc(b.lib || '양평도서관') + '</td></tr>'
+    +   '<tr><th>자료실</th><td>' + esc(b.section || '-') + '</td></tr>'
+    +   '<tr><th>청구기호</th><td>' + esc(b.callNo || '-') + '</td></tr>'
+    +   '<tr><th>등록번호</th><td>' + esc(b.regNo || '-') + '</td></tr>'
+    +   '<tr><th>대출상태</th><td><div class="stchips">' + statusChips(st, id) + '</div>'
+    +     '<div class="hint" id="chkDate">' + (b.checkedAt ? fmtDate(b.checkedAt) + ' 확인' : '확인일 없음') + '</div></td></tr>'
+    + '</table>'
+
+    + '<div class="links">'
+    +   '<a class="lk" href="' + esc(yplibSearch(b.title || '')) + '" target="_blank" rel="noopener">🔎 양평도서관에서 보기</a>'
+    +   '<div class="lks">'
+    +     '<a href="' + YPLIB + '" target="_blank" rel="noopener" data-apply="hope" data-id="' + id + '">📮 희망도서 신청</a>'
+    +     '<a href="' + YPLIB + '" target="_blank" rel="noopener" data-apply="ill" data-id="' + id + '">↔️ 상호대차 신청</a>'
+    +   '</div>'
+    +   '<div class="hint">신청은 양평도서관 홈페이지에 로그인한 뒤 진행해 주세요. 누르면 이 책을 신청한 상태로 표시해 둘게요.</div>'
+    + '</div>'
+
+    + '<div class="acts">'
+    +   '<button type="button" class="btn ghost" data-edit="' + id + '">수정</button>'
+    +   '<button type="button" class="btn red" data-del="' + id + '">삭제</button>'
+    + '</div>'
+    + '<div style="height:6px"></div>'
+    + '</div></div>';
+  openSheet(html);
+}
+
+/* ============================================================
+   책 추가 · 수정
+   ============================================================ */
+function openBookForm(id) {
+  const b = id ? (ST.books[id] || {}) : {};
+  const st = statusOf(b);
+  const opts = CATS.map((c) => '<option value="' + esc(c) + '"' + ((b.cat || '기타') === c ? ' selected' : '') + '>' + esc(c) + '</option>').join('');
+  const stOpts = STATUS_ORDER.map((k) => '<option value="' + k + '"' + (k === st ? ' selected' : '') + '>' + STATUS[k].label + '</option>').join('');
+  const html = '<div class="sheet"><div class="sheet-hd"><div class="grab"></div>'
+    + '<button type="button" class="x" data-close aria-label="닫기">✕</button></div>'
+    + '<div class="sheet-bd">'
+    + '<h3 class="sh-title">' + (id ? '책 수정' : '책 추가') + '</h3>'
+    + '<div class="f"><label>제목 *</label><input id="fTitle" value="' + esc(b.title || '') + '" placeholder="예: 아몬드"></div>'
+    + '<div class="frow">'
+    +   '<div class="f"><label>작가</label><input id="fAuthor" value="' + esc(b.author || '') + '" placeholder="예: 손원평"></div>'
+    +   '<div class="f"><label>분야</label><select id="fCat">' + opts + '</select></div>'
+    + '</div>'
+    + '<div class="frow">'
+    +   '<div class="f"><label>도서관</label><input id="fLib" value="' + esc(b.lib || '양평도서관') + '"></div>'
+    +   '<div class="f"><label>대출상태</label><select id="fStatus">' + stOpts + '</select></div>'
+    + '</div>'
+    + '<div class="frow">'
+    +   '<div class="f"><label>자료실</label><input id="fSection" value="' + esc(b.section || '') + '" placeholder="예: 종합자료실"></div>'
+    +   '<div class="f"><label>청구기호</label><input id="fCall" value="' + esc(b.callNo || '') + '" placeholder="예: 813.7 손67ㅇ"></div>'
+    + '</div>'
+    + '<div class="f"><label>등록번호</label><input id="fReg" value="' + esc(b.regNo || '') + '" placeholder="선택"></div>'
+    + '<div class="f"><label>메모</label><textarea id="fMemo" placeholder="왜 읽고 싶은지, 추천받은 곳 등">' + esc(b.memo || '') + '</textarea></div>'
+    + '<div class="acts">'
+    +   '<button type="button" class="btn ghost" data-close>취소</button>'
+    +   '<button type="button" class="btn navy" data-savebook="' + (id || '') + '">저장</button>'
+    + '</div><div style="height:6px"></div></div></div>';
+  openSheet(html);
+  if (!id) setTimeout(() => { const t = $('#fTitle'); if (t) t.focus(); }, 220);
+}
+
+async function saveBook(id) {
+  const title = ($('#fTitle').value || '').trim();
+  if (!title) { toast('제목을 적어 주세요', true); const t = $('#fTitle'); if (t) t.focus(); return; }
+  const prev = id ? Object.assign({}, ST.books[id]) : null;
+  const obj = Object.assign({}, prev || {}, {
+    title,
+    author: ($('#fAuthor').value || '').trim(),
+    cat: $('#fCat').value,
+    lib: ($('#fLib').value || '').trim() || '양평도서관',
+    section: ($('#fSection').value || '').trim(),
+    callNo: ($('#fCall').value || '').trim(),
+    regNo: ($('#fReg').value || '').trim(),
+    status: $('#fStatus').value,
+    memo: ($('#fMemo').value || '').trim(),
+    updated: Date.now()
+  });
+  if (!id) {
+    obj.created = Date.now();
+    obj.fav = 0; obj.read = 0;
+  }
+  if (obj.status !== (prev && prev.status)) obj.checkedAt = kstToday();
+  if (!obj.checkedAt) obj.checkedAt = kstToday();
+
+  const key = id || newId();
+  ST.books[key] = obj;
+  renderBooks();
+  hideSheet();
+  try { await putNode('books/' + key, obj); toast(id ? '책 정보를 고쳤어요' : '책장에 담았어요'); }
+  catch (e) { toast('저장하지 못했어요', true); syncNow(true); }
+}
+
+function deleteBook(id) {
+  const b = ST.books[id]; if (!b) return;
+  askConfirm('「' + (b.title || '') + '」을(를) 책장에서 지울까요?\n독서 기록은 그대로 남아요.', async () => {
+    hideSheet();
+    delete ST.books[id];
+    renderBooks();
+    try { await delNode('books/' + id); toast('지웠어요'); }
+    catch (e) { toast('지우지 못했어요', true); syncNow(true); }
+  });
+}
+
+/* ============================================================
+   읽음 → 독서 기록
+   ============================================================ */
+function openReadSheet(id) {
+  const b = ST.books[id]; if (!b) return;
+  recStars = 0;
+  const html = '<div class="sheet"><div class="sheet-hd"><div class="grab"></div>'
+    + '<button type="button" class="x" data-close aria-label="닫기">✕</button></div>'
+    + '<div class="sheet-bd">'
+    + '<h3 class="sh-title">📖 읽은 책으로 남기기</h3>'
+    + '<div class="dauthor" style="margin-top:4px">' + esc(b.title || '') + (b.author ? ' · ' + esc(b.author) : '') + '</div>'
+    + '<div class="f"><label>읽은 날짜</label><input type="date" id="rDate" value="' + esc(b.readDate || kstToday()) + '"></div>'
+    + '<div class="f"><label>한 줄 감상 (선택)</label><textarea id="rMemo" placeholder="짧게 남겨 두세요"></textarea></div>'
+    + '<div class="f"><label>별점 (선택)</label><div class="starset" id="starSet">'
+    +   [1, 2, 3, 4, 5].map((n) => '<button type="button" data-star="' + n + '">★</button>').join('')
+    + '</div></div>'
+    + '<div class="acts">'
+    +   '<button type="button" class="btn ghost" data-close>취소</button>'
+    +   '<button type="button" class="btn navy" data-doread="' + id + '">기록에 추가</button>'
+    + '</div><div style="height:6px"></div></div></div>';
+  openSheet(html);
+}
+
+function paintStars() {
+  $$('#starSet [data-star]').forEach((b) => b.classList.toggle('on', Number(b.dataset.star) <= recStars));
+}
+
+async function addReadRecord(bookId, date, memo, rating) {
+  const b = ST.books[bookId] || {};
+  const d = date || kstToday();
+  const rec = {
+    bookId,
+    title: b.title || '',
+    author: b.author || '',
+    date: d,
+    memo: memo || '',
+    rating: Number(rating) || 0,
+    created: Date.now()
+  };
+  const rid = newId();
+  ST.records[rid] = rec;
+  b.read = 1;
+  b.readDate = d;
+  renderRecords(); renderBooks();
+  hideSheet();
+  switchTab('records');
+  toast('독서 기록에 남겼어요');
+  try {
+    await putNode('records/' + rid, rec);
+    await patchNode('books/' + bookId, { read: 1, readDate: d });
+  } catch (e) {
+    toast('저장하지 못했어요', true);
+    syncNow(true);
+  }
+}
+
+/* ============================================================
+   독서 기록 폼
+   ============================================================ */
+function openRecordForm(id, pre) {
+  const r = id ? (ST.records[id] || {}) : (pre || {});
+  recPhoto = r.photo || '';
+  recStars = Number(r.rating) || 0;
+  const html = '<div class="sheet"><div class="sheet-hd"><div class="grab"></div>'
+    + '<button type="button" class="x" data-close aria-label="닫기">✕</button></div>'
+    + '<div class="sheet-bd">'
+    + '<h3 class="sh-title">' + (id ? '독서 기록 수정' : '책 기록 추가') + '</h3>'
+    + '<div class="f"><label>읽은 날짜</label><input type="date" id="rDate" value="' + esc(r.date || kstToday()) + '"></div>'
+    + '<div class="f"><label>제목 *</label><input id="rTitle" value="' + esc(r.title || '') + '" placeholder="책 제목"></div>'
+    + '<div class="f"><label>작가</label><input id="rAuthor" value="' + esc(r.author || '') + '" placeholder="작가"></div>'
+    + '<div class="f"><label>한 줄 감상 · 메모</label><textarea id="rMemo" placeholder="읽고 난 느낌을 남겨 보세요">' + esc(r.memo || '') + '</textarea></div>'
+    + '<div class="f"><label>별점 (선택)</label><div class="starset" id="starSet">'
+    +   [1, 2, 3, 4, 5].map((n) => '<button type="button" data-star="' + n + '">★</button>').join('')
+    + '</div></div>'
+    + '<div class="f"><label>책 사진 (선택)</label>'
+    +   '<button type="button" class="ph-btn" data-phpick>📷 사진 넣기</button>'
+    +   '<input type="file" id="phFile" accept="image/*" class="hidden">'
+    +   '<div id="phBox"></div>'
+    + '</div>'
+    + '<div class="acts">'
+    +   (id ? '<button type="button" class="btn red" data-recdel="' + id + '">삭제</button>' : '')
+    +   '<button type="button" class="btn ghost" data-close>취소</button>'
+    +   '<button type="button" class="btn navy" data-saverec="' + (id || '') + '">저장</button>'
+    + '</div><div style="height:6px"></div></div></div>';
+  openSheet(html);
+  paintStars();
+  paintPhoto();
+  const f = $('#phFile');
+  if (f) f.addEventListener('change', onPhotoPick);
+}
+
+function paintPhoto() {
+  const box = $('#phBox'); if (!box) return;
+  box.innerHTML = recPhoto
+    ? '<div class="ph-prev"><img src="' + esc(recPhoto) + '" alt="책 사진"><button type="button" class="ph-del" data-phdel aria-label="사진 빼기">✕</button></div>'
+    : '';
+}
+function shrinkImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const max = 760;
+        const s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.width * s));
+        c.height = Math.max(1, Math.round(img.height * s));
+        const g = c.getContext('2d');
+        g.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        resolve(c.toDataURL('image/jpeg', 0.66));
+      } catch (e) { URL.revokeObjectURL(url); reject(e); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('image')); };
+    img.src = url;
+  });
+}
+async function onPhotoPick(e) {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    toast('사진을 줄이는 중…');
+    const data = await shrinkImage(file);
+    recPhoto = data;
+    paintPhoto();
+    toast('사진을 넣었어요');
+  } catch (err) { toast('사진을 넣지 못했어요', true); }
+}
+
+async function saveRecord(id) {
+  const title = ($('#rTitle').value || '').trim();
+  if (!title) { toast('제목을 적어 주세요', true); const t = $('#rTitle'); if (t) t.focus(); return; }
+  const obj = {
+    date: $('#rDate').value || kstToday(),
+    title,
+    author: ($('#rAuthor').value || '').trim(),
+    memo: ($('#rMemo').value || '').trim(),
+    rating: Number(recStars) || 0,
+    photo: recPhoto || ''
+  };
+  if (id) {
+    obj.bookId = (ST.records[id] || {}).bookId || '';
+    obj.created = (ST.records[id] || {}).created || Date.now();
+  } else {
+    obj.bookId = '';
+    obj.created = Date.now();
+  }
+  const key = id || newId();
+  ST.records[key] = obj;
+  renderRecords();
+  hideSheet();
+  try { await putNode('records/' + key, obj); toast(id ? '기록을 고쳤어요' : '기록을 남겼어요'); }
+  catch (e) { toast('저장하지 못했어요', true); syncNow(true); }
+}
+
+function deleteRecord(id) {
+  const r = ST.records[id]; if (!r) return;
+  askConfirm('「' + (r.title || '') + '」 기록을 지울까요?', async () => {
+    hideSheet();
+    delete ST.records[id];
+    renderRecords();
+    try { await delNode('records/' + id); toast('지웠어요'); }
+    catch (e) { toast('지우지 못했어요', true); syncNow(true); }
+  });
+}
+
+/* ============================================================
+   수정 요청 메모장
+   ============================================================ */
+function openMemos() {
+  const arr = Object.keys(ST.notes || {}).map((id) => Object.assign({ id }, ST.notes[id] || {}))
+    .sort((a, b) => (b.at || 0) - (a.at || 0));
+  const html = '<div class="sheet"><div class="sheet-hd"><div class="grab"></div>'
+    + '<button type="button" class="x" data-close aria-label="닫기">✕</button></div>'
+    + '<div class="sheet-bd">'
+    + '<h3 class="sh-title">📝 수정 요청 메모장</h3>'
+    + '<div class="f"><label>고쳤으면 하는 점</label>'
+    +   '<textarea id="nText" placeholder="예: 분야에 &lsquo;만화&rsquo;도 넣어 줘"></textarea></div>'
+    + '<div class="acts" style="margin-top:10px">'
+    +   '<button type="button" class="btn navy" data-notesave>남기기</button>'
+    + '</div>'
+    + '<div class="sec">남긴 메모</div>'
+    + (arr.length ? arr.map((n) =>
+        '<div class="note"><div class="nt">' + esc(n.text || '') + '<div class="nd">' + esc(fmtDateWd(String(n.at || '').slice(0, 10))) + '</div></div>'
+        + '<button type="button" class="nx" data-notedel="' + n.id + '" aria-label="메모 지우기">✕</button></div>').join('')
+      : '<div class="hint">아직 남긴 메모가 없어요.</div>')
+    + '<div style="height:6px"></div></div></div>';
+  openSheet(html);
+}
+async function saveMemo() {
+  const t = ($('#nText').value || '').trim();
+  if (!t) { toast('내용을 적어 주세요', true); return; }
+  const id = newId();
+  const obj = { text: t, at: Date.now() };
+  ST.notes[id] = obj;
+  try { await putNode('notes/' + id, obj); openMemos(); toast('메모를 남겼어요'); }
+  catch (e) { delete ST.notes[id]; toast('남기지 못했어요', true); }
+}
+async function delMemo(id) {
+  askConfirm('이 메모를 지울까요?', async () => {
+    delete ST.notes[id];
+    try { await delNode('notes/' + id); openMemos(); }
+    catch (e) { toast('지우지 못했어요', true); syncNow(true); }
+  });
+}
+
+/* ============================================================
+   탭
+   ============================================================ */
+function switchTab(t) {
+  TAB = t;
+  $('#paneBooks').classList.toggle('hidden', t !== 'books');
+  $('#paneRecords').classList.toggle('hidden', t !== 'records');
+  $$('.tabbar button').forEach((b) => b.classList.toggle('on', b.dataset.tab === t));
+  const sc = t === 'books' ? $('#paneBooks .scroll') : $('#paneRecords .scroll');
+  if (sc) sc.scrollTop = 0;
+}
+
+/* ============================================================
+   클릭 처리
+   ============================================================ */
+document.addEventListener('click', (e) => {
+  /* 시트 바깥(어두운 곳) 누르면 닫기 */
+  if (e.target === wrap()) { hideSheet(); return; }
+
+  let el;
+  if ((el = e.target.closest('[data-close]'))) { hideSheet(); return; }
+  if ((el = e.target.closest('[data-fav]'))) { toggleFav(el.dataset.fav); return; }
+  if ((el = e.target.closest('[data-toggle]'))) { toggleStatus(el.dataset.toggle); return; }
+  if ((el = e.target.closest('[data-read]'))) { openReadSheet(el.dataset.read); return; }
+  if ((el = e.target.closest('[data-open]'))) { openDetail(el.dataset.open); return; }
+  if ((el = e.target.closest('[data-dfav]'))) { toggleFav(el.dataset.dfav); return; }
+  if ((el = e.target.closest('[data-setst]'))) { setStatus(el.dataset.setst, el.dataset.st); return; }
+  if ((el = e.target.closest('[data-apply]'))) { setStatus(el.dataset.id, el.dataset.apply); return; }
+  if ((el = e.target.closest('[data-doread]'))) {
+    const id = el.dataset.doread;
+    const dEl = $('#rDate') || $('#dDate');
+    const mEl = $('#rMemo');
+    addReadRecord(id, dEl ? dEl.value : kstToday(), mEl ? mEl.value : '', recStars);
+    return;
+  }
+  if ((el = e.target.closest('[data-star]'))) {
+    const n = Number(el.dataset.star);
+    recStars = (recStars === n) ? 0 : n;
+    paintStars();
+    return;
+  }
+  if ((el = e.target.closest('[data-phpick]'))) { const f = $('#phFile'); if (f) f.click(); return; }
+  if ((el = e.target.closest('[data-phdel]'))) { recPhoto = ''; paintPhoto(); return; }
+  if ((el = e.target.closest('[data-edit]'))) { openBookForm(el.dataset.edit); return; }
+  if ((el = e.target.closest('[data-del]'))) { deleteBook(el.dataset.del); return; }
+  if ((el = e.target.closest('[data-savebook]'))) { saveBook(el.dataset.savebook || ''); return; }
+  if ((el = e.target.closest('[data-recopen]'))) { openRecordForm(el.dataset.recopen); return; }
+  if ((el = e.target.closest('[data-saverec]'))) { saveRecord(el.dataset.saverec || ''); return; }
+  if ((el = e.target.closest('[data-recdel]'))) { deleteRecord(el.dataset.recdel); return; }
+  if ((el = e.target.closest('[data-notesave]'))) { saveMemo(); return; }
+  if ((el = e.target.closest('[data-notedel]'))) { delMemo(el.dataset.notedel); return; }
+  if ((el = e.target.closest('[data-cf]'))) { closeConfirm(el.dataset.cf === '1'); return; }
+  if ((el = e.target.closest('[data-film]'))) { return; }
+
+  if ((el = e.target.closest('.tabbar button'))) { switchTab(el.dataset.tab); return; }
+  if ((el = e.target.closest('.chip'))) {
+    F = el.dataset.f;
+    $$('.chip').forEach((c) => c.classList.toggle('on', c === el));
+    renderBooks();
+    return;
+  }
+  if (e.target.id === 'addBtn') { openBookForm(''); return; }
+  if (e.target.id === 'addRecBtn') { openRecordForm(''); return; }
+  if (e.target.id === 'memoBtn') { openMemos(); return; }
+});
+
+async function toggleStatus(id) {
+  const b = ST.books[id]; if (!b) return;
+  const cur = statusOf(b);
+  setStatus(id, cur === 'available' ? 'out' : 'available');
+}
+
+$('#qBooks').addEventListener('input', (e) => { Q = e.target.value; renderBooks(); });
+$('#qRecords').addEventListener('input', (e) => { QR = e.target.value; renderRecords(); });
+
+/* ============================================================
+   입장 잠금
+   ============================================================ */
+const LOCK_KEY = 'seeun.library.lock.v1';
+const LOCK_SALT = 'seeun-library::v1::';
+const LOCK_HASH = 'c2956209114eaefcf6fc970356ca4577e2770fa5d46ed8cb6f6a86fc03de7ec3';
+let lockBuf = '', lockBusy = false;
+
+function lockPaint() { $$('#lockDots i').forEach((d, i) => d.classList.toggle('on', i < lockBuf.length)); }
+function lockMsg(text, ok) {
+  const m = $('#lockMsg'); if (!m) return;
+  m.className = 'lock-msg' + (ok ? ' ok' : '');
+  m.textContent = text || '';
+}
+function sha256Hex(s) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)).then((buf) =>
+    Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join(''));
+}
+function lockPassed() {
+  try {
+    const v = JSON.parse(localStorage.getItem(LOCK_KEY) || 'null');
+    return !!(v && v.h === LOCK_HASH);
+  } catch (e) { return false; }
+}
+function lockTry() {
+  if (lockBusy || lockBuf.length !== 6) return;
+  lockBusy = true;
+  lockMsg('확인 중…');
+  if (!(window.crypto && crypto.subtle)) { lockMsg('보안 연결(https)에서 열어 주세요'); lockBusy = false; return; }
+  sha256Hex(LOCK_SALT + lockBuf).then((h) => {
+    if (h !== LOCK_HASH) {
+      lockMsg('비밀번호가 맞지 않아요');
+      const c = $('#lockCard');
+      if (c) { c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); }
+      lockBuf = ''; lockPaint(); lockBusy = false; return;
+    }
+    try { localStorage.setItem(LOCK_KEY, JSON.stringify({ h: LOCK_HASH, at: Date.now() })); } catch (e) {}
+    lockMsg('열리는 중…', true);
+    lockBusy = false;
+    const el = $('#lock'); if (el) el.remove();
+    boot();
+  }).catch(() => { lockMsg('잠시 후 다시 시도해 주세요'); lockBusy = false; });
+}
+function lockKey(k) {
+  lockMsg('');
+  if (k === 'del') { lockBuf = lockBuf.slice(0, -1); lockPaint(); return; }
+  if (k === 'clear') { lockBuf = ''; lockPaint(); return; }
+  if (lockBuf.length >= 6) return;
+  lockBuf += k; lockPaint();
+  if (lockBuf.length === 6) setTimeout(lockTry, 110);
+}
+function initLock() {
+  lockBuf = ''; lockPaint(); lockMsg('');
+  const pad = $('#lockPad');
+  if (pad) pad.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-k]');
+    if (b) lockKey(b.dataset.k);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!document.getElementById('lock')) return;
+    if (/^\d$/.test(e.key)) lockKey(e.key);
+    else if (e.key === 'Backspace') lockKey('del');
+    else if (e.key === 'Enter' && lockBuf.length === 6) lockTry();
+  });
+}
+
+/* ============================================================
+   방 연결 화면
+   ============================================================ */
+function showGate() {
+  $('#gate').classList.remove('hidden');
+  $('#app').classList.add('hidden');
+  const btn = $('#roomGo');
+  if (btn) btn.addEventListener('click', joinRoom);
+  const inp = $('#roomInput');
+  if (inp) inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') joinRoom(); });
+}
+function joinRoom() {
+  const v = ($('#roomInput').value || '').trim();
+  if (!ROOM_RE.test(v)) { toast('방 코드를 확인해 주세요', true); return; }
+  ROOM = v;
+  splitRoomFromUrlIfAny();
+  $('#gate').classList.add('hidden');
+  boot();
+}
+function splitRoomFromUrlIfAny() {
+  try {
+    const u = new URL(location.href);
+    if (u.searchParams.get('room') === ROOM) {
+      u.searchParams.delete('room');
+      history.replaceState(null, '', u.pathname + (u.search || '') + u.hash);
+    }
+  } catch (e) {}
+}
+
+/* ============================================================
+   시작
+   ============================================================ */
+function boot() {
+  if (!ROOM) { showGate(); return; }
+  localStorage.setItem('seeun.library.room', ROOM);
+  const g = $('#gate'); if (g) g.classList.add('hidden');
+  $('#app').classList.remove('hidden');
+  render();
+  switchTab('books');
+  connect();
+  setInterval(() => { if (!es) syncNow(true); }, 20000);
+  window.addEventListener('online', () => syncNow(true));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && !es) syncNow(true); });
+}
+
+function start() {
+  if (lockPassed()) { const el = $('#lock'); if (el) el.remove(); boot(); }
+  else { initLock(); }
+  /* 서비스워커 — 새 버전이 준비되면 한 번 새로고침 */
+  if ('serviceWorker' in navigator) {
+    let hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController) { hadController = true; return; }
+      location.reload();
+    });
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js', { scope: './' }).then((reg) => {
+        reg.update().catch(() => {});
+        setInterval(() => reg.update().catch(() => {}), 30 * 60 * 1000);
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }).catch(() => {});
+    });
+  }
+}
+
+start();
+</script>
+</body>
+</html>
