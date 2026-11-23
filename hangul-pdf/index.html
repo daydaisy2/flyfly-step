@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex, nosnippet">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#FBE049">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="세은 한글·PDF">
+<meta name="format-detection" content="telephone=no">
+<title>세은 한글·PDF</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23FBE049'/%3E%3Crect x='9' y='6' width='14' height='20' rx='3' fill='%231B2358'/%3E%3Cpath d='M12.5 12h7M12.5 16h7M12.5 20h4.5' stroke='%23fff' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body class="locked">
+
+<!-- ============ 입장 잠금 ============ -->
+<div id="lock" class="lock" role="dialog" aria-modal="true" aria-label="입장 비밀번호">
+  <div class="lock-card" id="lockCard">
+    <div class="lock-emoji" aria-hidden="true">📄</div>
+    <h1 class="lock-title">세은 한글·PDF</h1>
+    <p class="lock-sub">아래한글과 PDF를 한 곳에서</p>
+    <span class="lock-badge">🔒 나만 보는 앱</span>
+    <div class="lock-dots" id="lockDots" aria-label="비밀번호 6자리"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="lock-msg" id="lockMsg" role="alert"></p>
+    <div class="lock-pad" id="lockPad">
+      <button type="button" class="lock-key" data-k="1">1</button><button type="button" class="lock-key" data-k="2">2</button><button type="button" class="lock-key" data-k="3">3</button>
+      <button type="button" class="lock-key" data-k="4">4</button><button type="button" class="lock-key" data-k="5">5</button><button type="button" class="lock-key" data-k="6">6</button>
+      <button type="button" class="lock-key" data-k="7">7</button><button type="button" class="lock-key" data-k="8">8</button><button type="button" class="lock-key" data-k="9">9</button>
+      <button type="button" class="lock-key ghost" data-k="clear">전체</button><button type="button" class="lock-key" data-k="0">0</button><button type="button" class="lock-key ghost" data-k="del" aria-label="지우기">←</button>
+    </div>
+    <p class="lock-foot">비밀번호를 입력하면 이 기기에서는<br>다음부터 바로 열려요</p>
+  </div>
+</div>
+
+<!-- ============ 앱 ============ -->
+<div id="app" class="app" hidden>
+
+  <header class="top">
+    <div class="brand">
+      <span class="brand-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="2.6" width="14" height="18.8" rx="3" fill="#1B2358"/><path d="M9 8.4h6M9 12h6M9 15.6h3.6" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </span>
+      <h1>세은 한글·PDF</h1>
+    </div>
+    <div class="top-btns">
+      <button id="installBtn" class="btn-install" type="button">
+        <span aria-hidden="true">⬇</span> 설치하기
+      </button>
+      <button id="lockNow" class="btn-lock" type="button" aria-label="잠그기" title="잠그기">🔒</button>
+    </div>
+  </header>
+
+  <main id="home" class="wrap">
+    <section class="card hero">
+      <h2 class="hero-title">아래한글 <span class="hero-arrow" aria-hidden="true">↔</span> PDF</h2>
+      <p class="hero-sub">파일을 끌어다 놓거나 선택하세요</p>
+
+      <div id="drop" class="drop" tabindex="0" role="button" aria-label="한글·PDF 파일 선택">
+        <svg class="drop-cloud" viewBox="0 0 132 96" aria-hidden="true">
+          <path d="M34 80h62a20 20 0 0 0 1.6-39.9A29 29 0 0 0 41 39.4 20 20 0 0 0 34 80z" fill="#E8ECF8"/>
+          <path d="M66 66V38m-11.5 11.5L66 38l11.5 11.5" fill="none" stroke="#1B2358" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="drop-main">여기에 파일을 끌어다 놓으세요</p>
+        <div class="drop-or"><span></span><b>또는</b><span></span></div>
+        <div class="chips" aria-hidden="true"><span class="chip">.hwpx</span><span class="chip">.hwp</span><span class="chip">.pdf</span></div>
+        <button id="pickBtn" class="pick-btn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5a2 2 0 0 1 2-2h4l2 2.2h8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="currentColor"/></svg>
+          파일 선택
+        </button>
+      </div>
+
+      <p class="safe">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 19 6v5.6c0 4.3-2.9 7.8-7 9.2-4.1-1.4-7-4.9-7-9.2V6z" fill="none" stroke="#3B4A7A" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.7 12.1l2.3 2.3 4.3-4.5" fill="none" stroke="#3B4A7A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        모든 처리는 이 기기 안에서만 이루어집니다
+      </p>
+    </section>
+
+    <section class="card feats" aria-label="기능 안내">
+      <div class="feat">
+        <div class="feat-art" aria-hidden="true">
+          <svg viewBox="0 0 132 74">
+            <rect x="4" y="7" width="42" height="60" rx="7" fill="#fff" stroke="#4C7BC9" stroke-width="3"/>
+            <path d="M13 19h24M13 27h24M13 35h15" stroke="#4C7BC9" stroke-width="2.4" stroke-linecap="round"/>
+            <text x="25" y="56" text-anchor="middle" font-size="17" font-weight="800" fill="#4C7BC9" font-family="inherit">한</text>
+            <path d="M52 36h12" stroke="#1B2358" stroke-width="3" stroke-linecap="round"/>
+            <path d="M59 30.5 64.5 36 59 41.5" fill="none" stroke="#1B2358" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M78 7h26a5 5 0 0 1 5 5v50a5 5 0 0 1-5 5H78a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5z" fill="#E8453C"/>
+            <path d="M96 7h8a5 5 0 0 1 5 5v2H96z" fill="#fff" opacity=".45"/>
+            <text x="91" y="43" text-anchor="middle" font-size="15" font-weight="800" fill="#fff" font-family="inherit">PDF</text>
+          </svg>
+        </div>
+        <b>한글 → PDF</b>
+        <span>저장·인쇄</span>
+      </div>
+      <div class="feat-sep" aria-hidden="true"></div>
+      <div class="feat">
+        <div class="feat-art" aria-hidden="true">
+          <svg viewBox="0 0 132 74">
+            <path d="M4 7h26a5 5 0 0 1 5 5v50a5 5 0 0 1-5 5H4a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5z" fill="#E8453C"/>
+            <text x="17" y="43" text-anchor="middle" font-size="15" font-weight="800" fill="#fff" font-family="inherit">PDF</text>
+            <path d="M40 36h12" stroke="#1B2358" stroke-width="3" stroke-linecap="round"/>
+            <path d="M47 30.5 52.5 36 47 41.5" fill="none" stroke="#1B2358" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="62" y="7" width="46" height="60" rx="7" fill="#fff" stroke="#4C7BC9" stroke-width="3"/>
+            <path d="M71 18h28M71 26h28" stroke="#4C7BC9" stroke-width="2.4" stroke-linecap="round"/>
+            <text x="85" y="52" text-anchor="middle" font-size="12" font-weight="800" fill="#4C7BC9" font-family="inherit">.hwpx</text>
+          </svg>
+        </div>
+        <b>PDF → .hwpx</b>
+        <span>변환</span>
+      </div>
+    </section>
+
+    <p class="memo-link"><button id="memoBtn" type="button">📝 수정 요청 남기기</button></p>
+    <p class="home-foot">한글(.hwpx·.hwp)과 PDF를 열어 보고, PDF로 저장·인쇄하거나 .hwpx로 바꿀 수 있어요.</p>
+  </main>
+
+  <!-- ============ 문서 보기 ============ -->
+  <section id="viewer" class="viewer" hidden aria-label="문서 보기">
+    <header class="vtop">
+      <button id="backBtn" class="vback" type="button" aria-label="목록으로">←</button>
+      <div class="vname">
+        <b id="vTitle">문서</b>
+        <span id="vMeta"></span>
+      </div>
+      <button id="vLock" class="vlock" type="button" aria-label="잠그기" title="잠그기">🔒</button>
+    </header>
+
+    <div class="vbar">
+      <div class="vbar-actions">
+        <button id="printBtn" class="act" type="button">
+          <span aria-hidden="true">🖨</span> PDF로 저장·인쇄
+        </button>
+        <button id="convertBtn" class="act" type="button" hidden>
+          <span aria-hidden="true">⬇</span> .hwpx로 변환
+        </button>
+      </div>
+      <div class="zoom" role="group" aria-label="확대·축소">
+        <button id="zoomOut" type="button" aria-label="축소">−</button>
+        <button id="zoomFit" type="button" aria-label="화면 폭에 맞추기">맞춤</button>
+        <button id="zoomIn" type="button" aria-label="확대">＋</button>
+      </div>
+    </div>
+
+    <div id="notice" class="notice" hidden></div>
+
+    <div id="docScroll" class="doc-scroll">
+      <div id="sheetWrap" class="sheet-wrap"><div id="sheet" class="sheet"></div></div>
+    </div>
+  </section>
+
+  <input id="fileInput" type="file" accept=".hwpx,.hwp,.pdf,application/pdf" hidden>
+</div>
+
+<!-- ============ 수정 요청 메모장 ============ -->
+<div id="memoBack" class="sheet-back" hidden>
+  <div class="memo-card" role="dialog" aria-modal="true" aria-label="수정 요청 메모장">
+    <div class="memo-head"><b>📝 수정 요청 메모장</b><button id="memoClose" type="button" aria-label="닫기">✕</button></div>
+    <p class="memo-hint">두두에게 바라는 점을 적어 두면 다음에 반영할게요.</p>
+    <textarea id="memoText" rows="3" placeholder="예: PDF로 저장할 때 글자를 조금 크게 해줘"></textarea>
+    <div class="memo-row">
+      <button id="memoCopy" class="ghost" type="button">전체 복사</button>
+      <button id="memoSave" class="primary" type="button">저장</button>
+    </div>
+    <ul id="memoList" class="memo-list"></ul>
+  </div>
+</div>
+
+<!-- ============ 진행 표시 ============ -->
+<div id="busy" class="busy" hidden>
+  <div class="busy-card">
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="busyText">파일을 여는 중…</p>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="./libs/jszip.min.js"></script>
+<script src="./libs/pako.min.js"></script>
+<script src="./libs/cfb.min.js"></script>
+<script src="./libs/pdf.min.js"></script>
+<script src="./hwpx-template.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

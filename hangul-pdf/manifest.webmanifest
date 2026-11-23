@@ -1,0 +1,20 @@
+{
+  "name": "세은 한글·PDF",
+  "short_name": "한글·PDF",
+  "description": "아래한글(.hwpx·.hwp)과 PDF를 열어 보고, PDF로 저장·인쇄하거나 .hwpx로 바꾸는 나만의 앱",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#FBE049",
+  "theme_color": "#FBE049",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
