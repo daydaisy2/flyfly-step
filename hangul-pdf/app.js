@@ -258,6 +258,7 @@
     $('#notice').hidden = true;
     $('#notice').innerHTML = '';
     $('#convertBtn').hidden = true;
+    $('#convertBtn').classList.remove('off');
     $('#printBtn').classList.remove('off');
   }
 
