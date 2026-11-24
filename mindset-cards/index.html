@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#420A1E">
+<meta name="format-detection" content="telephone=no">
+<title>훨훨 부자지도 마인드세팅 · 카드뉴스</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23420A1E'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FF6B9E'/%3E%3C/svg%3E">
+<style>
+
+:root{
+  --s:1; --u:calc(1px * var(--s));
+  --sw:390px; --sh:844px; --sr:0px;
+  --burg:#420A1E; --pink:#E0145C; --pinkb:#FF6B9E; --ink:#191114;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;overflow:hidden;background:#120509;color:#fff;
+  font-family:"Pretendard","Noto Sans KR","Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;word-break:keep-all;line-height:1.4}
+
+/* ---------------- stage ---------------- */
+.stage{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:var(--sw);height:var(--sh);border-radius:var(--sr);overflow:hidden;
+  background:linear-gradient(168deg,#3A071A 0%,#520920 13%,#7B0B2E 31%,#AE0F49 55%,#D1125A 79%,#E0145C 100%);
+  display:flex;flex-direction:column;isolation:isolate;
+  box-shadow:0 calc(24*var(--u)) calc(70*var(--u)) rgba(0,0,0,.62)}
+.stage::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(calc(260*var(--u)) calc(240*var(--u)) at 50% 10%,rgba(255,107,158,.22),rgba(255,107,158,0) 72%)}
+.prog{position:absolute;top:0;left:0;height:calc(2.4*var(--u));width:0;z-index:8;
+  background:linear-gradient(90deg,#FF7FAC,#FFC2D6);transition:width .38s ease;box-shadow:0 0 calc(8*var(--u)) rgba(255,120,170,.9)}
+
+/* ---------------- header ---------------- */
+.hdr{position:relative;z-index:4;flex:0 0 auto;display:flex;align-items:center;
+  justify-content:space-between;gap:calc(8*var(--u));padding:calc(14*var(--u)) calc(16*var(--u)) 0}
+.brand{font-size:calc(11.2*var(--u));font-weight:700;letter-spacing:-.02em;color:rgba(255,255,255,.84);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hnav{display:flex;align-items:center;gap:calc(4*var(--u));flex:0 0 auto}
+.pageno{font-size:calc(11.2*var(--u));font-weight:800;color:rgba(255,255,255,.78);font-variant-numeric:tabular-nums;
+  letter-spacing:.03em;min-width:calc(42*var(--u));text-align:center}
+.pageno b{color:#fff;font-weight:900}
+.hbtn{width:calc(21*var(--u));height:calc(21*var(--u));border-radius:50%;padding:0;cursor:pointer;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.3);color:#fff;
+  display:grid;place-items:center;transition:background .18s,opacity .18s}
+.hbtn svg{width:calc(9*var(--u));height:calc(9*var(--u));stroke:currentColor;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.hbtn:active{background:rgba(255,255,255,.3)}
+.hbtn:disabled{opacity:.3;cursor:default}
+@media (hover:hover){.hbtn:hover{background:rgba(255,255,255,.26)}}
+
+/* ---------------- deck / slide ---------------- */
+.deck{position:relative;z-index:3;flex:1 1 auto;min-height:0;overflow:hidden;touch-action:pan-y}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:calc(8*var(--u)) calc(16*var(--u)) calc(13*var(--u));
+  opacity:0;visibility:hidden;transform:translateX(calc(16*var(--u)));
+  transition:opacity .3s ease,transform .42s cubic-bezier(.22,.7,.3,1),visibility .3s}
+.slide.active{opacity:1;visibility:visible;transform:none;z-index:2}
+.slide.left{transform:translateX(calc(-16*var(--u)))}
+
+.tt{flex:0 0 auto;margin:calc(4*var(--u)) 0 calc(13*var(--u));text-align:center;
+  font-weight:900;letter-spacing:-.04em;line-height:1.1}
+.tt span{display:block;white-space:nowrap;font-size:calc(var(--tfs,26) * var(--u))}
+.tt .l1{color:#fff;text-shadow:0 calc(2*var(--u)) calc(10*var(--u)) rgba(60,0,20,.25)}
+.tt .l2{color:#FF6B9E;margin-top:calc(2*var(--u))}
+
+/* ---------------- board ---------------- */
+.board{flex:1 1 auto;min-height:0;display:grid;gap:calc(9*var(--u))}
+.board.g4w{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr auto}
+.board.pan{display:flex;flex-direction:column}
+.board.pan>.card:not(.wide){flex:1 1 auto;min-height:0}
+.board.pan>.wide{flex:0 0 auto}
+.board.stack{grid-template-columns:1fr;grid-auto-rows:1fr}
+.board.cmp{grid-template-columns:1fr 1fr;grid-template-rows:1fr auto}
+
+/* ---------------- cards ---------------- */
+.card{position:relative;background:#fff;border-radius:calc(18*var(--u));
+  padding:calc(10*var(--u)) calc(8*var(--u)) calc(10*var(--u));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  min-height:0;overflow:hidden;
+  box-shadow:0 calc(4*var(--u)) calc(13*var(--u)) rgba(48,0,18,.2), 0 1px 0 rgba(255,255,255,.6) inset}
+.num{position:absolute;left:calc(7*var(--u));top:calc(7*var(--u));
+  width:calc(22*var(--u));height:calc(22*var(--u));border-radius:calc(6.5*var(--u));
+  background:#191114;color:#fff;font-weight:900;font-size:calc(11*var(--u));
+  display:grid;place-items:center;letter-spacing:0;line-height:1;z-index:2}
+.card .ic{width:calc(52*var(--u));height:calc(52*var(--u));margin:calc(8*var(--u)) 0 calc(7*var(--u));flex:0 0 auto}
+.ct{font-size:calc(15.4*var(--u));font-weight:900;color:var(--ink);letter-spacing:-.045em;line-height:1.2;margin:0}
+.cs{font-size:calc(11.2*var(--u));font-weight:800;color:var(--pink);letter-spacing:-.03em;line-height:1.3;
+  margin:calc(4*var(--u)) 0 0;max-width:100%}
+
+/* wide single-line card */
+.card.wide{grid-column:1/-1;flex-direction:row;align-items:center;text-align:left;
+  gap:calc(9*var(--u));padding:calc(10*var(--u)) calc(12*var(--u)) calc(10*var(--u)) calc(39*var(--u));
+  min-height:calc(54*var(--u))}
+.card.wide .num{left:calc(7*var(--u));top:50%;transform:translateY(-50%)}
+.card.wide .wt{font-size:calc(12.2*var(--u));font-weight:900;color:var(--ink);letter-spacing:-.035em;
+  line-height:1.3;margin:0;flex:1 1 auto;min-width:0;height:auto}
+.card.wide .wt em{font-style:normal;color:var(--pink)}
+.card.wide .ic{width:calc(28*var(--u));height:calc(28*var(--u));margin:0 0 0 auto;flex:0 0 auto}
+
+/* stat card */
+.card.stat .ic{width:calc(34*var(--u));height:calc(34*var(--u));margin:calc(6*var(--u)) 0 calc(2*var(--u))}
+.card.stat .sv{font-size:calc(33*var(--u));font-weight:900;color:var(--pink);letter-spacing:-.06em;
+  line-height:1;margin-top:calc(2*var(--u));font-variant-numeric:tabular-nums}
+.card.stat .sv span{font-size:calc(15*var(--u));margin-left:calc(1.5*var(--u));letter-spacing:-.02em}
+.card.stat .sl{font-size:calc(12.6*var(--u));font-weight:900;color:var(--ink);margin-top:calc(6*var(--u));
+  letter-spacing:-.035em;line-height:1.2}
+.card.stat .cs{margin-top:calc(3*var(--u))}
+
+/* panel card with rows */
+.card.panel{align-items:stretch;justify-content:flex-start;text-align:left;
+  padding:calc(11*var(--u)) calc(11*var(--u)) calc(9*var(--u)) calc(12*var(--u))}
+.panel .ph{display:flex;align-items:center;gap:calc(7*var(--u));margin-bottom:calc(5*var(--u))}
+.panel .ph .num{position:static;flex:0 0 auto;width:calc(20*var(--u));height:calc(20*var(--u));font-size:calc(10*var(--u))}
+.panel .ph h3{font-size:calc(12.6*var(--u));font-weight:900;color:var(--ink);margin:0;letter-spacing:-.035em;
+  line-height:1.25;min-width:0}
+.panel ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;
+  justify-content:flex-start;flex:1 1 auto;min-height:0}
+.panel li{flex:1 1 0;display:flex;align-items:center;gap:calc(8*var(--u));min-height:0;
+  padding:calc(3*var(--u)) 0;border-top:1px solid rgba(224,20,92,.1)}
+.panel li:first-child{border-top:0}
+.panel li b{font-size:calc(12.4*var(--u));font-weight:900;color:var(--ink);letter-spacing:-.03em;
+  white-space:nowrap;flex:0 0 auto}
+.panel li span{font-size:calc(11*var(--u));font-weight:700;color:var(--pink);letter-spacing:-.03em;
+  line-height:1.2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk{flex:0 0 auto;width:calc(19*var(--u));height:calc(19*var(--u));border-radius:calc(6*var(--u));
+  background:#FFE3EC;color:var(--pink);font-style:normal;font-weight:900;font-size:calc(10*var(--u));
+  display:grid;place-items:center;line-height:1}
+.rk.ok{background:var(--pink);color:#fff}
+.yr{flex:0 0 auto;font-style:normal;font-weight:900;font-size:calc(10.4*var(--u));color:var(--pink);
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;width:calc(26*var(--u))}
+
+/* comparison cards */
+.cmp-card{align-items:stretch;text-align:left;justify-content:flex-start;
+  padding:calc(11*var(--u)) calc(10*var(--u)) calc(9*var(--u))}
+.cmp-card .ph{display:flex;align-items:center;gap:calc(6*var(--u));margin-bottom:calc(6*var(--u))}
+.cmp-card .ph .num{position:static;flex:0 0 auto;width:calc(20*var(--u));height:calc(20*var(--u));font-size:calc(10*var(--u))}
+.cmp-card .ph h3{font-size:calc(13*var(--u));font-weight:900;color:var(--ink);margin:0;letter-spacing:-.04em;line-height:1.2}
+.cmp-card .cl{flex:1 1 0;display:flex;flex-direction:column;justify-content:center;gap:calc(1*var(--u));
+  padding:calc(6*var(--u)) 0;border-top:1px solid rgba(224,20,92,.13);min-height:0}
+.cmp-card .cl:first-of-type{border-top:0}
+.cmp-card .cl b{font-size:calc(11.6*var(--u));font-weight:900;color:var(--ink);letter-spacing:-.03em;line-height:1.2}
+.cmp-card .cl span{font-size:calc(10.2*var(--u));font-weight:700;color:var(--pink);letter-spacing:-.03em;line-height:1.25}
+.cmp-card.dim{background:#FFF4F7}
+.cmp-card.dim .cl b{color:#8A5568;text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(224,20,92,.45)}
+.cmp-card.dim .cl span{color:#C08A9C}
+
+/* 3-row value cards (세팅값) */
+.card.row3{flex-direction:row;align-items:center;text-align:left;gap:calc(10*var(--u));
+  padding:calc(10*var(--u)) calc(12*var(--u)) calc(10*var(--u)) calc(37*var(--u))}
+.card.row3 .num{left:calc(7*var(--u));top:50%;transform:translateY(-50%)}
+.r3l{flex:1 1 auto;min-width:0}
+.r3l .cs{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r3v{flex:0 0 auto;font-size:calc(29*var(--u));font-weight:900;color:var(--pink);letter-spacing:-.05em;
+  line-height:1;font-variant-numeric:tabular-nums}
+.r3v span{font-size:calc(13*var(--u));margin-left:calc(1*var(--u))}
+
+/* ---------------- pill ---------------- */
+.pill{flex:0 0 auto;margin-top:calc(11*var(--u));align-self:center;max-width:100%;
+  background:linear-gradient(180deg,#F62B70 0%,#DE1758 100%);color:#fff;
+  border:1px solid rgba(255,255,255,.28);border-radius:calc(999*var(--u));
+  padding:calc(8*var(--u)) calc(15*var(--u));
+  font-size:calc(10.8*var(--u));font-weight:800;letter-spacing:-.025em;line-height:1.2;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  box-shadow:0 calc(5*var(--u)) calc(14*var(--u)) rgba(90,0,30,.4), inset 0 1px 0 rgba(255,255,255,.35)}
+
+/* ---------------- toc ---------------- */
+.scrim{position:absolute;inset:0;z-index:18;background:rgba(20,2,9,.55);opacity:0;visibility:hidden;
+  transition:opacity .3s,visibility .3s}
+.scrim.on{opacity:1;visibility:visible}
+.toc{position:absolute;top:0;right:0;bottom:0;z-index:19;width:min(88%,calc(292*var(--u)));
+  background:linear-gradient(180deg,#2A0512 0%,#4B0920 42%,#7C0C2F 100%);
+  transform:translateX(102%);transition:transform .34s cubic-bezier(.22,.7,.3,1);
+  display:flex;flex-direction:column;box-shadow:calc(-16*var(--u)) 0 calc(48*var(--u)) rgba(0,0,0,.55);
+  border-left:1px solid rgba(255,255,255,.12)}
+.toc.on{transform:none}
+.toc-h{flex:0 0 auto;display:flex;align-items:center;gap:calc(8*var(--u));
+  padding:calc(16*var(--u)) calc(14*var(--u)) calc(10*var(--u));border-bottom:1px solid rgba(255,255,255,.13)}
+.toc-h b{font-size:calc(13*var(--u));font-weight:900;letter-spacing:-.02em}
+.toc-h span{font-size:calc(10*var(--u));font-weight:800;color:#FF6B9E;letter-spacing:.08em}
+.toc-h button{margin-left:auto;width:calc(24*var(--u));height:calc(24*var(--u));border-radius:50%;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.26);color:#fff;
+  font-size:calc(11*var(--u));cursor:pointer;display:grid;place-items:center;padding:0}
+.toc ul{list-style:none;margin:0;padding:calc(8*var(--u));overflow-y:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch}
+.toc li{margin-bottom:calc(2*var(--u))}
+.toc-item{width:100%;display:flex;gap:calc(9*var(--u));align-items:baseline;text-align:left;
+  background:transparent;border:0;color:#fff;cursor:pointer;padding:calc(8*var(--u)) calc(9*var(--u));
+  border-radius:calc(10*var(--u));font-family:inherit}
+.toc-item .no{font-size:calc(10*var(--u));font-weight:900;color:rgba(255,255,255,.5);
+  font-variant-numeric:tabular-nums;padding-top:calc(1*var(--u))}
+.toc-item .pt{display:block;font-size:calc(8.6*var(--u));font-weight:800;letter-spacing:.14em;
+  color:#FF6B9E;text-transform:uppercase;margin-bottom:calc(1*var(--u))}
+.toc-item .ttx{display:block;font-size:calc(11.4*var(--u));font-weight:800;letter-spacing:-.03em;
+  line-height:1.3;color:rgba(255,255,255,.92)}
+.toc-item.on{background:rgba(255,255,255,.14)}
+.toc-item.on .no{color:#fff}
+@media (hover:hover){.toc-item:hover{background:rgba(255,255,255,.09)}}
+
+/* ---------------- lock ---------------- */
+.lock{position:absolute;inset:0;z-index:30;display:grid;place-items:center;padding:calc(24*var(--u));
+  background:linear-gradient(168deg,#39071A 0%,#5E0A24 38%,#A80F47 74%,#D4135B 100%);
+  transition:opacity .45s ease,visibility .45s}
+.lock.hide{opacity:0;visibility:hidden;pointer-events:none}
+.lock::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(calc(240*var(--u)) calc(220*var(--u)) at 50% 22%,rgba(255,107,158,.28),rgba(255,107,158,0) 70%)}
+.lock-in{position:relative;width:100%;max-width:calc(300*var(--u));text-align:center}
+.lk-brand{font-size:calc(8.8*var(--u));font-weight:900;letter-spacing:.34em;color:#FF9DBE}
+.lk-t{font-size:calc(25*var(--u));font-weight:900;line-height:1.15;letter-spacing:-.045em;margin:calc(10*var(--u)) 0 0}
+.lk-t em{font-style:normal;color:#FF6B9E}
+.lk-s{font-size:calc(10.4*var(--u));font-weight:700;color:rgba(255,255,255,.72);margin:calc(8*var(--u)) 0 0;
+  letter-spacing:-.02em;line-height:1.45}
+#lockForm{display:flex;flex-direction:column;gap:calc(8*var(--u));margin-top:calc(22*var(--u))}
+#pw{width:100%;height:calc(44*var(--u));border-radius:calc(13*var(--u));border:1px solid rgba(255,255,255,.45);
+  background:rgba(255,255,255,.96);color:#420A1E;font-family:inherit;font-weight:900;
+  font-size:calc(15*var(--u));letter-spacing:.42em;text-align:center;padding:0 calc(4*var(--u));
+  outline:none;box-shadow:0 calc(5*var(--u)) calc(16*var(--u)) rgba(40,0,15,.35)}
+#pw::placeholder{letter-spacing:-.01em;font-size:calc(11*var(--u));font-weight:700;color:#B9909F}
+#pw:focus{border-color:#fff;box-shadow:0 0 0 calc(3*var(--u)) rgba(255,255,255,.22)}
+#lockForm button{height:calc(42*var(--u));border-radius:calc(13*var(--u));border:0;cursor:pointer;
+  background:#191114;color:#fff;font-family:inherit;font-weight:900;font-size:calc(13*var(--u));
+  letter-spacing:.02em;box-shadow:0 calc(5*var(--u)) calc(16*var(--u)) rgba(20,0,8,.4)}
+#lockForm button:active{transform:translateY(1px)}
+.lk-err{min-height:calc(14*var(--u));font-size:calc(10*var(--u));font-weight:800;color:#FFD1DF;
+  margin:calc(8*var(--u)) 0 0;letter-spacing:-.01em}
+.lk-foot{position:absolute;left:0;right:0;bottom:calc(-6*var(--u));font-size:calc(8.8*var(--u));
+  font-weight:700;color:rgba(255,255,255,.42);letter-spacing:.02em}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}
+  60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+#lockForm.shake{animation:shake .34s ease}
+</style>
+</head>
+<body>
+<div class="lock" id="lock">
+  <div class="lock-in">
+    <p class="lk-brand">PRIVATE NOTE</p>
+    <h2 class="lk-t">훨훨 부자지도<br><em>마인드세팅</em></h2>
+    <p class="lk-s">서울권 정규강의 필기 40p<br>카드뉴스 16장</p>
+    <form id="lockForm" autocomplete="off">
+      <input id="pw" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="비밀번호 6자리" aria-label="비밀번호">
+      <button type="submit">열기</button>
+    </form>
+    <p class="lk-err" id="err" role="alert"></p>
+    <p class="lk-foot">개인 열람용 · 검색 비공개</p>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <div class="prog" id="prog"></div>
+  <header class="hdr">
+    <div class="brand">훨훨 부자지도 마인드세팅</div>
+    <div class="hnav">
+      <button class="hbtn" id="prevBtn" type="button" aria-label="이전 슬라이드">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="pageno"><b id="curNum">01</b> / <span id="totNum">16</span></div>
+      <button class="hbtn" id="nextBtn" type="button" aria-label="다음 슬라이드">
+        <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button class="hbtn" id="tocBtn" type="button" aria-label="목차" aria-expanded="false">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+  </header>
+
+  <div class="deck" id="deck">
+<section class="slide" data-part="표지" data-title="언제 살까를 버리고, 무엇을 어떻게 살까" style="--tfs:25"><h2 class="tt"><span class="l1">언제 살까를 버리고</span><span class="l2">무엇을, 어떻게 살까</span></h2><div class="board stack"><article class="card "><span class="num">1</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="11" y="7" width="26" height="34" rx="3.5" fill="#FFD7E5"/><path d="M18 16h12M18 23h12M18 30h8" stroke-width="2"/><path d="M16 7v34" stroke-width="1.8"/></svg><h3 class="ct">사야 할 집은 정해져 있다</h3><p class="cs">심플한 원칙 · 서울 · 설인경</p></article><article class="card "><span class="num">2</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 40h10V30h10V20h10V10h6" fill="none" stroke-width="2.6"/><path d="M6 40h10V30h10V20h10V10h6v30H6z" fill="#FFD7E5" stroke="none"/><path d="M6 40h10V30h10V20h10V10h6" fill="none" stroke-width="2.6"/></svg><h3 class="ct">10년에 세 번, 타고 오른다</h3><p class="cs">매매 2억에서 70억 펜트까지</p></article><article class="card "><span class="num">3</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 9h18v9a9 9 0 0 1-18 0z" fill="#FFD7E5"/><path d="M15 12H9.5v3.5A6.5 6.5 0 0 0 16 22M33 12h5.5v3.5A6.5 6.5 0 0 1 32 22"/><path d="M24 27v8M17 39h14"/></svg><h3 class="ct">찐똘 두 채 + 월 천만원</h3><p class="cs">10년 플랜과 체크리스트</p></article></div><p class="pill">필기 40p 원문 전체 정리 · 2024.07.01 서울권 정규강의</p></section>
+<section class="slide" data-part="프레임" data-title="사야 할 집은 정해져 있다" style="--tfs:23.5"><h2 class="tt"><span class="l1">부동산은 진짜 심플하다</span><span class="l2">사야 할 집은 정해져 있다</span></h2><div class="board g4w"><article class="card "><span class="num">1</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14l11-5 12 5 11-5v26l-11 5-12-5-11 5z" fill="#FFD7E5"/><path d="M18 9v26M30 14v26"/><path d="M33 8c3.2 0 5.6 2.5 5.6 5.6 0 4-5.6 9.2-5.6 9.2s-5.6-5.2-5.6-9.2C27.4 10.5 29.8 8 33 8z" fill="#E0145C" stroke="none"/><circle cx="33" cy="13.4" r="2" fill="#fff" stroke="none"/></svg><h3 class="ct">서울부터 시작</h3><p class="cs">지방 말고 수요 많은 설인경에서</p></article><article class="card "><span class="num">2</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 41h36"/><rect x="8" y="17" width="14" height="24" rx="2" fill="#FFD7E5"/><rect x="26" y="7" width="15" height="34" rx="2" fill="#FFEAF2"/><rect x="12" y="22" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="17" y="22" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="12" y="28" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="17" y="28" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="30" y="13" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="13" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="19" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="19" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="25" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="25" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="31" width="3.4" height="6" rx="1" fill="#E0145C" stroke="none"/></svg><h3 class="ct">설인경</h3><p class="cs">서울·역세권·신축·대단지 · 신축 품귀</p></article><article class="card "><span class="num">3</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="#FFEAF2"/><circle cx="24" cy="24" r="9.5" fill="#FFD7E5"/><circle cx="24" cy="24" r="3.4" fill="#E0145C" stroke="none"/></svg><h3 class="ct">대표성 있는 단지</h3><p class="cs">틈새단지 말고 선명한 단지</p></article><article class="card "><span class="num">4</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 23L24 8l17 15" /><path d="M11 21v19h26V21" fill="#FFD7E5"/><rect x="21" y="29" width="7" height="11" rx="1.6" fill="#E0145C" stroke="none"/></svg><h3 class="ct">대단지는 급하게 빠진다</h3><p class="cs">팔고 싶어도 못 파는 게 가장 무섭다</p></article><article class="card wide"><span class="num">5</span><p class="wt">9억에 사서 12억이면 <em>완전 비과세</em> — 1~2주택이면 충분</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16" cy="16" r="8" fill="#FFD7E5"/><path d="M21.6 21.6L39 39M30 30l4.5-4.5M35 35l4-4"/></svg></article></div><p class="pill">원문 p.1–2, p.17 · 한 채를 잘 사는 것으로 충분하다</p></section>
+<section class="slide" data-part="판" data-title="왜 지금 서울인가 — 숫자로 보는 판" style="--tfs:26"><h2 class="tt"><span class="l1">왜 지금 서울인가</span><span class="l2">숫자로 보는 판</span></h2><div class="board g4w"><article class="card stat"><span class="num">1</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="24" cy="14" rx="13" ry="5" fill="#FFEAF2"/><path d="M11 14v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7"/><path d="M11 22v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7" fill="#FFD7E5"/><path d="M11 30v6c0 2.8 5.8 5 13 5s13-2.2 13-5v-6"/></svg><div class="sv">13<span>억</span></div><div class="sl">서울 아파트 평균가</div><p class="cs">전고점 13.8억에 근접</p></article><article class="card stat"><span class="num">2</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16" cy="16" r="8" fill="#FFD7E5"/><path d="M21.6 21.6L39 39M30 30l4.5-4.5M35 35l4-4"/></svg><div class="sv">54.6<span>%</span></div><div class="sl">서울 전세가율</div><p class="cs">60% 넘으면 매수 움직임</p></article><article class="card stat"><span class="num">3</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 41h36"/><rect x="8" y="17" width="14" height="24" rx="2" fill="#FFD7E5"/><rect x="26" y="7" width="15" height="34" rx="2" fill="#FFEAF2"/><rect x="12" y="22" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="17" y="22" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="12" y="28" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="17" y="28" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="30" y="13" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="13" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="19" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="19" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="25" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="25" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="31" width="3.4" height="6" rx="1" fill="#E0145C" stroke="none"/></svg><div class="sv">85~90<span>%</span></div><div class="sl">신규공급 중 정비사업</div><p class="cs">신축은 재개발·재건축에서</p></article><article class="card stat"><span class="num">4</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 40h32"/><rect x="11" y="26" width="7" height="12" rx="2.2" fill="#FFD7E5"/><rect x="21" y="19" width="7" height="19" rx="2.2" fill="#FFD7E5"/><rect x="31" y="11" width="7" height="27" rx="2.2" fill="#FFD7E5"/><path d="M33 7l4 4-4 4" stroke-width="2.2"/></svg><div class="sv">2~3<span>배</span></div><div class="sl">10년 뒤 최소 상승 가정</div><p class="cs">2014년 대비 이미 2~4배</p></article><article class="card wide"><span class="num">5</span><p class="wt">고점을 빨리 회복한 단지가 미래가치도 좋다 — <em>파도를 타야 다음 파도</em></p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 40h32"/><rect x="11" y="26" width="7" height="12" rx="2.2" fill="#FFD7E5"/><rect x="21" y="19" width="7" height="19" rx="2.2" fill="#FFD7E5"/><rect x="31" y="11" width="7" height="27" rx="2.2" fill="#FFD7E5"/><path d="M33 7l4 4-4 4" stroke-width="2.2"/></svg></article></div><p class="pill">원문 p.2, p.5, p.21, p.33 · 시장에 참여해야 파도를 탄다</p></section>
+<section class="slide" data-part="프레임" data-title="시기를 버리고 두 질문만" style="--tfs:25"><h2 class="tt"><span class="l1">시기를 판단하지 마라</span><span class="l2">남는 건 두 질문뿐</span></h2><div class="board cmp"><article class="card cmp-card dim"><div class="ph"><span class="num">1</span><h3>버릴 질문</h3></div><div class="cl"><b>언제 사요?</b><span>저점·상투는 아무도 모른다</span></div><div class="cl"><b>저평가된 것</b><span>저평가는 없다, 저가치만</span></div><div class="cl"><b>남 따라 사기</b><span>데이터 분석가도 저점은 모른다</span></div></article><article class="card cmp-card "><div class="ph"><span class="num">2</span><h3>남길 질문</h3></div><div class="cl"><b>무엇을 살까</b><span>급지·상품·세팅값 보는 눈</span></div><div class="cl"><b>어떻게 살까</b><span>대출을 알면 입지가 달라진다</span></div><div class="cl"><b>준비됐을 때</b><span>공부 + 자본 + 대출 가능 시점</span></div></article><article class="card wide"><span class="num">5</span><p class="wt">3개월 뒤 떨어져도 <em>10년 뒤 올라 있을 집</em>을 산다</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="#FFD7E5"/><path d="M31 17l-4.6 10.2L16.2 31l4.6-10.2z" fill="#E0145C" stroke="none"/><circle cx="24" cy="24" r="1.8" fill="#fff" stroke="none"/></svg></article></div><p class="pill">원문 p.1, p.12–13 · 2024년은 2034년에게 기회다</p></section>
+<section class="slide" data-part="판" data-title="서울 급지표" style="--tfs:24"><h2 class="tt"><span class="l1">기본은 서울 급지 순위를</span><span class="l2">알고 있는 것</span></h2><div class="board pan"><article class="card panel "><div class="ph"><span class="num">1</span><h3>2024년 6월 기준 · 급지를 바꿔가며 대표단지를 산다</h3></div><ul><li><i class="rk">1</i><b>강서용송</b><span>항상 상위 · 강남·서초·용산·송파</span></li><li><i class="rk">2</i><b>성양광마</b><span>성동·양천·광진·마포</span></li><li><i class="rk">3</i><b>영종강중동</b><span>영등포·종로·강동·중랑·동작</span></li><li><i class="rk">4</i><b>서강동은성관노</b><span>서대문·강북·동대문·은평·성북·관악·노원</span></li><li><i class="rk">5</i><b>구중금강도</b><span>구로·중구·금천·강서·도봉 · 최하위</span></li><li><i class="rk">B5</i><b>경기 BIG5</b><span>과천·성남(분당·수정)·하남·광명·안양(동안)</span></li></ul></article><article class="card wide"><span class="num">2</span><p class="wt">서울 하위 vs 경기 상위는 <em>지역이 아니라 물건</em>으로 비교한다</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14l11-5 12 5 11-5v26l-11 5-12-5-11 5z" fill="#FFD7E5"/><path d="M18 9v26M30 14v26"/><path d="M33 8c3.2 0 5.6 2.5 5.6 5.6 0 4-5.6 9.2-5.6 9.2s-5.6-5.2-5.6-9.2C27.4 10.5 29.8 8 33 8z" fill="#E0145C" stroke="none"/><circle cx="33" cy="13.4" r="2" fill="#fff" stroke="none"/></svg></article></div><p class="pill">원문 p.3 · 첫 집은 경기 BIG5 아래로 내려오지 않는다</p></section>
+<section class="slide" data-part="상품" data-title="같은 20억, 다른 세팅값" style="--tfs:26"><h2 class="tt"><span class="l1">같은 20억,</span><span class="l2">완전히 다른 세팅값</span></h2><div class="board stack"><article class="card row3"><span class="num">1</span><div class="r3l"><h3 class="ct">헬리오시티</h3><p class="cs">신축·등기 · 전세 10억 + 후순위 5억</p></div><div class="r3v">5<span>억</span></div></article><article class="card row3"><span class="num">2</span><div class="r3l"><h3 class="ct">올림픽파크포레온</h3><p class="cs">입주권·미등기 · 이주비 2억뿐</p></div><div class="r3v">18<span>억</span></div></article><article class="card row3"><span class="num">3</span><div class="r3l"><h3 class="ct">올림픽선수기자촌</h3><p class="cs">재건축 · 전세 7억</p></div><div class="r3v">13<span>억</span></div></article><article class="card wide"><span class="num">4</span><p class="wt">같은 20억이라도 <em>내 돈은 5억~18억</em> — 세팅값이 수익률이다</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="24" cy="14" rx="13" ry="5" fill="#FFEAF2"/><path d="M11 14v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7"/><path d="M11 22v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7" fill="#FFD7E5"/><path d="M11 30v6c0 2.8 5.8 5 13 5s13-2.2 13-5v-6"/></svg></article></div><p class="pill">원문 p.2 · 세팅값 = 전세 + 대출 + 자기자본</p></section>
+<section class="slide" data-part="자금" data-title="생초갭투 — 3.3억으로 16.5억" style="--tfs:26"><h2 class="tt"><span class="l1">생초는 진짜 큰 혜택</span><span class="l2">3.3억으로 16.5억</span></h2><div class="board g4w"><article class="card stat"><span class="num">1</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 23L24 8l17 15" /><path d="M11 21v19h26V21" fill="#FFD7E5"/><rect x="21" y="29" width="7" height="11" rx="1.6" fill="#E0145C" stroke="none"/></svg><div class="sv">16.5<span>억</span></div><div class="sl">센트라스 매매가</div><p class="cs">갭투자 실전 예시</p></article><article class="card stat"><span class="num">2</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="24" cy="14" rx="13" ry="5" fill="#FFEAF2"/><path d="M11 14v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7"/><path d="M11 22v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7" fill="#FFD7E5"/><path d="M11 30v6c0 2.8 5.8 5 13 5s13-2.2 13-5v-6"/></svg><div class="sv">3.3<span>억</span></div><div class="sl">필요 자기자본</div><p class="cs">전세 10억 + 대출 3.2억</p></article><article class="card "><span class="num">3</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="#FFD7E5"/><path d="M24 13v11l7 4.5" stroke-width="2.6"/></svg><h3 class="ct">호흡은 2·4년</h3><p class="cs">세입자 있을 때 매도</p></article><article class="card "><span class="num">4</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="16" r="6.4" fill="#FFD7E5"/><circle cx="32" cy="18" r="5.4" fill="#FFEAF2"/><path d="M6 39c0-6.6 4.9-11 11-11s11 4.4 11 11"/><path d="M28 39c0-5.2 3.4-8.6 8-8.6s8 3.4 8 8.6"/></svg><h3 class="ct">혼인신고 전 각각</h3><p class="cs">부부가 각자 생초를 쓰는 세팅</p></article><article class="card wide"><span class="num">5</span><p class="wt">2억을 모으는 것보다 <em>2억을 빌리는 게</em> 낫다</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18h18l4 22H11z" fill="#FFD7E5"/><path d="M18.5 18a5.5 5.5 0 0 1 11 0"/><path d="M24 26v8M20.5 29.5h7" stroke-width="2.2"/></svg></article></div><p class="pill">원문 p.7, p.17, p.22 · 1금융 최대 6억, 집값 제한 없음</p></section>
+<section class="slide" data-part="자금" data-title="뿌리자산 = 베이스캠프" style="--tfs:23.5"><h2 class="tt"><span class="l1">첫 집은 뿌리자산</span><span class="l2">두 번째 집이 여기서 나온다</span></h2><div class="board g4w"><article class="card "><span class="num">1</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 23L24 8l17 15" /><path d="M11 21v19h26V21" fill="#FFD7E5"/><rect x="21" y="29" width="7" height="11" rx="1.6" fill="#E0145C" stroke="none"/></svg><h3 class="ct">첫 집 = 예선전</h3><p class="cs">예산 안에서 가장 좋은 집</p></article><article class="card "><span class="num">2</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18h18l4 22H11z" fill="#FFD7E5"/><path d="M18.5 18a5.5 5.5 0 0 1 11 0"/><path d="M24 26v8M20.5 29.5h7" stroke-width="2.2"/></svg><h3 class="ct">뿌리자산</h3><p class="cs">ATM · 베이스캠프 · 비빌 언덕</p></article><article class="card "><span class="num">3</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 41h36"/><rect x="8" y="17" width="14" height="24" rx="2" fill="#FFD7E5"/><rect x="26" y="7" width="15" height="34" rx="2" fill="#FFEAF2"/><rect x="12" y="22" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="17" y="22" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="12" y="28" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="17" y="28" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="30" y="13" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="13" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="19" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="19" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="25" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="25" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="31" width="3.4" height="6" rx="1" fill="#E0145C" stroke="none"/></svg><h3 class="ct">2호기</h3><p class="cs">1채 더 갭투 · 관리처분 입주권</p></article><article class="card "><span class="num">4</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 40h32"/><rect x="11" y="26" width="7" height="12" rx="2.2" fill="#FFD7E5"/><rect x="21" y="19" width="7" height="19" rx="2.2" fill="#FFD7E5"/><rect x="31" y="11" width="7" height="27" rx="2.2" fill="#FFD7E5"/><path d="M33 7l4 4-4 4" stroke-width="2.2"/></svg><h3 class="ct">자산의 볼륨</h3><p class="cs">84가 30억, 펜트가 70억</p></article><article class="card wide"><span class="num">5</span><p class="wt">내가 쓴 돈은 <em>집이 갚는다</em> — 단, 12억 이자는 감당 가능해야</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16" cy="16" r="8" fill="#FFD7E5"/><path d="M21.6 21.6L39 39M30 30l4.5-4.5M35 35l4-4"/></svg></article></div><p class="pill">원문 p.3, p.7 · 찐똘 2채 + 현금흐름이 종착점</p></section>
+<section class="slide" data-part="사례" data-title="10년, 세 번의 갈아타기" style="--tfs:23"><h2 class="tt"><span class="l1">10년, 세 번의 갈아타기</span><span class="l2">70억 펜트하우스까지</span></h2><div class="board pan"><article class="card panel "><div class="ph"><span class="num">1</span><h3>레버리지로 묘목을 심었다 · 매매 2억 + 대출 2억에서 시작</h3></div><ul><li><i class="yr">2014</i><b>강남보금자리</b><span>매매 2억 · 대출 2억 · 무피 투자</span></li><li><i class="yr">2017</i><b>잠실 미성</b><span>9억 재건축 매수 · 경매 2등 후 즉시</span></li><li><i class="yr">2018</i><b>고덕그라시움</b><span>8억 분양권 → 18억 · 13억 매도</span></li><li><i class="yr">2024</i><b>잠실래미안아이파크</b><span>80평대 펜트하우스 · 70억 입성</span></li></ul></article><article class="card wide"><span class="num">2</span><p class="wt">매 순간 최선을 고민하고 <em>방법이 없는지</em> 계속 물었다</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 9h18v9a9 9 0 0 1-18 0z" fill="#FFD7E5"/><path d="M15 12H9.5v3.5A6.5 6.5 0 0 0 16 22M33 12h5.5v3.5A6.5 6.5 0 0 1 32 22"/><path d="M24 27v8M17 39h14"/></svg></article></div><p class="pill">원문 p.14–15 · 70억짜리 ATM 기계가 생긴 것이다</p></section>
+<section class="slide" data-part="상품" data-title="서신대 vs 재개발·재건축" style="--tfs:25"><h2 class="tt"><span class="l1">서신대가 기본,</span><span class="l2">재재는 비교해서 고른다</span></h2><div class="board cmp"><article class="card cmp-card "><div class="ph"><span class="num">1</span><h3>서신대</h3></div><div class="cl"><b>세팅값이 잘 붙는다</b><span>전세가 높은 단지가 유리</span></div><div class="cl"><b>기축은 모멘텀이 약하다</b><span>자본이 적을수록 신축에서 빠르게</span></div><div class="cl"><b>소규모·틈새는 안 팔린다</b><span>하락기 거래 절벽</span></div></article><article class="card cmp-card "><div class="ph"><span class="num">2</span><h3>재개발·재건축</h3></div><div class="cl"><b>신규공급의 85~90%</b><span>조분 10억 시대 · 송파 15억</span></div><div class="cl"><b>초투는 낮다</b><span>대신 시간을 투입한다</span></div><div class="cl"><b>관처 → 입주 6~8년</b><span>재개발 평균 20년 대기</span></div></article><article class="card wide"><span class="num">5</span><p class="wt">초투가 싸거나 총매가가 싸야 한다 — <em>아니면 그냥 신축</em></p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 41h36"/><rect x="8" y="17" width="14" height="24" rx="2" fill="#FFD7E5"/><rect x="26" y="7" width="15" height="34" rx="2" fill="#FFEAF2"/><rect x="12" y="22" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="17" y="22" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="12" y="28" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="17" y="28" width="3" height="3" rx=".8" fill="#E0145C" stroke="none"/><rect x="30" y="13" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="13" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="19" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="19" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="25" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="35" y="25" width="3.4" height="3.4" rx=".9" fill="#E0145C" stroke="none"/><rect x="30" y="31" width="3.4" height="6" rx="1" fill="#E0145C" stroke="none"/></svg></article></div><p class="pill">원문 p.4–6, p.12, p.25 · 콩과 수박은 구르는 방식이 다르다</p></section>
+<section class="slide" data-part="상품" data-title="정비사업 읽는 법" style="--tfs:26"><h2 class="tt"><span class="l1">정비사업 읽는 법</span><span class="l2">용어와 5단계</span></h2><div class="board pan"><article class="card panel "><div class="ph"><span class="num">1</span><h3>두 개의 총액부터 계산한다</h3></div><ul><li><i class="rk">A</i><b>조피총</b><span>조합원분양가 + 프리미엄</span></li><li><i class="rk">B</i><b>매추총</b><span>은집(기존집) 매매가 + 추가분담금</span></li></ul></article><article class="card panel "><div class="ph"><span class="num">2</span><h3>원픽 찾는 5단계</h3></div><ul><li><i class="rk">1</i><b>정비구역 확인</b><span>아실 · 부자지도</span></li><li><i class="rk">2</i><b>물건 검색</b><span>네이버부동산 · 프리미엄 얼마</span></li><li><i class="rk">3</i><b>감정가·프리미엄·분담금</b><span>총매가까지 확인</span></li><li><i class="rk">4</i><b>임장</b><span>부동산 최소 2곳 브리핑</span></li><li><i class="rk">5</i><b>인근 신축과 비교</b><span>다른 지역·다른 상품과도</span></li></ul></article><article class="card wide"><span class="num">3</span><p class="wt">뚜껑은 권리가액이 낮아 <em>초투가 적다</em> — 대신 분담금이 크다</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7h15l9 9v25H12z" fill="#FFD7E5"/><path d="M27 7v9h9"/><path d="M18 24h12M18 30h12M18 36h7" stroke-width="2"/></svg></article></div><p class="pill">원문 p.5, p.18, p.20, p.35–36 · 나중엔 설인경이 한 판으로 보인다</p></section>
+<section class="slide" data-part="판" data-title="규제와 함정" style="--tfs:26"><h2 class="tt"><span class="l1">규제와 함정</span><span class="l2">알고 들어간다</span></h2><div class="board g4w"><article class="card "><span class="num">1</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 7l17 32H7z" fill="#FFD7E5"/><path d="M24 19v10" stroke-width="2.8"/><circle cx="24" cy="34" r="1.9" fill="#E0145C" stroke="none"/></svg><h3 class="ct">토지거래허가구역</h3><p class="cs">실거주 2년 · 압목여성·잠삼대청</p></article><article class="card "><span class="num">2</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 7l14 5v11c0 9-6 15.5-14 18-8-2.5-14-9-14-18V12z" fill="#FFD7E5"/><path d="M17.5 23.5l4.5 4.5 8-8.5" stroke-width="2.6"/></svg><h3 class="ct">조합원 지위양도</h3><p class="cs">강남3구·용산 · 인가 후 5년 거주</p></article><article class="card "><span class="num">3</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7h15l9 9v25H12z" fill="#FFD7E5"/><path d="M27 7v9h9"/><path d="M18 24h12M18 30h12M18 36h7" stroke-width="2"/></svg><h3 class="ct">무주택자는 미철거</h3><p class="cs">취득세 1~3% · 입주권부터는 불리</p></article><article class="card "><span class="num">4</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="24" cy="14" rx="13" ry="5" fill="#FFEAF2"/><path d="M11 14v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7"/><path d="M11 22v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7" fill="#FFD7E5"/><path d="M11 30v6c0 2.8 5.8 5 13 5s13-2.2 13-5v-6"/></svg><h3 class="ct">다주택자는 철거된 물건</h3><p class="cs">취득세·보유세 계산이 달라진다</p></article><article class="card wide"><span class="num">5</span><p class="wt">판이 바뀐다고 <em>지금 들어갈 필요는 없다</em> — 기회는 순환한다</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="#FFD7E5"/><path d="M24 13v11l7 4.5" stroke-width="2.6"/></svg></article></div><p class="pill">원문 p.9, p.19–20 · 하락기엔 재개발이 제일 많이 떨어진다</p></section>
+<section class="slide" data-part="상품" data-title="서울 뉴타운 순위와 12억대" style="--tfs:24"><h2 class="tt"><span class="l1">지금 손에 잡히는</span><span class="l2">뉴타운 순위와 12억대</span></h2><div class="board pan"><article class="card panel "><div class="ph"><span class="num">1</span><h3>자본 없으면 장위, 있으면 이문휘경</h3></div><ul><li><i class="rk">1</i><b>길음역</b><span>한 채로 할 수 있는 게 너무 많다</span></li><li><i class="rk">2</i><b>이문휘경</b><span>장위+1=휘경 · 2025 입주물량 몰림</span></li><li><i class="rk">3</i><b>가재울·수색증산</b><span>아직 한 바퀴 안 돌았다 · 디센자 15억</span></li><li><i class="rk">4</i><b>장위</b><span>24,000세대 · 가장 크고 가장 싸다</span></li></ul></article><article class="card wide"><span class="num">2</span><p class="wt">장위 6구역 12억 — <em>동북선 2026</em>, 지금 사서 2년 뒤 매도면 개통 후</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="13" y="6" width="22" height="27" rx="7" fill="#FFD7E5"/><path d="M13 21h22"/><path d="M18 38l-4 5M30 38l4 5"/><path d="M19 13h10"/><rect x="17" y="25" width="6" height="5" rx="1.4" fill="#E0145C" stroke="none"/><rect x="25" y="25" width="6" height="5" rx="1.4" fill="#E0145C" stroke="none"/></svg></article></div><p class="pill">원문 p.13, p.20, p.22 · 서울 12억 이하는 유의해서 볼 것</p></section>
+<section class="slide" data-part="자금" data-title="대출 전략" style="--tfs:22"><h2 class="tt"><span class="l1">대출은 해줄 때 받는다</span><span class="l2">대출을 알면 입지가 달라진다</span></h2><div class="board g4w"><article class="card "><span class="num">1</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="13" width="36" height="23" rx="4.5" fill="#FFD7E5"/><path d="M6 21h36"/><path d="M12 30h8" stroke-width="2.4"/><circle cx="34" cy="30" r="2" fill="#E0145C" stroke="none"/></svg><h3 class="ct">추가담보대출</h3><p class="cs">DSR 미적용 · 집값의 75%까지</p></article><article class="card "><span class="num">2</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="16" cy="16" r="8" fill="#FFD7E5"/><path d="M21.6 21.6L39 39M30 30l4.5-4.5M35 35l4-4"/></svg><h3 class="ct">생애최초</h3><p class="cs">1금융 최대 6억 · 집값 제한 없음</p></article><article class="card "><span class="num">3</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="#FFD7E5"/><path d="M24 13v11l7 4.5" stroke-width="2.6"/></svg><h3 class="ct">이자는 미리</h3><p class="cs">2~4년치를 통장에 받아두기</p></article><article class="card "><span class="num">4</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="30" height="30" rx="4" fill="#FFD7E5"/><path d="M16 19h16M16 25h16M16 31h9" stroke-width="2.2"/></svg><h3 class="ct">대출 10억 = 연 5,000만</h3><p class="cs">월 400만 현금흐름이 필요</p></article><article class="card wide"><span class="num">5</span><p class="wt">상승기엔 급지를 낮추기보다 <em>평형을 낮춘다</em> — 그릇만큼만</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="24" cy="14" rx="13" ry="5" fill="#FFEAF2"/><path d="M11 14v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7"/><path d="M11 22v7c0 2.8 5.8 5 13 5s13-2.2 13-5v-7" fill="#FFD7E5"/><path d="M11 30v6c0 2.8 5.8 5 13 5s13-2.2 13-5v-6"/></svg></article></div><p class="pill">원문 p.7–8, p.17, p.22, p.29 · 버틸 현금흐름이 있어야 무기</p></section>
+<section class="slide" data-part="실행" data-title="임장과 브리핑" style="--tfs:24"><h2 class="tt"><span class="l1">임장은 짧게, 밀도 있게</span><span class="l2">부동산에 들어간다</span></h2><div class="board g4w"><article class="card "><span class="num">1</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7h15l9 9v25H12z" fill="#FFD7E5"/><path d="M27 7v9h9"/><path d="M18 24h12M18 30h12M18 36h7" stroke-width="2"/></svg><h3 class="ct">재개발·입주권</h3><p class="cs">이주비·프리미엄·초투부터 묻는다</p></article><article class="card "><span class="num">2</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="11" y="7" width="26" height="34" rx="3.5" fill="#FFD7E5"/><path d="M18 16h12M18 23h12M18 30h8" stroke-width="2"/><path d="M16 7v34" stroke-width="1.8"/></svg><h3 class="ct">분양권</h3><p class="cs">전매 시점·프리미엄·실거주 의사</p></article><article class="card "><span class="num">3</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="21" cy="21" r="11" fill="#FFD7E5"/><path d="M29 29l9.5 9.5" stroke-width="2.8"/><path d="M16.5 18.5a6 6 0 0 1 4-3" stroke-width="1.8"/></svg><h3 class="ct">일반 매물</h3><p class="cs">네이버에서 봤는데 · 매전갭·옆단지</p></article><article class="card "><span class="num">4</span><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 7l17 32H7z" fill="#FFD7E5"/><path d="M24 19v10" stroke-width="2.8"/><circle cx="24" cy="34" r="1.9" fill="#E0145C" stroke="none"/></svg><h3 class="ct">하지 말 것</h3><p class="cs">호재 묻기 · 반박하지 말고 듣기</p></article><article class="card wide"><span class="num">5</span><p class="wt"><em>호가는 거짓말</em> — 그래서 부동산을 가봐야 한다</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14l11-5 12 5 11-5v26l-11 5-12-5-11 5z" fill="#FFD7E5"/><path d="M18 9v26M30 14v26"/><path d="M33 8c3.2 0 5.6 2.5 5.6 5.6 0 4-5.6 9.2-5.6 9.2s-5.6-5.2-5.6-9.2C27.4 10.5 29.8 8 33 8z" fill="#E0145C" stroke="none"/><circle cx="33" cy="13.4" r="2" fill="#fff" stroke="none"/></svg></article></div><p class="pill">원문 p.6, p.10–11, p.37 · 브리핑을 받아내야 실력이 된다</p></section>
+<section class="slide" data-part="실행" data-title="10년 플랜과 체크리스트" style="--tfs:24"><h2 class="tt"><span class="l1">10년 안에</span><span class="l2">찐똘 두 채 + 월 천만원</span></h2><div class="board pan"><article class="card panel "><div class="ph"><span class="num">1</span><h3>이번 달 체크리스트</h3></div><ul><li><i class="rk ok">1</i><b>숫자로 확정</b><span>종잣돈 · 최대대출 · 원리금 상환능력</span></li><li><i class="rk ok">2</i><b>급지 정하기</b><span>급지표 외우고 갈 수 있는 곳 1개</span></li><li><i class="rk ok">3</i><b>비교표 만들기</b><span>12억대 3단지 매매·전세·매전갭</span></li><li><i class="rk ok">4</i><b>임장 다녀오기</b><span>뉴타운 1곳 + 부동산 2곳 브리핑</span></li><li><i class="rk ok">5</i><b>내 조건 확인</b><span>생초·추담대 (혼인신고 전 각각)</span></li></ul></article><article class="card wide"><span class="num">2</span><p class="wt">오늘 이후 가장 빠른 날은 <em>오늘</em> — 강의를 더 듣지 말고 현장으로</p><svg class="ic" viewBox="0 0 48 48" fill="none" stroke="#E0145C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 40h10V30h10V20h10V10h6" fill="none" stroke-width="2.6"/><path d="M6 40h10V30h10V20h10V10h6v30H6z" fill="#FFD7E5" stroke="none"/><path d="M6 40h10V30h10V20h10V10h6" fill="none" stroke-width="2.6"/></svg></article></div><p class="pill">원문 p.38–40 · 이 수업이 시작이고, 이제 자습이다</p></section>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+  <aside class="toc" id="toc" aria-label="목차">
+    <div class="toc-h"><b>목차</b><span>16 SLIDES</span>
+      <button id="tocClose" type="button" aria-label="목차 닫기">✕</button></div>
+    <ul id="tocList"></ul>
+  </aside>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var GATE_SALT = 'bujamap-cards::';
+  var GATE_HASH = '292b51c440a102b9f5ed0519bd06cf09efcf712bf964fb25286503c7cf08936a';
+  var STORE_KEY = 'bujamap.cards.open.v1';
+
+  function digest(str){
+    if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest){
+      return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+        .then(function(buf){
+          var b = new Uint8Array(buf), out = '';
+          for (var i=0;i<b.length;i++){ out += ('00'+b[i].toString(16)).slice(-2); }
+          return out;
+        });
+    }
+    return Promise.resolve(null);
+  }
+
+  var lock = document.getElementById('lock');
+  var lockForm = document.getElementById('lockForm');
+  var pw = document.getElementById('pw');
+  var err = document.getElementById('err');
+
+  function relocking(){
+    return /[?&]relock(=1)?(&|$)/.test(location.search);
+  }
+  function saved(){
+    try {
+      if (relocking()){ localStorage.removeItem(STORE_KEY); return false; }
+      return localStorage.getItem(STORE_KEY) === '1';
+    } catch(e){ return false; }
+  }
+  function remember(){
+    try { localStorage.setItem(STORE_KEY, '1'); } catch(e){}
+  }
+
+  /* ---------- deck ---------- */
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var index = 0;
+  var toc = document.getElementById('toc');
+  var scrim = document.getElementById('scrim');
+  var tocList = document.getElementById('tocList');
+  var tocBtn = document.getElementById('tocBtn');
+  var curNum = document.getElementById('curNum');
+  var totNum = document.getElementById('totNum');
+  var prog = document.getElementById('prog');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+
+  totNum.textContent = String(total).padStart(2,'0');
+  slides.forEach(function(s, i){ s.dataset.num = String(i+1).padStart(2,'0'); });
+
+  function clamp(n){ return Math.max(0, Math.min(total-1, n)); }
+
+  function go(n, instant){
+    n = clamp(n);
+    index = n;
+    slides.forEach(function(s, i){
+      var on = (i === n);
+      s.classList.toggle('active', on);
+      s.classList.toggle('left', i < n);
+      s.setAttribute('aria-hidden', on ? 'false' : 'true');
+    });
+    curNum.textContent = String(n+1).padStart(2,'0');
+    prog.style.width = (((n+1)/total)*100) + '%';
+    prevBtn.disabled = (n === 0);
+    nextBtn.disabled = (n === total-1);
+    Array.prototype.forEach.call(tocList.children, function(li, i){
+      var b = li.firstChild;
+      if (b){ b.classList.toggle('on', i === n); b.setAttribute('aria-current', i === n ? 'true' : 'false'); }
+    });
+    if (!instant){ try { history.replaceState(null, '', '#s' + (n+1)); } catch(e){} }
+  }
+
+  function initialIndex(){
+    var m = /#s(\d+)/.exec(location.hash || '');
+    return m ? clamp(parseInt(m[1],10) - 1) : 0;
+  }
+
+  function buildToc(){
+    if (tocList.children.length) return;
+    slides.forEach(function(s, i){
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'toc-item';
+      b.innerHTML = '<span class="no">' + String(i+1).padStart(2,'0') + '</span>' +
+                    '<span><span class="pt">' + (s.dataset.part || '') + '</span>' +
+                    '<span class="ttx">' + (s.dataset.title || ('슬라이드 ' + (i+1))) + '</span></span>';
+      b.addEventListener('click', function(){ closeToc(); go(i); });
+      li.appendChild(b);
+      tocList.appendChild(li);
+    });
+    go(index, true);
+  }
+  function openToc(){ buildToc(); toc.classList.add('on'); scrim.classList.add('on'); tocBtn.setAttribute('aria-expanded','true'); }
+  function closeToc(){ toc.classList.remove('on'); scrim.classList.remove('on'); tocBtn.setAttribute('aria-expanded','false'); }
+
+  tocBtn.addEventListener('click', function(){ toc.classList.contains('on') ? closeToc() : openToc(); });
+  document.getElementById('tocClose').addEventListener('click', closeToc);
+  scrim.addEventListener('click', closeToc);
+  prevBtn.addEventListener('click', function(){ go(index - 1); });
+  nextBtn.addEventListener('click', function(){ go(index + 1); });
+
+  document.addEventListener('keydown', function(ev){
+    if (lock && !lock.classList.contains('hide')) return;
+    var t = ev.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    var k = ev.key;
+    if (k === 'Escape'){ closeToc(); return; }
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Spacebar'){
+      ev.preventDefault(); go(index + 1);
+    } else if (k === 'ArrowLeft' || k === 'PageUp'){
+      ev.preventDefault(); go(index - 1);
+    } else if (k === 'Home'){ ev.preventDefault(); go(0); }
+    else if (k === 'End'){ ev.preventDefault(); go(total - 1); }
+  });
+
+  /* swipe */
+  var sx = 0, sy = 0, tracking = false, t0 = 0;
+  deck.addEventListener('pointerdown', function(ev){
+    if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+    var el = ev.target;
+    if (el && el.closest && el.closest('button, a, input, .toc')) return;
+    sx = ev.clientX; sy = ev.clientY; tracking = true; t0 = Date.now();
+  }, {passive:true});
+  deck.addEventListener('pointerup', function(ev){
+    if (!tracking) return;
+    tracking = false;
+    var dx = ev.clientX - sx, dy = ev.clientY - sy, dt = Date.now() - t0;
+    if (dt > 900) return;
+    if (Math.abs(dx) > 46 && Math.abs(dx) > Math.abs(dy) * 1.35){
+      if (dx < 0){ go(index + 1); } else { go(index - 1); }
+    }
+  }, {passive:true});
+  deck.addEventListener('pointercancel', function(){ tracking = false; }, {passive:true});
+
+  /* ---------- layout fit ---------- */
+  var root = document.documentElement;
+  var RATIO = 390 / 620;   /* 카드뉴스 판 비율 (390 x 620) */
+  function fit(){
+    var w = window.innerWidth, h = window.innerHeight, W, H, s, r;
+    if (w <= 880){
+      W = Math.min(w, Math.round((h - 28) * RATIO));
+      H = Math.round(W / RATIO);
+      W = Math.round(H * RATIO);
+    } else {
+      H = Math.min(h - 48, 920);
+      W = Math.round(H * RATIO);
+      H = Math.round(W / RATIO);
+    }
+    s = W / 390;
+    r = Math.round(24 * Math.min(s, 1.6));
+    root.style.setProperty('--sw', W + 'px');
+    root.style.setProperty('--sh', H + 'px');
+    root.style.setProperty('--s', String(s));
+    root.style.setProperty('--sr', r + 'px');
+    fitTitles();
+  }
+  function fitTitles(){
+    var spans = document.querySelectorAll('.tt span');
+    Array.prototype.forEach.call(spans, function(el){
+      el.style.fontSize = '';
+      var fs = parseFloat(getComputedStyle(el).fontSize), guard = 0;
+      while (el.scrollWidth > el.clientWidth + 0.6 && fs > 11 && guard++ < 60){
+        fs -= 0.4;
+        el.style.fontSize = fs + 'px';
+      }
+    });
+  }
+  var rt;
+  window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(fit, 90); });
+  window.addEventListener('orientationchange', function(){ setTimeout(fit, 140); });
+
+  function openDeck(){
+    lock.classList.add('hide');
+    lock.setAttribute('aria-hidden','true');
+    document.body.classList.add('unlocked');
+    fit();
+    go(initialIndex(), true);
+    buildToc();
+  }
+
+  lockForm.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var val = (pw.value || '').replace(/\s+/g,'');
+    if (!val){ err.textContent = '비밀번호를 입력해 주세요.'; return; }
+    digest(GATE_SALT + val).then(function(h){
+      var good = (h === GATE_HASH) || (h === null && val === '261213');
+      if (good){
+        err.textContent = '';
+        remember();
+        openDeck();
+      } else {
+        err.textContent = '비밀번호가 맞지 않습니다.';
+        pw.value = '';
+        lockForm.classList.remove('shake');
+        void lockForm.offsetWidth;
+        lockForm.classList.add('shake');
+        pw.focus();
+      }
+    });
+  });
+
+  window.addEventListener('hashchange', function(){
+    var m = /#s(\d+)/.exec(location.hash || '');
+    if (m){ var n = clamp(parseInt(m[1],10) - 1); if (n !== index) go(n, true); }
+  });
+
+  /* boot */
+  if (saved()){
+    lock.classList.add('hide');
+    lock.setAttribute('aria-hidden','true');
+    document.body.classList.add('unlocked');
+    fit();
+    go(initialIndex(), true);
+    buildToc();
+  } else {
+    fit();
+    setTimeout(function(){ try { pw.focus({preventScroll:true}); } catch(e){ pw.focus(); } }, 420);
+  }
+  window.addEventListener('load', fit);
+})();
+</script>
+</body>
+</html>
