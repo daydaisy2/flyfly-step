@@ -6,7 +6,7 @@
 <title>세은 독서</title>
 <meta name="description" content="양평도서관에서 읽고 싶은 책과 독서 기록을 담아 두는 세은의 독서 노트.">
 <meta name="theme-color" content="#FBE049">
-<meta name="seeun-library-version" content="v1">
+<meta name="seeun-library-version" content="v2">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="googlebot" content="noindex, nofollow, noarchive">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -56,9 +56,6 @@
   .dot.warn{background:#D08A17}
   .dot.off{background:#A9A497}
   .icon-btn{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.6);display:grid;place-items:center;font-size:16px;line-height:1}
-  .add-btn{height:40px;padding:0 15px;border-radius:13px;background:var(--navy);color:#fff;
-    font-weight:900;font-size:15px;letter-spacing:-.02em;box-shadow:0 2px 6px rgba(27,35,88,.2)}
-  .add-btn:active{transform:translateY(1px)}
 
   .pane{flex:1;min-height:0;display:flex;flex-direction:column;padding-top:11px}
   .search{position:relative;margin:0 var(--pad)}
@@ -69,16 +66,15 @@
     box-shadow:0 2px 8px rgba(90,72,0,.06);outline:none}
   .search input::placeholder{color:#B9B39A;font-weight:700}
 
-  .chips{display:flex;gap:7px;overflow-x:auto;padding:11px var(--pad) 2px;scrollbar-width:none}
-  .chips::-webkit-scrollbar{display:none}
-  .chip{flex:0 0 auto;height:38px;padding:0 15px;border-radius:999px;background:#fff;color:#3B382E;
-    font-weight:800;font-size:14px;letter-spacing:-.02em;box-shadow:0 1px 4px rgba(90,72,0,.07);
-    white-space:nowrap;transition:background .15s,color .15s}
-  .chip.on{background:var(--navy);color:#fff;box-shadow:0 3px 8px rgba(27,35,88,.22)}
+  .addbig{display:flex;align-items:center;justify-content:center;gap:7px;margin:11px var(--pad) 0;
+    height:56px;border-radius:16px;background:var(--navy);color:#fff;
+    font-weight:900;font-size:16.5px;letter-spacing:-.02em;
+    box-shadow:0 4px 14px rgba(27,35,88,.24)}
+  .addbig:active{transform:translateY(1px)}
 
-  .quick{display:flex;align-items:center;justify-content:flex-end;gap:8px;
-    padding:7px var(--pad) 0;font-size:11.5px;font-weight:800;color:#4A4436;letter-spacing:-.01em}
-  .quick a{opacity:.7}
+  .quick{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;
+    padding:10px var(--pad) 0;font-size:12px;font-weight:800;color:#4A4436;letter-spacing:-.01em}
+  .quick a{opacity:.78;white-space:nowrap}
   .quick a:active{opacity:1}
   .quick .sep{width:1px;height:9px;background:rgba(27,35,88,.2)}
 
@@ -228,10 +224,7 @@
   .links{display:flex;flex-direction:column;gap:8px;margin-top:12px}
   .lk{display:flex;align-items:center;justify-content:center;gap:6px;height:46px;border-radius:13px;
     background:var(--navy);color:#fff;font-weight:900;font-size:14px;letter-spacing:-.02em}
-  .lks{display:flex;gap:8px}
-  .lks a{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;height:44px;border-radius:12px;
-    background:#F4F1E4;color:#3B382E;font-weight:900;font-size:12.5px;letter-spacing:-.02em;
-    text-align:center;line-height:1.25;padding:0 6px}
+  .lk.alt{background:#F1EDDD;color:#2B2A24}
 
   .acts{display:flex;gap:8px;margin-top:17px}
   .btn{flex:1;height:48px;border-radius:14px;font-weight:900;font-size:15px;
@@ -318,7 +311,6 @@
     <div class="top-right">
       <i id="dot" class="dot" title="연결 중"></i>
       <button id="memoBtn" class="icon-btn" type="button" aria-label="수정 요청 메모장" title="수정 요청 메모장">📝</button>
-      <button id="addBtn" class="add-btn" type="button">＋ 추가</button>
     </div>
   </header>
 
@@ -327,18 +319,13 @@
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
       <input id="qBooks" type="search" placeholder="제목·작가로 찾기" autocomplete="off" enterkeyhint="search">
     </div>
-    <div class="chips" id="chips">
-      <button class="chip on" type="button" data-f="all">전체</button>
-      <button class="chip" type="button" data-f="fav">찜한 책</button>
-      <button class="chip" type="button" data-f="소설">소설</button>
-      <button class="chip" type="button" data-f="에세이">에세이</button>
-      <button class="chip" type="button" data-f="경제·투자">경제·투자</button>
-      <button class="chip" type="button" data-f="기타">기타</button>
-    </div>
+    <button id="addBookBig" class="addbig" type="button">＋ 책 추가하기</button>
     <div class="quick">
-      <a href="https://www.yplib.go.kr/" target="_blank" rel="noopener">🏛 양평도서관</a>
+      <a id="lnkLib" href="https://www.yplib.go.kr/" target="_blank" rel="noopener">🏛 양평도서관</a>
       <span class="sep"></span>
-      <a href="https://www.yplib.go.kr/" target="_blank" rel="noopener">📮 희망도서 · ↔️ 상호대차 신청</a>
+      <a id="lnkYes24" href="https://www.yes24.com/" target="_blank" rel="noopener">예스24</a>
+      <span class="sep"></span>
+      <a href="https://www.yplib.go.kr/" target="_blank" rel="noopener">📮 희망도서 · 상호대차 신청</a>
     </div>
     <div class="scroll"><div class="list" id="bookList"></div></div>
   </section>
@@ -389,7 +376,9 @@ const STATUS = {
 };
 const STATUS_ORDER = ['available', 'out', 'ill', 'hope'];
 const YPLIB = 'https://www.yplib.go.kr/';
-const yplibSearch = (title) => 'https://www.yplib.go.kr/searchResult?keyword=' + encodeURIComponent(title || '');
+const YES24 = 'https://www.yes24.com/';
+const yplibSearch = (q) => q ? YPLIB + 'searchResult?keyword=' + encodeURIComponent(q) : YPLIB;
+const yes24Search = (q) => q ? YES24 + 'Product/Search?domain=ALL&query=' + encodeURIComponent(q) : YES24;
 
 const params = new URLSearchParams(location.search);
 let ROOM = (params.get('room') || '').trim();
@@ -400,7 +389,7 @@ if (!ROOM_RE.test(ROOM)) {
 
 const ST = { books: {}, records: {}, notes: {} };
 let es = null, retry = 0, pollTimer = null, gotSnapshot = false;
-let Q = '', F = 'all', QR = '';
+let Q = '', QR = '';
 let TAB = 'books';
 let sheetPushed = false;
 let recPhoto = '', recStars = 0;
@@ -570,9 +559,6 @@ function bookArr() {
 function bookList() {
   const q = Q.trim().toLowerCase();
   let arr = bookArr();
-  if (F === 'fav') arr = arr.filter((b) => !!b.fav);
-  else if (F === '기타') arr = arr.filter((b) => !b.cat || b.cat === '기타');
-  else if (F !== 'all') arr = arr.filter((b) => b.cat === F);
   if (q) arr = arr.filter((b) => ((b.title || '') + ' ' + (b.author || '')).toLowerCase().includes(q));
   arr.sort((a, b) => (b.created || 0) - (a.created || 0));
   return arr;
@@ -583,7 +569,7 @@ function renderBooks() {
   if (!arr.length) {
     const all = bookArr().length;
     box.innerHTML = '<div class="empty"><span class="e">📚</span>'
-      + (all ? '찾는 책이 없어요.<br>검색어나 분야를 바꿔 보세요.' : '아직 담은 책이 없어요.<br><b>＋ 추가</b>로 읽고 싶은 책을 담아 보세요.')
+      + (all ? '찾는 책이 없어요.<br>검색어를 바꿔 보세요.' : '아직 담은 책이 없어요.<br><b>＋ 책 추가하기</b>로 읽고 싶은 책을 담아 보세요.')
       + '</div>';
     return;
   }
@@ -735,12 +721,8 @@ function openDetail(id) {
     + '</table>'
 
     + '<div class="links">'
-    +   '<a class="lk" href="' + esc(yplibSearch(b.title || '')) + '" target="_blank" rel="noopener">🔎 양평도서관에서 보기</a>'
-    +   '<div class="lks">'
-    +     '<a href="' + YPLIB + '" target="_blank" rel="noopener" data-apply="hope" data-id="' + id + '">📮 희망도서 신청</a>'
-    +     '<a href="' + YPLIB + '" target="_blank" rel="noopener" data-apply="ill" data-id="' + id + '">↔️ 상호대차 신청</a>'
-    +   '</div>'
-    +   '<div class="hint">신청은 양평도서관 홈페이지에 로그인한 뒤 진행해 주세요. 누르면 이 책을 신청한 상태로 표시해 둘게요.</div>'
+    +   '<a class="lk" href="' + esc(yplibSearch((b.title || '').trim())) + '" target="_blank" rel="noopener">🏛 양평도서관에서 보기</a>'
+    +   '<a class="lk alt" href="' + esc(yes24Search((b.title || '').trim())) + '" target="_blank" rel="noopener">🛒 예스24에서 보기</a>'
     + '</div>'
 
     + '<div class="acts">'
@@ -767,7 +749,7 @@ function openBookForm(id) {
     + '<div class="f"><label>제목 *</label><input id="fTitle" value="' + esc(b.title || '') + '" placeholder="예: 아몬드"></div>'
     + '<div class="frow">'
     +   '<div class="f"><label>작가</label><input id="fAuthor" value="' + esc(b.author || '') + '" placeholder="예: 손원평"></div>'
-    +   '<div class="f"><label>분야</label><select id="fCat">' + opts + '</select></div>'
+    +   '<div class="f"><label>분야 (선택)</label><select id="fCat">' + opts + '</select></div>'
     + '</div>'
     + '<div class="frow">'
     +   '<div class="f"><label>도서관</label><input id="fLib" value="' + esc(b.lib || '양평도서관') + '"></div>'
@@ -1092,13 +1074,7 @@ document.addEventListener('click', (e) => {
   if ((el = e.target.closest('[data-film]'))) { return; }
 
   if ((el = e.target.closest('.tabbar button'))) { switchTab(el.dataset.tab); return; }
-  if ((el = e.target.closest('.chip'))) {
-    F = el.dataset.f;
-    $$('.chip').forEach((c) => c.classList.toggle('on', c === el));
-    renderBooks();
-    return;
-  }
-  if (e.target.id === 'addBtn') { openBookForm(''); return; }
+  if (e.target.id === 'addBookBig') { openBookForm(''); return; }
   if (e.target.id === 'addRecBtn') { openRecordForm(''); return; }
   if (e.target.id === 'memoBtn') { openMemos(); return; }
 });
@@ -1109,8 +1085,16 @@ async function toggleStatus(id) {
   setStatus(id, cur === 'available' ? 'out' : 'available');
 }
 
-$('#qBooks').addEventListener('input', (e) => { Q = e.target.value; renderBooks(); });
+$('#qBooks').addEventListener('input', (e) => { Q = e.target.value; paintQuickLinks(); renderBooks(); });
 $('#qRecords').addEventListener('input', (e) => { QR = e.target.value; renderRecords(); });
+
+/* 검색어가 있으면 그 말로, 비어 있으면 도서관·서점 시작 페이지로 */
+function paintQuickLinks() {
+  const q = Q.trim();
+  const lib = $('#lnkLib'), ys = $('#lnkYes24');
+  if (lib) lib.href = yplibSearch(q);
+  if (ys) ys.href = yes24Search(q);
+}
 
 /* ============================================================
    입장 잠금
@@ -1215,6 +1199,7 @@ function boot() {
   localStorage.setItem('seeun.library.room', ROOM);
   const g = $('#gate'); if (g) g.classList.add('hidden');
   $('#app').classList.remove('hidden');
+  paintQuickLinks();
   render();
   switchTab('books');
   connect();
